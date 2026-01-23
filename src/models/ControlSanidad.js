@@ -24,10 +24,10 @@ class ControlSanidad {
   }
 
   // Obtener por plato
-  static async obtenerPorPlato(plato_codigo) {
+  static async obtenerPorPlato(platos) {
     return new Promise((resolve, reject) => {
-      const sql = 'SELECT * FROM control_sanidad WHERE plato_codigo = ? ORDER BY fecha_produccion DESC';
-      db.all(sql, [plato_codigo], (err, rows) => {
+      const sql = 'SELECT * FROM control_sanidad WHERE platos = ? ORDER BY fecha_produccion DESC';
+      db.all(sql, [platos], (err, rows) => {
         if (err) reject(err);
         else resolve(rows || []);
       });
@@ -39,16 +39,22 @@ class ControlSanidad {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO control_sanidad 
-        (plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        (platos, ingredientes, lote_produccion, fecha_produccion, punto_critico, 
+         valor_medido, valor_esperado, punto_corrector, resultado, responsable, 
+         observaciones, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
       `;
       
       db.run(sql, [
-        datos.plato_codigo,
-        datos.ingrediente_codigo || '',
+        datos.platos,
+        datos.ingredientes || '',
+        datos.lote_produccion || '',
         datos.fecha_produccion || new Date().toISOString(),
         datos.punto_critico || '',
-        datos.corrector || '',
+        datos.valor_medido || 0,
+        datos.valor_esperado || '',
+        datos.punto_corrector || '',
+        datos.resultado || '',
         datos.responsable || '',
         datos.observaciones || ''
       ], function(err) {

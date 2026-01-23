@@ -6,19 +6,29 @@ class Trazabilidad {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO trazabilidad 
-        (codigo_plato, lote_produccion, fecha_produccion, partida_cocina, 
-         cantidad_producida, responsable, observaciones, estado, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        (codigo_plato, nombre_plato, unidad, cantidad_producida, grupo_conservacion,
+         partida_cocina, lote_produccion, fecha_produccion, semana, dia_semana,
+         anticipado, responsable, trazabilidad_activa, observaciones, coste_total,
+         estado, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
       `;
       
       db.run(sql, [
         datos.codigo_plato,
+        datos.nombre_plato || '',
+        datos.unidad || 'Kg',
+        datos.cantidad_producida || 0,
+        datos.grupo_conservacion || 'Fresco',
+        datos.partida_cocina || '',
         datos.lote_produccion || '',
         datos.fecha_produccion || new Date().toISOString(),
-        datos.partida_cocina || '',
-        datos.cantidad_producida || 0,
+        datos.semana || null,
+        datos.dia_semana || '',
+        datos.anticipado ? 1 : 0,
         datos.responsable || '',
+        datos.trazabilidad_activa !== false ? 1 : 0,
         datos.observaciones || '',
+        datos.coste_total || 0,
         datos.estado || 'activo'
       ], function(err) {
         if (err) reject(err);

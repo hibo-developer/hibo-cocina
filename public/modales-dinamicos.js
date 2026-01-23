@@ -18,7 +18,7 @@ const MODAL_CONFIGS = {
         etiqueta: 'Código Plato',
         tipo: 'select',
         required: true,
-        lookup: 'platos',  // Tabla a consultar
+        lookup: 'platos',
         lookup_key: 'codigo',
         lookup_display: 'nombre',
         onChange: 'autoFillPlato'
@@ -32,19 +32,45 @@ const MODAL_CONFIGS = {
         dependsOn: 'codigo_plato'
       },
       {
+        nombre: 'unidad',
+        etiqueta: 'Unidad Escandallo',
+        tipo: 'select',
+        required: true,
+        options: ['Kg', 'Lt', 'Ud', 'Gramo', 'Litro'],
+        default: 'Kg'
+      },
+      {
         nombre: 'cantidad_producida',
         etiqueta: 'Cantidad Producida',
         tipo: 'number',
         required: true,
         min: 0.01,
+        step: 0.01,
         onChange: 'calcularIngredientesNecesarios'
+      },
+      {
+        nombre: 'grupo_conservacion',
+        etiqueta: 'Grupo Conservación',
+        tipo: 'select',
+        required: true,
+        options: ['Congelado', 'Fresco', 'Neutro', 'Refrigerado'],
+        default: 'Fresco'
+      },
+      {
+        nombre: 'partida_cocina',
+        etiqueta: 'Partidas y Almacén',
+        tipo: 'select',
+        required: true,
+        lookup: 'partidas-cocina',
+        lookup_key: 'id',
+        lookup_display: 'nombre'
       },
       {
         nombre: 'lote_produccion',
         etiqueta: 'Lote Producción',
         tipo: 'text',
         required: true,
-        default: 'generateLote',  // Función para generar
+        default: 'generateLote',
         readonly: true
       },
       {
@@ -56,13 +82,26 @@ const MODAL_CONFIGS = {
         readonly: true
       },
       {
-        nombre: 'partida_cocina',
-        etiqueta: 'Partida Cocina',
+        nombre: 'semana',
+        etiqueta: 'Semana del Año',
+        tipo: 'number',
+        readonly: true,
+        autoCalc: true,
+        formula: 'getWeekNumber(fecha_produccion)'
+      },
+      {
+        nombre: 'dia_semana',
+        etiqueta: 'Día de la Semana',
         tipo: 'select',
         required: true,
-        lookup: 'partidas-cocina',
-        lookup_key: 'id',
-        lookup_display: 'nombre'
+        options: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+        onChange: 'calcularTrazabilidad'
+      },
+      {
+        nombre: 'anticipado',
+        etiqueta: 'Anticipado',
+        tipo: 'toggle',
+        default: false
       },
       {
         nombre: 'responsable',
@@ -72,10 +111,17 @@ const MODAL_CONFIGS = {
         default: 'currentUser'
       },
       {
+        nombre: 'trazabilidad_activa',
+        etiqueta: 'Trazabilidad Activa',
+        tipo: 'toggle',
+        default: true
+      },
+      {
         nombre: 'observaciones',
         etiqueta: 'Observaciones',
         tipo: 'textarea',
-        required: false
+        required: false,
+        rows: 3
       },
       {
         nombre: 'coste_total',
@@ -564,48 +610,69 @@ const MODAL_CONFIGS = {
     hoja_origen: 'Sanidad',
     campos: [
       {
-        nombre: 'lote_produccion',
-        etiqueta: 'Lote Producción',
-        tipo: 'search-select',  // Con autosuggest
+        nombre: 'platos',
+        etiqueta: 'Plato',
+        tipo: 'select',
         required: true,
-        lookup: 'trazabilidad',
-        lookup_filter: 'activo = 1',
+        lookup: 'platos',
+        lookup_key: 'codigo',
+        lookup_display: 'nombre',
         onChange: 'autoFillSanidadData'
       },
       {
-        nombre: 'plato',
-        etiqueta: 'Plato',
-        tipo: 'text',
-        readonly: true,
-        dependsOn: 'lote_produccion'
+        nombre: 'ingredientes',
+        etiqueta: 'Ingredientes',
+        tipo: 'select',
+        required: true,
+        lookup: 'ingredientes',
+        lookup_key: 'codigo',
+        lookup_display: 'nombre'
+      },
+      {
+        nombre: 'lote_produccion',
+        etiqueta: 'Lote Producción',
+        tipo: 'search-select',
+        required: false,
+        lookup: 'trazabilidad',
+        lookup_filter: 'activo = 1',
+        onChange: 'autoFillLoteData'
       },
       {
         nombre: 'fecha_produccion',
-        etiqueta: 'Fecha Producción',
+        etiqueta: 'Fecha de Producción',
         tipo: 'date',
-        readonly: true,
-        dependsOn: 'lote_produccion'
+        required: true,
+        default: 'today'
       },
       {
         nombre: 'punto_critico',
         etiqueta: 'Punto Crítico',
         tipo: 'select',
         required: true,
-        options: ['Temperatura', 'Tiempo', 'pH', 'Humedad', 'Contaminación'],
+        options: ['Temperatura', 'Tiempo de Cocción', 'pH', 'Humedad', 'Contaminación Cruzada', 'Higiene Personal'],
         onChange: 'mostrarRangosExpectados'
       },
       {
         nombre: 'valor_medido',
         etiqueta: 'Valor Medido',
         tipo: 'number',
-        required: true
+        required: true,
+        step: 0.1
       },
       {
         nombre: 'valor_esperado',
         etiqueta: 'Valor Esperado',
         tipo: 'text',
         readonly: true,
-        dependsOn: 'punto_critico'  // Rangos según punto crítico
+        dependsOn: 'punto_critico'
+      },
+      {
+        nombre: 'punto_corrector',
+        etiqueta: 'Punto Corrector / Acción Correctora',
+        tipo: 'textarea',
+        required: false,
+        rows: 2,
+        placeholder: 'Describir acción tomada si no cumple'
       },
       {
         nombre: 'resultado',
@@ -616,25 +683,25 @@ const MODAL_CONFIGS = {
         onChange: 'mostrarAccionCorrectora'
       },
       {
-        nombre: 'accion_correctora',
-        etiqueta: 'Acción Correctora',
-        tipo: 'textarea',
-        required: false,
-        visible_if: 'resultado == "✗ FUERA RANGO"'
-      },
-      {
         nombre: 'responsable',
         etiqueta: 'Responsable',
         tipo: 'select',
         default: 'currentUser',
         readonly: true
+      },
+      {
+        nombre: 'observaciones',
+        etiqueta: 'Observaciones',
+        tipo: 'textarea',
+        required: false,
+        rows: 2
       }
     ],
     validaciones: [
-      { campo: 'lote_produccion', regla: 'existe', error: 'Lote no existe o no está activo' },
+      { campo: 'platos', regla: 'existe', error: 'El plato no existe' },
       { campo: 'valor_medido', regla: 'numero', error: 'Debe ser un número' },
       { 
-        campo: 'accion_correctora',
+        campo: 'punto_corrector',
         regla: 'required_if',
         condicion: 'resultado == "✗ FUERA RANGO"',
         error: 'Debe indicar acción correctora cuando está fuera de rango'

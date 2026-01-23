@@ -208,12 +208,20 @@ function crearTablas() {
         CREATE TABLE IF NOT EXISTS trazabilidad (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           codigo_plato TEXT NOT NULL,
+          nombre_plato TEXT,
+          unidad TEXT DEFAULT 'Kg',
+          cantidad_producida REAL,
+          grupo_conservacion TEXT DEFAULT 'Fresco',
+          partida_cocina TEXT,
           lote_produccion TEXT,
           fecha_produccion DATETIME DEFAULT CURRENT_TIMESTAMP,
-          partida_cocina TEXT,
-          cantidad_producida REAL,
+          semana INTEGER,
+          dia_semana TEXT,
+          anticipado BOOLEAN DEFAULT 0,
           responsable TEXT,
+          trazabilidad_activa BOOLEAN DEFAULT 1,
           observaciones TEXT,
+          coste_total REAL DEFAULT 0,
           estado TEXT DEFAULT 'activo',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -295,16 +303,20 @@ function crearTablas() {
       db.run(`
         CREATE TABLE IF NOT EXISTS control_sanidad (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          plato_codigo TEXT NOT NULL,
-          ingrediente_codigo TEXT,
+          platos TEXT NOT NULL,
+          ingredientes TEXT,
+          lote_produccion TEXT,
           fecha_produccion DATETIME,
           punto_critico TEXT,
-          corrector TEXT,
+          valor_medido REAL,
+          valor_esperado TEXT,
+          punto_corrector TEXT,
+          resultado TEXT,
           responsable TEXT,
           observaciones TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (plato_codigo) REFERENCES platos(codigo)
+          FOREIGN KEY (platos) REFERENCES platos(codigo)
         )
       `, (err) => {
         if (err) reject(err);
