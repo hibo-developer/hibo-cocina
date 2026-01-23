@@ -6,17 +6,20 @@ class PartidaCocina {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO partidas_cocina 
-        (nombre, responsable, descripcion, activo, created_at, updated_at)
-        VALUES (?, ?, ?, 1, datetime('now'), datetime('now'))
+        (nombre, responsable, anticipado, trazabilidad_activa, descripcion, activo, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
       `;
       
       db.run(sql, [
         datos.nombre,
         datos.responsable || '',
-        datos.descripcion || ''
+        datos.anticipado ? 1 : 0,
+        datos.trazabilidad_activa !== false ? 1 : 0,
+        datos.descripcion || '',
+        datos.activo !== false ? 1 : 0
       ], function(err) {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...datos, activo: 1 });
+        else resolve({ id: this.lastID, ...datos });
       });
     });
   }

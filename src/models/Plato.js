@@ -5,23 +5,33 @@ class Plato {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO platos (
-          codigo, nombre, descripcion, unidad, coste, tipo, 
-          peso_raciones, grupo_menu, cocina, stock_activo, preparacion
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          codigo, nombre, descripcion, unidad_escandallo, coste, coste_racion, tipo, 
+          peso_raciones, plato_venta, grupo_menu, preparacion, 
+          formato_cubetas, formato_gn100, formato_mono, formato_gn60, formato_gn30,
+          stock_activo, stock_cantidad, plantilla_produccion
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       
       db.run(sql, [
         datos.codigo,
         datos.nombre,
         datos.descripcion || '',
-        datos.unidad || 'Ud',
+        datos.unidad_escandallo || 'Kg',
         datos.coste || 0,
+        datos.coste_racion || 0,
         datos.tipo || 'Platos',
-        datos.peso_raciones || 0,
+        datos.peso_raciones || 0.75,
+        datos.plato_venta !== false ? 1 : 0,
         datos.grupo_menu || '',
-        datos.cocina || '',
+        datos.preparacion || 'Caliente',
+        datos.formato_cubetas || 0,
+        datos.formato_gn100 || 0,
+        datos.formato_mono || 0,
+        datos.formato_gn60 || 0,
+        datos.formato_gn30 || 0,
         datos.stock_activo ? 1 : 0,
-        datos.preparacion || ''
+        datos.stock_cantidad || 0,
+        datos.plantilla_produccion || 'Preparacion'
       ], function(err) {
         if (err) reject(err);
         else resolve({ id: this.lastID, ...datos });

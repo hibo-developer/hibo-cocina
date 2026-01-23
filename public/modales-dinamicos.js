@@ -113,6 +113,18 @@ const MODAL_CONFIGS = {
         default: 'currentUser'
       },
       {
+        nombre: 'anticipado',
+        etiqueta: 'Anticipado',
+        tipo: 'toggle',
+        default: false
+      },
+      {
+        nombre: 'trazabilidad_activa',
+        etiqueta: 'Trazabilidad Activa',
+        tipo: 'toggle',
+        default: true
+      },
+      {
         nombre: 'descripcion',
         etiqueta: 'Descripción',
         tipo: 'textarea',
@@ -239,7 +251,7 @@ const MODAL_CONFIGS = {
       },
       {
         nombre: 'nombre',
-        etiqueta: 'Nombre Artículo',
+        etiqueta: 'ARTICULOS',
         tipo: 'text',
         required: true
       },
@@ -261,6 +273,13 @@ const MODAL_CONFIGS = {
         options: ['Congelado', 'Fresco', 'Neutro', 'Seco']
       },
       {
+        nombre: 'partidas_almacen',
+        etiqueta: 'Partidas y Almacén',
+        tipo: 'select',
+        required: true,
+        options: ['Economato', 'Cocina', 'Almacén', 'Bodega']
+      },
+      {
         nombre: 'unidad_economato',
         etiqueta: 'Unidad Economato',
         tipo: 'select',
@@ -275,11 +294,66 @@ const MODAL_CONFIGS = {
         options: ['Lt', 'Kg', 'Ud', 'Gramo', 'Litro']
       },
       {
-        nombre: 'coste_kilo',
-        etiqueta: 'Coste por Kg/Lt',
+        nombre: 'formato_envases',
+        etiqueta: 'Formato Envases',
+        tipo: 'select',
+        options: ['Garrafa', 'Bote', 'Caja', 'Bolsa', 'Bandeja', 'Tarrina'],
+        default: 'Caja'
+      },
+      {
+        nombre: 'peso_neto_envase',
+        etiqueta: 'Peso neto Envase/Ud',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'unidad_por_formatos',
+        etiqueta: 'Unidad por formatos',
+        tipo: 'number',
+        default: 1,
+        min: 1
+      },
+      {
+        nombre: 'coste_unidad',
+        etiqueta: 'Coste de la Unidad',
         tipo: 'number',
         required: true,
         min: 0
+      },
+      {
+        nombre: 'coste_kilo',
+        etiqueta: 'Coste Kilo',
+        tipo: 'number',
+        required: true,
+        min: 0
+      },
+      {
+        nombre: 'proveedores',
+        etiqueta: 'Proveedores',
+        tipo: 'text',
+        placeholder: 'Ej: TOP CASH'
+      },
+      {
+        nombre: 'bulto',
+        etiqueta: 'Bulto',
+        tipo: 'text',
+        default: 'Caja'
+      },
+      {
+        nombre: 'envases_por_bulto',
+        etiqueta: 'Envases por Bulto',
+        tipo: 'number',
+        default: 1,
+        min: 1
+      },
+      {
+        nombre: 'coste_envase',
+        etiqueta: 'Coste Envase',
+        tipo: 'number',
+        readonly: true,
+        autoCalc: true,
+        formula: 'coste_unidad * unidad_por_formatos'
       },
       {
         nombre: 'activo',
@@ -289,7 +363,7 @@ const MODAL_CONFIGS = {
       }
     ],
     validaciones: [
-      { campo: 'codigo', regla: 'unico_en_tabla', tabla: 'articulos', error: 'Código ya existe' },
+      { campo: 'codigo', regla: 'unico_en_tabla', tabla: 'ingredientes', error: 'Código ya existe' },
       { campo: 'nombre', regla: 'no_vacio', error: 'El nombre es obligatorio' },
       { campo: 'coste_kilo', regla: 'numero_positivo', error: 'El coste debe ser positivo' }
     ]
@@ -298,7 +372,7 @@ const MODAL_CONFIGS = {
   // MODAL 5: Crear Plato
   plato: {
     titulo: '🍽️ Nuevo Plato',
-    hoja_origen: 'Platos',
+    hoja_origen: 'Platos Menu',
     campos: [
       {
         nombre: 'codigo',
@@ -326,12 +400,12 @@ const MODAL_CONFIGS = {
         ]
       },
       {
-        nombre: 'preparacion',
-        etiqueta: 'Preparación',
+        nombre: 'unidad_escandallo',
+        etiqueta: 'Unidad Escandallo',
         tipo: 'select',
         required: true,
-        options: ['Fria', 'Caliente'],
-        onChange: 'cargarPuntosControlSanidad'
+        options: ['Kg', 'Lt', 'Ud', 'Gramo', 'Litro'],
+        default: 'Kg'
       },
       {
         nombre: 'peso_raciones',
@@ -342,18 +416,81 @@ const MODAL_CONFIGS = {
         min: 0.1
       },
       {
-        nombre: 'plato_venta',
-        etiqueta: 'Plato a Venta',
-        tipo: 'toggle',
-        default: true
-      },
-      {
         nombre: 'coste_racion',
-        etiqueta: 'Coste Racion (€)',
+        etiqueta: 'Coste Raciones (€)',
         tipo: 'number',
         readonly: true,
         autoCalc: true,
         formula: 'calculada_desde_escandallo'
+      },
+      {
+        nombre: 'plato_venta',
+        etiqueta: 'Plato a la Venta',
+        tipo: 'toggle',
+        default: true
+      },
+      {
+        nombre: 'preparacion',
+        etiqueta: 'Preparación (Cocina)',
+        tipo: 'select',
+        required: true,
+        options: ['Fria', 'Caliente'],
+        onChange: 'cargarPuntosControlSanidad'
+      },
+      {
+        nombre: 'formato_cubetas',
+        etiqueta: 'Cubetas',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'formato_gn100',
+        etiqueta: 'Barqueta GN 100',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'formato_mono',
+        etiqueta: 'Mono',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'formato_gn60',
+        etiqueta: 'Barqueta GN 60',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'formato_gn30',
+        etiqueta: 'Barqueta GN 30',
+        tipo: 'number',
+        default: 0,
+        min: 0
+      },
+      {
+        nombre: 'stock_activo',
+        etiqueta: 'Activar Stock',
+        tipo: 'toggle',
+        default: false
+      },
+      {
+        nombre: 'stock_cantidad',
+        etiqueta: 'STOCK Disponible',
+        tipo: 'number',
+        readonly: true,
+        default: 0
+      },
+      {
+        nombre: 'plantilla_produccion',
+        etiqueta: 'Plantillas PROD',
+        tipo: 'select',
+        options: ['Preparacion', 'Cocina', 'Terminados', 'No Aplica'],
+        default: 'Preparacion'
       }
     ],
     validaciones: [

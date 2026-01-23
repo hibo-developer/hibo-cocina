@@ -39,16 +39,32 @@ class Ingrediente {
     return new Promise((resolve, reject) => {
       const sql = `
         INSERT INTO ingredientes 
-        (codigo, nombre, descripcion, grupo_conservacion, proveedor, created_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now'))
+        (codigo, nombre, descripcion, familia, grupo_conservacion, partidas_almacen,
+         unidad_economato, unidad_escandallo, formato_envases, peso_neto_envase,
+         unidad_por_formatos, coste_unidad, coste_kilo, proveedores, bulto,
+         envases_por_bulto, coste_envase, activo, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
       `;
       
       db.run(sql, [
         datos.codigo,
         datos.nombre,
         datos.descripcion || '',
-        datos.grupo_conservacion || 'Temperatura Ambiente',
-        datos.proveedor || ''
+        datos.familia || '',
+        datos.grupo_conservacion || 'Neutro',
+        datos.partidas_almacen || 'Economato',
+        datos.unidad_economato || 'Kg',
+        datos.unidad_escandallo || 'Kg',
+        datos.formato_envases || 'Caja',
+        datos.peso_neto_envase || 0,
+        datos.unidad_por_formatos || 1,
+        datos.coste_unidad || 0,
+        datos.coste_kilo || 0,
+        datos.proveedores || '',
+        datos.bulto || 'Caja',
+        datos.envases_por_bulto || 1,
+        datos.coste_envase || 0,
+        datos.activo !== false ? 1 : 0
       ], function(err) {
         if (err) reject(err);
         else resolve({ id: this.lastID, ...datos });
