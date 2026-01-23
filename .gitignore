@@ -30,3 +30,12 @@ build/
 # Excel files temporales
 ~$*.xlsx
 ~$*.xlsb
+
+# Archivos de análisis grandes
+analisis.json
+analisis_xlsb.json
+
+# Archivos de documentación redundantes
+*.md
+!README.md
+!QUICK_START.md
