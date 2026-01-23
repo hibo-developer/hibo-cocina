@@ -26,18 +26,44 @@ exports.obtenerPorPlato = async (req, res) => {
 // Crear nuevo escandallo
 exports.crear = async (req, res) => {
   try {
-    const { codigo_plato, articulo_id, cantidad, unidad, coste_total } = req.body;
+    const { 
+      plato_id, 
+      ingrediente_id, 
+      planning,
+      cantidad, 
+      unidad, 
+      peso_unidad,
+      kilo_bruto,
+      perdida_elaboracion,
+      peso_neto_real,
+      coste,
+      partidas,
+      activa,
+      mise_en_place,
+      punto_critico,
+      punto_corrector
+    } = req.body;
     
-    if (!codigo_plato || !articulo_id || !cantidad) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    if (!plato_id || !ingrediente_id || !cantidad) {
+      return res.status(400).json({ error: 'Faltan datos requeridos (plato_id, ingrediente_id, cantidad)' });
     }
     
     const escandallo = await Escandallo.crear({
-      codigo_plato,
-      articulo_id,
+      plato_id,
+      ingrediente_id,
+      planning: planning || null,
       cantidad,
-      unidad: unidad || 'kg',
-      coste_total: coste_total || 0
+      unidad: unidad || 'Kg',
+      peso_unidad: peso_unidad || null,
+      kilo_bruto: kilo_bruto || null,
+      perdida_elaboracion: perdida_elaboracion || null,
+      peso_neto_real: peso_neto_real || null,
+      coste: coste || 0,
+      partidas: partidas || null,
+      activa: activa !== undefined ? activa : true,
+      mise_en_place: mise_en_place || null,
+      punto_critico: punto_critico || null,
+      punto_corrector: punto_corrector || null
     });
     
     res.status(201).json(escandallo);

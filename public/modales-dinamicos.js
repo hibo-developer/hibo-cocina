@@ -730,20 +730,64 @@ const MODAL_CONFIGS = {
         onChange: 'autoFillIngredienteInfo'
       },
       {
+        nombre: 'planning',
+        etiqueta: 'Tipo Preparación',
+        tipo: 'select',
+        required: false,
+        options: ['Medir', 'Pesar', 'Contar', 'Troceado', 'Cocido', 'Otro']
+      },
+      {
         nombre: 'cantidad',
-        etiqueta: 'Cantidad',
+        etiqueta: 'Cantidad Ud Escandallo',
         tipo: 'number',
         required: true,
-        min: 0.01,
-        step: 0.01,
-        placeholder: '0.00'
+        min: 0.001,
+        step: 0.001,
+        placeholder: '0.000'
       },
       {
         nombre: 'unidad',
         etiqueta: 'Unidad',
         tipo: 'select',
         required: true,
-        options: ['Kg', 'g', 'L', 'ml', 'Ud', 'Pieza']
+        options: ['Kg', 'g', 'L', 'ml', 'Ud', 'Pieza', 'Lt']
+      },
+      {
+        nombre: 'peso_unidad',
+        etiqueta: 'Peso Unidad (Kg)',
+        tipo: 'number',
+        required: false,
+        min: 0,
+        step: 0.001,
+        placeholder: '0.000'
+      },
+      {
+        nombre: 'kilo_bruto',
+        etiqueta: 'Kilo Bruto',
+        tipo: 'number',
+        required: false,
+        min: 0,
+        step: 0.001,
+        placeholder: '0.000'
+      },
+      {
+        nombre: 'perdida_elaboracion',
+        etiqueta: '% Pérdida 1º Elaboración',
+        tipo: 'number',
+        required: false,
+        min: 0,
+        max: 100,
+        step: 0.01,
+        placeholder: '0.00'
+      },
+      {
+        nombre: 'peso_neto_real',
+        etiqueta: 'Peso Neto Real (Kg)',
+        tipo: 'number',
+        required: false,
+        readonly: true,
+        autoCalc: true,
+        placeholder: 'Se calcula automáticamente'
       },
       {
         nombre: 'coste',
@@ -753,6 +797,44 @@ const MODAL_CONFIGS = {
         readonly: true,
         autoCalc: true,
         placeholder: 'Se calcula automáticamente'
+      },
+      {
+        nombre: 'partidas',
+        etiqueta: 'Partida Cocina',
+        tipo: 'select',
+        required: false,
+        lookup: 'partidas-cocina',
+        lookup_key: 'id',
+        lookup_display: 'nombre'
+      },
+      {
+        nombre: 'activa',
+        etiqueta: 'Activa',
+        tipo: 'checkbox',
+        required: false,
+        default: true
+      },
+      {
+        nombre: 'mise_en_place',
+        etiqueta: 'Mise en Place',
+        tipo: 'textarea',
+        required: false,
+        rows: 2,
+        placeholder: 'Instrucciones de preparación previa'
+      },
+      {
+        nombre: 'punto_critico',
+        etiqueta: 'Punto Crítico',
+        tipo: 'text',
+        required: false,
+        placeholder: 'Ej: Temperatura mínima 75°C'
+      },
+      {
+        nombre: 'punto_corrector',
+        etiqueta: 'Acción Correctora',
+        tipo: 'text',
+        required: false,
+        placeholder: 'Ej: Cocinar hasta alcanzar temperatura'
       }
     ],
     validaciones: [
