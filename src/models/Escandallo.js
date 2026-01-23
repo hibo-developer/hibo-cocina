@@ -135,6 +135,25 @@ class Escandallo {
     });
   }
 
+  // Obtener escandallo por ID
+  static async obtenerPorId(id) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT e.*, 
+               p.codigo as plato_codigo,
+               i.codigo as ingrediente_codigo
+        FROM escandallos e
+        LEFT JOIN platos p ON e.plato_id = p.id
+        LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+        WHERE e.id = ?
+      `;
+      db.get(sql, [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row || null);
+      });
+    });
+  }
+
   // Calcular coste total de un plato
   static async calcularCostePlato(codigo_plato) {
     return new Promise((resolve, reject) => {

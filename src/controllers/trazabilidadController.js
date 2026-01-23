@@ -1,4 +1,8 @@
 const Trazabilidad = require('../models/Trazabilidad');
+const db = require('../db/database');
+const ControlStock = require('../services/ControlStock');
+
+const controlStock = new ControlStock(db);
 
 // Obtener todas las trazabilidades
 exports.obtenerTodas = async (req, res) => {
@@ -105,6 +109,20 @@ exports.crear = async (req, res) => {
       responsable,
       observaciones
     });
+
+    // Descontar ingredientes del stock automáticamente
+    if (cantidad_producida && cantidad_producida > 0) {
+      try {
+        const descuento = await controlStock.descontarProduccion(
+          codigo_plato, 
+          cantidad_producida
+        );
+        console.log('Stock actualizado:', descuento);
+      } catch (stockError) {
+        console.warn('Error al actualizar stock:', stockError);
+        // No fallar la creación de trazabilidad si falla el stock
+      }
+    }
     
     res.status(201).json(trazabilidad);
   } catch (error) {

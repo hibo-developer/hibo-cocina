@@ -1,4 +1,8 @@
 const Escandallo = require('../models/Escandallo');
+const db = require('../db/database');
+const CalculadoraCostes = require('../services/CalculadoraCostes');
+
+const calculadora = new CalculadoraCostes(db);
 
 // Obtener todos los escandallos
 exports.obtenerTodos = async (req, res) => {
@@ -65,6 +69,14 @@ exports.crear = async (req, res) => {
       punto_critico: punto_critico || null,
       punto_corrector: punto_corrector || null
     });
+
+    // Recalcular coste del plato automáticamente
+    try {
+      await calculadora.actualizarCostePlato(plato_id);
+    } catch (calcError) {
+      console.warn('Error al actualizar coste del plato:', calcError);
+      // No fallar la creación del escandallo si el cálculo falla
+    }
     
     res.status(201).json(escandallo);
   } catch (error) {
@@ -77,8 +89,16 @@ exports.crear = async (req, res) => {
 exports.calcularCostePlato = async (req, res) => {
   try {
     const { codigo_plato } = req.params;
-    const costo = await Escandallo.calcularCostePlato(codigo_plato);
-    res.json({ codigo_plato, costo_total: costo });
+    
+    // Usar la nueva calculadora con fórmulas del Excel
+    const resultado = await calculadora.actualizarCostePlato(codigo_plato);
+    
+    res.json({ 
+      codigo_plato, 
+      costo_racion: resultado.costeRacion,
+      alergenos: resultado.alergenos,
+      actualizado: resultado.actualizado
+    });
   } catch (error) {
     console.error('Error al calcular costo del plato:', error);
     res.status(500).json({ error: error.message });
@@ -90,6 +110,17 @@ exports.actualizar = async (req, res) => {
   try {
     const { id } = req.params;
     const actualizacion = await Escandallo.actualizar(id, req.body);
+    
+    // Obtener el plato_id para recalcular costes
+    const escandallo = await Escandallo.obtenerPorId(id);
+    if (escandallo && escandallo.plato_codigo) {
+      try {
+        await calculadora.actualizarCostePlato(escandallo.plato_codigo);
+      } catch (calcError) {
+        console.warn('Error al actualizar coste del plato:', calcError);
+      }
+    }
+    
     res.json(actualizacion);
   } catch (error) {
     console.error('Error al actualizar escandallo:', error);
@@ -101,7 +132,22 @@ exports.actualizar = async (req, res) => {
 exports.eliminar = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Obtener el plato_id antes de eliminar
+    const escandallo = await Escandallo.obtenerPorId(id);
+    const platoId = escandallo ? escandallo.plato_codigo : null;
+    
     const resultado = await Escandallo.eliminar(id);
+    
+    // Recalcular costes del plato después de eliminar
+    if (platoId) {
+      try {
+        await calculadora.actualizarCostePlato(platoId);
+      } catch (calcError) {
+        console.warn('Error al actualizar coste del plato:', calcError);
+      }
+    }
+    
     res.json(resultado);
   } catch (error) {
     console.error('Error al eliminar escandallo:', error);

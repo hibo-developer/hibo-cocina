@@ -387,6 +387,23 @@ function crearTablas() {
         )
       `, (err) => {
         if (err) reject(err);
+      });
+
+      // Tabla de Movimientos de Stock
+      db.run(`
+        CREATE TABLE IF NOT EXISTS movimientos_stock (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          articulo_codigo TEXT NOT NULL,
+          tipo TEXT CHECK(tipo IN ('ENTRADA', 'SALIDA', 'AJUSTE', 'PRODUCCION')) NOT NULL,
+          cantidad REAL NOT NULL,
+          motivo TEXT,
+          stock_resultante REAL,
+          usuario TEXT,
+          documento_ref TEXT
+        )
+      `, (err) => {
+        if (err) reject(err);
         resolve();
       });
     });
