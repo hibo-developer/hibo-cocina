@@ -1,0 +1,40 @@
+<!-- Sección Platos -->
+<section id="platos" class="section" style="display:none;">
+  <h2>🍽️ Gestión de Platos</h2>
+  
+  <div class="toolbar">
+    <div class="search-group">
+      <input type="text" id="searchPlatos" placeholder="Buscar platos...">
+      <select id="filterGrupo">
+        <option value="">Todos los grupos</option>
+        <option value="Arroces">Arroces</option>
+        <option value="Carnes">Carnes</option>
+        <option value="Pescados">Pescados</option>
+        <option value="Verduras">Verduras</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalDinamico('plato')">🍽️ Crear Plato</button>
+    <button id="btn-eliminar-platos" class="btn btn-danger" onclick="eliminarSeleccionados('platos', 'platos')" disabled>🗑️ Eliminar (0)</button>
+  </div>
+
+  <div id="platosTable" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="check-all-platos" onchange="toggleSeleccionTodos('platos', Array.from(document.querySelectorAll('#platosTableBody input[type=checkbox]')).map(cb => parseInt(cb.id.split('-')[2])))"></th>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Grupo Menú</th>
+          <th>Unidad</th>
+          <th>Coste</th>
+          <th>Peso (g)</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="platosTableBody">
+      </tbody>
+    </table>
+    <div id="platos-paginacion" class="pagination-container"></div>
+  </div>
+</section>

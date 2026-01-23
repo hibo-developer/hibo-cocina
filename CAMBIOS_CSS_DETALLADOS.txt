@@ -1,0 +1,385 @@
+═══════════════════════════════════════════════════════════════════════════════
+  CAMBIOS CSS ESPECÍFICOS - DESGLOSE LÍNEA POR LÍNEA
+═══════════════════════════════════════════════════════════════════════════════
+
+Este archivo documenta exactamente qué cambios se hicieron en public/styles.css
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 1: MODAL CONTAINER
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 1.1: Opacidad del overlay
+  ANTES: background-color: rgba(0, 0, 0, 0.6);
+  AHORA: background-color: rgba(0, 0, 0, 0.7);
+  RAZÓN: Más oscuro para mejor contraste
+
+CAMBIO 1.2: Padding del modal
+  ANTES: [sin padding]
+  AHORA: padding: 20px;
+  RAZÓN: Mejor espaciado en pantallas móviles
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 2: MODAL CONTENT
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 2.1: Margin superior
+  ANTES: margin: 5% auto;
+  AHORA: margin: 10% auto;
+  RAZÓN: Más espacio desde el top
+
+CAMBIO 2.2: Padding
+  ANTES: padding: 40px;
+  AHORA: padding: 0;
+  RAZÓN: El padding ahora está en #modalForm, no en container
+
+CAMBIO 2.3: Border radius
+  ANTES: border-radius: 12px;
+  AHORA: border-radius: 14px;
+  RAZÓN: Más redondeado, más moderno
+
+CAMBIO 2.4: Box shadow
+  ANTES: box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  AHORA: box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  RAZÓN: Sombra más prominente y profunda
+
+CAMBIO 2.5: Overflow
+  ANTES: [sin overflow]
+  AHORA: overflow: hidden;
+  RAZÓN: Mejor control del contenido
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 3: CLOSE BUTTON (.close)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 3.1: Position
+  ANTES: float: right;
+  AHORA: position: absolute; right: 20px; top: 15px;
+  RAZÓN: Mejor posicionamiento
+
+CAMBIO 3.2: Dimensiones
+  ANTES: font-size: 28px; no width/height
+  AHORA: width: 40px; height: 40px; font-size: 32px;
+  RAZÓN: Cuadrado perfecto, área más grande para click
+
+CAMBIO 3.3: Display
+  ANTES: [sin display específico]
+  AHORA: display: flex; align-items: center; justify-content: center;
+  RAZÓN: Centrado perfecto del ícono
+
+CAMBIO 3.4: Border radius
+  ANTES: [sin border radius]
+  AHORA: border-radius: 6px;
+  RAZÓN: Apariencia más refinada
+
+CAMBIO 3.5: Hover effect
+  ANTES: color: var(--primary-color);
+  AHORA: color: var(--primary-color); background-color: rgba(231, 76, 60, 0.1);
+  RAZÓN: Fondo rojo semi-transparente en hover
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 4: MODAL TITLE (#modalTitle)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 4.1: Color
+  ANTES: color: var(--dark-gray);
+  AHORA: color: white;
+  RAZÓN: Contraste sobre fondo rojo
+
+CAMBIO 4.2: Font size
+  ANTES: font-size: 1.6em;
+  AHORA: font-size: 1.7em;
+  RAZÓN: Más visible
+
+CAMBIO 4.3: Background
+  ANTES: border-bottom: 2px solid var(--light-gray);
+  AHORA: background: linear-gradient(135deg, var(--primary-color) 0%, #c0392b 100%);
+  RAZÓN: Encabezado de marca rojo con gradiente
+
+CAMBIO 4.4: Padding
+  ANTES: border-bottom: 2px solid var(--light-gray); padding-bottom: 15px;
+  AHORA: padding: 25px 30px;
+  RAZÓN: Más generoso y simétrico
+
+CAMBIO 4.5: Border bottom
+  ANTES: border-bottom: 2px solid var(--light-gray);
+  AHORA: border-bottom: none;
+  RAZÓN: El gradiente ya delimita la sección
+
+CAMBIO 4.6: Font weight
+  ANTES: [sin especificar]
+  AHORA: font-weight: 600;
+  RAZÓN: Más visible y profesional
+
+CAMBIO 4.7: Letter spacing
+  ANTES: [sin especificar]
+  AHORA: letter-spacing: 0.3px;
+  RAZÓN: Más elegante y profesional
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 5: MODAL FORM (#modalForm)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 5.1: Padding
+  ANTES: margin-top: 20px;
+  AHORA: padding: 35px 30px;
+  RAZÓN: Padding más generoso, simetría mejorada
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 6: MODAL FIELDS (#modalFields)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 6.1: Gap
+  ANTES: gap: 18px;
+  AHORA: gap: 22px;
+  RAZÓN: Más respiro entre campos
+
+CAMBIO 6.2: Margin bottom
+  ANTES: margin-bottom: 25px;
+  AHORA: margin-bottom: 30px;
+  RAZÓN: Más espacio antes de los botones
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 7: LABELS (#modalFields label)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 7.1: Font weight
+  ANTES: font-weight: 600;
+  AHORA: font-weight: 600;
+  RAZÓN: Sin cambio (mantener)
+
+CAMBIO 7.2: Font size
+  ANTES: font-size: 0.95em;
+  AHORA: font-size: 0.85em;
+  RAZÓN: Más pequeño para mejor proporción
+
+CAMBIO 7.3: Formato
+  ANTES: [sin especificar]
+  AHORA: text-transform: uppercase; letter-spacing: 0.5px;
+  RAZÓN: Mayúsculas y espaciado para profesionalismo
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 8: INPUTS, SELECT, TEXTAREA
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 8.1: Padding
+  ANTES: padding: 12px 14px;
+  AHORA: padding: 14px 16px;
+  RAZÓN: Más generoso, mejor proporciones
+
+CAMBIO 8.2: Border
+  ANTES: border: 2px solid var(--light-gray);
+  AHORA: border: 2px solid #e0e0e0;
+  RAZÓN: Color más consistente, menos variable según tema
+
+CAMBIO 8.3: Border radius
+  ANTES: border-radius: 6px;
+  AHORA: border-radius: 8px;
+  RAZÓN: Más redondeado, más moderno
+
+CAMBIO 8.4: Background
+  ANTES: background-color: white;
+  AHORA: background-color: #fafafa;
+  RAZÓN: Gris muy claro para diferenciar input de modal
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 9: INPUT HOVER (NUEVO)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 9.1: Hover state (COMPLETAMENTE NUEVO)
+  ANTES: [no existía]
+  AHORA:
+    #modalFields input:hover,
+    #modalFields select:hover,
+    #modalFields textarea:hover {
+      border-color: #d0d0d0;
+      background-color: white;
+    }
+  RAZÓN: Feedback visual al hover
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 10: INPUT FOCUS
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 10.1: Box shadow
+  ANTES: box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  AHORA: box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.12), inset 0 1px 2px rgba(0,0,0,0.05);
+  RAZÓN: Sombra más prominente (4px) + inset shadow
+
+CAMBIO 10.2: Background
+  ANTES: background-color: #fafafa;
+  AHORA: background-color: white;
+  RAZÓN: Más blanco para destacar que está activo
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 11: TEXTAREA
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 11.1: Min height
+  ANTES: min-height: 80px;
+  AHORA: min-height: 100px;
+  RAZÓN: Más espacio para escribir
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 12: MODAL BUTTONS
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 12.1: Padding top
+  ANTES: padding-top: 20px;
+  AHORA: padding-top: 25px;
+  RAZÓN: Más espacio
+
+CAMBIO 12.2: Margin top
+  ANTES: margin-top: 30px;
+  AHORA: margin-top: 35px;
+  RAZÓN: Más separación del formulario
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 13: BOTONES (.btn)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 13.1: Padding
+  ANTES: padding: 10px 20px;
+  AHORA: padding: 12px 24px;
+  RAZÓN: Botones más grandes y visibles
+
+CAMBIO 13.2: Border radius
+  ANTES: border-radius: 4px;
+  AHORA: border-radius: 8px;
+  RAZÓN: Más redondeado, más moderno
+
+CAMBIO 13.3: Font weight
+  ANTES: [sin especificar]
+  AHORA: font-weight: 600;
+  RAZÓN: Más visible
+
+CAMBIO 13.4: Letter spacing
+  ANTES: [sin especificar]
+  AHORA: letter-spacing: 0.3px;
+  RAZÓN: Más profesional
+
+CAMBIO 13.5: Text transform
+  ANTES: [sin especificar]
+  AHORA: text-transform: uppercase;
+  RAZÓN: Mayúsculas para énfasis
+
+CAMBIO 13.6: Font size
+  ANTES: font-size: 1em;
+  AHORA: font-size: 0.95em;
+  RAZÓN: Ligeramente más pequeño para proporciones mejores
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 14: BOTÓN PRIMARY (.btn-primary)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 14.1: Background
+  ANTES: background: var(--primary-color);
+  AHORA: background: linear-gradient(135deg, var(--primary-color) 0%, #c0392b 100%);
+  RAZÓN: Gradiente más atractivo
+
+CAMBIO 14.2: Box shadow (NUEVO)
+  ANTES: [sin shadow]
+  AHORA: box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25);
+  RAZÓN: Sombra roja para profundidad
+
+CAMBIO 14.3: Hover transform
+  ANTES: transform: translateY(-2px);
+  AHORA: transform: translateY(-2px);
+  RAZÓN: Sin cambio (mantener)
+
+CAMBIO 14.4: Hover background
+  ANTES: background: #c0392b;
+  AHORA: background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  RAZÓN: Gradiente más oscuro en hover
+
+CAMBIO 14.5: Hover box shadow (NUEVO)
+  ANTES: box-shadow: var(--shadow);
+  AHORA: box-shadow: 0 6px 25px rgba(231, 76, 60, 0.35);
+  RAZÓN: Sombra más prominente en hover
+
+CAMBIO 14.6: Active state (NUEVO)
+  ANTES: [no existía]
+  AHORA:
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(231, 76, 60, 0.2);
+    }
+  RAZÓN: Efecto presión al hacer click
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 15: BOTÓN SECONDARY (.btn-secondary)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 15.1: Background
+  ANTES: background: var(--light-gray);
+  AHORA: background: #f0f0f0;
+  RAZÓN: Gris más consistente
+
+CAMBIO 15.2: Border (NUEVO)
+  ANTES: [sin border]
+  AHORA: border: 1px solid #e0e0e0;
+  RAZÓN: Definición de borde
+
+CAMBIO 15.3: Hover background
+  ANTES: background: #d5d8dc;
+  AHORA: background: #e8e8e8;
+  RAZÓN: Menos cambio drástico, más sutil
+
+CAMBIO 15.4: Hover border (NUEVO)
+  ANTES: [sin border]
+  AHORA: border-color: #d0d0d0;
+  RAZÓN: Borde más oscuro en hover
+
+═══════════════════════════════════════════════════════════════════════════════
+📍 SECCIÓN 16: BOTÓN DANGER (.btn-danger)
+═══════════════════════════════════════════════════════════════════════════════
+
+CAMBIO 16.1: Box shadow (NUEVO)
+  ANTES: [sin shadow]
+  AHORA: box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25);
+  RAZÓN: Sombra roja
+
+CAMBIO 16.2: Hover background
+  ANTES: background: #c0392b;
+  AHORA: background: #c0392b;
+  RAZÓN: Sin cambio
+
+CAMBIO 16.3: Hover box shadow (NUEVO)
+  ANTES: [sin shadow]
+  AHORA: box-shadow: 0 6px 25px rgba(231, 76, 60, 0.35);
+  RAZÓN: Sombra más prominente en hover
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 RESUMEN DE CAMBIOS
+═══════════════════════════════════════════════════════════════════════════════
+
+NUEVAS PROPIEDADES AGREGADAS:
+  • padding en .modal
+  • position: absolute; right; top en .close
+  • width, height, flex display en .close
+  • border-radius en .close
+  • background en .close:hover
+  • background gradient en #modalTitle
+  • letter-spacing en #modalTitle
+  • padding en #modalForm
+  • text-transform, letter-spacing en labels
+  • background: #fafafa en inputs
+  • Hover state completo para inputs
+  • Box-shadow inset en focus
+  • Active state para .btn-primary
+  • Border en .btn-secondary
+  • Box shadows en todos los botones
+
+PROPIEDADES MODIFICADAS:
+  • 13 cambios de valores específicos
+  • 5 cambios de color
+  • 4 cambios de tamaño
+  • 7 cambios de padding/margin
+
+RESULTADO:
+  ✅ Modales profesionales
+  ✅ Inputs con feedback visual
+  ✅ Botones atractivos
+  ✅ Animaciones y transiciones suaves
+  ✅ Apariencia moderna y pulida
+
+═══════════════════════════════════════════════════════════════════════════════

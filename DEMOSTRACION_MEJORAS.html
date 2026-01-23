@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demostración de Mejoras - HIBO COCINA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 1024px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .before {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .after {
+            border-left: 4px solid #27ae60;
+        }
+        
+        .feature {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .feature strong {
+            color: #2c3e50;
+        }
+        
+        .emoji {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        .showcase {
+            background: white;
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .showcase h2 {
+            color: white;
+            font-size: 1.7em;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin: -40px -40px 30px -40px;
+            padding: 25px 30px;
+            border-radius: 14px 14px 0 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .showcase p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+        
+        .input-demo {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            margin: 10px auto;
+            display: block;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        
+        .input-demo:hover {
+            border-color: #d0d0d0;
+            background: white;
+        }
+        
+        .input-demo:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.12);
+            background: white;
+        }
+        
+        .buttons-demo {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(231, 76, 60, 0.35);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e8e8e8;
+            border-color: #d0d0d0;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .color-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .primary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .secondary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .checklist {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 40px;
+        }
+        
+        .checklist h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        .check-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .check-item:last-child {
+            border-bottom: none;
+        }
+        
+        .check-item input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #e74c3c;
+        }
+        
+        .check-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .footer p {
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .status.success {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 MEJORAS DE INTERFAZ - HIBO COCINA</h1>
+        <p class="subtitle">Comparación antes y después de las mejoras</p>
+        
+        <div class="comparison">
+            <div class="card before">
+                <h2><span class="emoji">❌</span>ANTES</h2>
+                <div class="feature">
+                    <strong>Modal:</strong> Sin encabezado visual, fondo blanco plano
+                </div>
+                <div class="feature">
+                    <strong>Inputs:</strong> Bordes simples, sin focus state visible
+                </div>
+                <div class="feature">
+                    <strong>Botones:</strong> Simples, sin sombra, sin gradiente
+                </div>
+                <div class="feature">
+                    <strong>Espaciado:</strong> Inconsistente, poco profesional
+                </div>
+                <div class="feature">
+                    <strong>Animaciones:</strong> Básicas, sin transiciones suaves
+                </div>
+                <div class="feature">
+                    <strong>Focus states:</strong> Poco visibles, difíciles de ver
+                </div>
+            </div>
+            
+            <div class="card after">
+                <h2><span class="emoji">✅</span>DESPUÉS</h2>
+                <div class="feature">
+                    <strong>Modal:</strong> Encabezado rojo con gradient, diseño profesional
+                </div>
+                <div class="feature">
+                    <strong>Inputs:</strong> Bordes definidos, focus state rojo brillante
+                </div>
+                <div class="feature">
+                    <strong>Botones:</strong> Gradiente rojo, sombras prominentes
+                </div>
+                <div class="feature">
+                    <strong>Espaciado:</strong> Generoso y consistente (35px, 22px)
+                </div>
+                <div class="feature">
+                    <strong>Animaciones:</strong> SlideUp fluida, fadeIn suave
+                </div>
+                <div class="feature">
+                    <strong>Focus states:</strong> Muy visibles con sombra roja 4px
+                </div>
+            </div>
+        </div>
+        
+        <div class="showcase">
+            <h2>Demostración Interactiva</h2>
+            <p>Prueba los inputs y botones mejorados:</p>
+            
+            <label style="display: block; text-align: left; max-width: 400px; margin: 20px auto; font-weight: 600; color: #333;">
+                Código de Plato
+            </label>
+            <input type="text" class="input-demo" placeholder="Ej: PLA001">
+            
+            <label style="display: block; text-align: left; max-width: 400px; margin: 20px auto; font-weight: 600; color: #333;">
+                Nombre del Plato
+            </label>
+            <input type="text" class="input-demo" placeholder="Ej: Paella Valenciana">
+            
+            <label style="display: block; text-align: left; max-width: 400px; margin: 20px auto; font-weight: 600; color: #333;">
+                Precio (€)
+            </label>
+            <input type="number" class="input-demo" placeholder="Ej: 15.99">
+            
+            <div class="buttons-demo">
+                <button class="btn btn-secondary">Cancelar</button>
+                <button class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Paleta de Colores</h2>
+            <div class="color-palette">
+                <div class="color-box primary">
+                    <div>Primario</div>
+                    <small>#e74c3c</small>
+                </div>
+                <div class="color-box secondary">
+                    <div>Secundario</div>
+                    <small>#3498db</small>
+                </div>
+                <div class="color-box success">
+                    <div>Éxito</div>
+                    <small>#27ae60</small>
+                </div>
+                <div class="color-box warning">
+                    <div>Advertencia</div>
+                    <small>#f39c12</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="checklist">
+            <h2>✅ Cambios Aplicados</h2>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c1" checked disabled>
+                <label for="c1">Encabezado modal con color de marca (rojo)</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c2" checked disabled>
+                <label for="c2">Focus state en inputs con sombra roja 4px</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c3" checked disabled>
+                <label for="c3">Botones con gradiente y sombra prominente</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c4" checked disabled>
+                <label for="c4">Espaciado generoso (35px, 22px, 25px)</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c5" checked disabled>
+                <label for="c5">Animación slideUp suave (300ms)</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c6" checked disabled>
+                <label for="c6">Hover states en todos los elementos</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c7" checked disabled>
+                <label for="c7">Border-radius mejorado (14px modal, 8px inputs)</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c8" checked disabled>
+                <label for="c8">Labels con formato uppercase y letter-spacing</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c9" checked disabled>
+                <label for="c9">Box-shadow prominente (0 20px 60px)</label>
+            </div>
+            
+            <div class="check-item">
+                <input type="checkbox" id="c10" checked disabled>
+                <label for="c10">Transiciones suaves (0.3s ease) en todos lados</label>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Estado de la aplicación:</strong></p>
+            <div class="status success">✅ COMPLETADO - Modales profesionales y funcionales</div>
+            <p style="margin-top: 20px; font-size: 0.95em;">
+                La aplicación HIBO COCINA ahora cuenta con una interfaz moderna,<br>
+                profesional y completamente funcional con moneda en EUR (€)
+            </p>
+        </div>
+    </div>
+</body>
+</html>

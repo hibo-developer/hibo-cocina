@@ -1,0 +1,40 @@
+<!-- Sección Pedidos -->
+<section id="pedidos" class="section" style="display:none;">
+  <h2>Gestión de Pedidos</h2>
+  
+  <div class="toolbar">
+    <div class="search-group">
+      <input type="text" id="searchPedidos" placeholder="Buscar por cliente...">
+      <select id="filterEstado">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="produccion">En Producción</option>
+        <option value="completado">Completado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalDinamico('pedido')">📦 Crear Pedido</button>
+    <button id="btn-eliminar-pedidos" class="btn btn-danger" onclick="eliminarSeleccionados('pedidos', 'pedidos')" disabled>🗑️ Eliminar (0)</button>
+  </div>
+
+  <div id="pedidosTable" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="check-all-pedidos" onchange="toggleSeleccionTodos('pedidos', [])"></th>
+          <th>ID</th>
+          <th>Número</th>
+          <th>Cliente</th>
+          <th>Fecha Pedido</th>
+          <th>Fecha Entrega</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="pedidosTableBody">
+      </tbody>
+    </table>
+    <div id="pedidos-paginacion" class="pagination-container"></div>
+  </div>
+</section>

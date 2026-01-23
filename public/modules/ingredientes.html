@@ -1,0 +1,46 @@
+<!-- Sección Ingredientes -->
+<section id="ingredientes" class="section" style="display:none;">
+  <h2>🥬 Gestión de Ingredientes y Artículos</h2>
+  
+  <div class="toolbar">
+    <div class="search-group">
+      <input type="text" id="searchIngredientes" placeholder="Buscar ingredientes...">
+      <select id="filterFamilia">
+        <option value="">Todas las familias</option>
+        <option value="Aceites y Grasas">Aceites y Grasas</option>
+        <option value="Carnes">Carnes</option>
+        <option value="Pescados">Pescados</option>
+        <option value="Verduras">Verduras</option>
+        <option value="Lacteos">Lácteos</option>
+      </select>
+      <select id="filterConservacion">
+        <option value="">Todos los grupos</option>
+        <option value="Fresco">Fresco</option>
+        <option value="Congelado">Congelado</option>
+        <option value="Neutro">Neutro</option>
+        <option value="Refrigerado">Refrigerado</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalDinamico('ingrediente')">🧄 Crear Ingrediente</button>
+    <button id="btn-eliminar-ingredientes" class="btn btn-danger" onclick="eliminarSeleccionados('ingredientes', 'ingredientes')" disabled>🗑️ Eliminar (0)</button>
+  </div>
+
+  <div id="ingredientesTable" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="check-all-ingredientes" onchange="toggleSeleccionTodos('ingredientes', [])"></th>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Familia</th>
+          <th>Grupo Conservación</th>
+          <th>Proveedor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="ingredientesTableBody">
+      </tbody>
+    </table>
+    <div id="ingredientes-paginacion" class="pagination-container"></div>
+  </div>
+</section>

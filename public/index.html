@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIBO Cocina - Gestor de Producción</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <h1>🍳 HIBO COCINA</h1>
+        <p>Sistema de Gestión Integral de Producción y Pedidos</p>
+      </div>
+    </header>
+
+    <nav class="navbar">
+      <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+      <button class="nav-btn" data-section="platos">Platos</button>
+      <button class="nav-btn" data-section="ingredientes">Ingredientes</button>
+      <button class="nav-btn" data-section="escandallos">Escandallos</button>
+      <button class="nav-btn" data-section="inventario">Inventario</button>
+      <button class="nav-btn" data-section="pedidos">Pedidos</button>
+      <button class="nav-btn" data-section="produccion">Producción</button>
+      <button class="nav-btn" data-section="estadisticas">Estadísticas</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- Contenedor donde se cargarán los módulos dinámicamente -->
+      <div id="sections-container"></div>
+
+      <!-- Sección Estadísticas -->
+      <section id="estadisticas" class="section" style="display:none;">
+        <h2>📊 Estadísticas y Análisis</h2>
+        <div class="stats-container">
+          <div class="card">
+            <h3>Distribución de Platos por Grupo</h3>
+            <div id="statsPlatos"></div>
+          </div>
+          <div class="card">
+            <h3>Estado de Pedidos</h3>
+            <div id="statsPedidos"></div>
+          </div>
+          <div class="card">
+            <h3>Costos Promedio por Grupo</h3>
+            <div id="statsCostos"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal para crear/editar -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Modal</h2>
+        <form id="modalForm">
+          <div id="modalFields"></div>
+          <div class="modal-buttons">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal dinámico global -->
+  <div id="modal-container"></div>
+
+  <script src="module-loader.js"></script>
+  <script src="modales-dinamicos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

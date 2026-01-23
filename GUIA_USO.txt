@@ -1,0 +1,309 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║                   🍳 HIBO COCINA - GUÍA DE USO 🍳                    ║
+║                                                                       ║
+║            Sistema Integral de Gestión de Cocina y Catering          ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                      PASO 1: INICIAR SERVIDOR                      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+1. Abre PowerShell o CMD
+2. Navega a: c:\hibo-cocina
+3. Ejecuta: npm start
+
+Verás un mensaje como este:
+
+    ╔════════════════════════════════════════╗
+    ║   HIBO COCINA - Gestor de Producción   ║
+    ╚════════════════════════════════════════╝
+    Servidor escuchando en: http://localhost:3000
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                   PASO 2: ABRIR EN NAVEGADOR                       │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+Abre tu navegador favorito e ingresa:
+
+    ▶ http://localhost:3000
+
+¡Verás la interfaz de HIBO COCINA!
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    PASO 3: EXPLORAR SECCIONES                      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+En la parte superior encontrarás 5 botones de navegación:
+
+  🏠 Dashboard
+  ├─ Ver métricas principales
+  ├─ Total de platos
+  ├─ Pedidos pendientes
+  └─ Valor acumulado
+
+  🍽️  Platos
+  ├─ Catálogo de 1,639+ artículos
+  ├─ Buscar por nombre/código
+  ├─ Filtrar por grupo
+  ├─ Crear nuevos platos
+  ├─ Editar platos existentes
+  └─ Eliminar platos
+
+  📋 Pedidos
+  ├─ Ver todos los pedidos
+  ├─ Filtrar por estado
+  ├─ Buscar por cliente
+  ├─ Crear nuevos pedidos
+  ├─ Cambiar estado
+  └─ Eliminar pedidos
+
+  🔨 Producción
+  ├─ Planificación de producción
+  ├─ Partidas de cocina
+  ├─ Control de envases
+  └─ Seguimiento
+
+  📊 Estadísticas
+  ├─ Distribución por grupo
+  ├─ Costes promedio
+  ├─ Análisis de pedidos
+  └─ Reportes visuales
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    GUÍA RÁPIDA DE FUNCIONES                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+🔍 BUSCAR PLATO:
+  1. Haz clic en "Platos"
+  2. Escribe en "Buscar platos..."
+  3. Los resultados aparecen en tiempo real
+
+📌 FILTRAR POR GRUPO:
+  1. En "Platos", selecciona un grupo del dropdown
+  2. La tabla se actualiza automáticamente
+  3. Opcionalmente busca dentro del grupo
+
+➕ CREAR NUEVO PLATO:
+  1. Haz clic en "+ Nuevo Plato"
+  2. Rellena los campos:
+     - Código (ej: PL-100)
+     - Nombre
+     - Grupo menú
+     - Coste
+     - Peso (g)
+     - Otros datos
+  3. Haz clic en "Guardar"
+  4. ¡Plato creado!
+
+✏️ EDITAR PLATO:
+  1. En la tabla, haz clic en "Editar"
+  2. Modifica los campos que necesites
+  3. Haz clic en "Guardar"
+  4. Los cambios se guardan inmediatamente
+
+🗑️ ELIMINAR PLATO:
+  1. En la tabla, haz clic en "Eliminar"
+  2. Confirma la eliminación
+  3. El plato se elimina de la BD
+
+📦 CREAR PEDIDO:
+  1. Haz clic en "Pedidos"
+  2. Haz clic en "+ Nuevo Pedido"
+  3. Rellena:
+     - Número de pedido
+     - Cliente
+     - Fecha de entrega
+     - Estado (pendiente/producción/completado)
+     - Total
+  4. Haz clic en "Guardar"
+
+👁️ VER DETALLES PEDIDO:
+  1. En "Pedidos", haz clic en "Ver"
+  2. Se abre una ventana con detalles
+  3. Puedes ver las líneas del pedido
+
+📊 VER ESTADÍSTICAS:
+  1. Haz clic en "Estadísticas"
+  2. Verás 3 tarjetas con análisis
+  3. Distribución de platos por grupo
+  4. Costes promedio
+  5. Estado de pedidos
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                       DATOS DISPONIBLES                            │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+La aplicación incluye datos de:
+
+📋 Catálogo de Platos:
+   • 1,639 artículos de escandallos
+   • 84 platos activos en menú
+   • 7 grupos principales (Arroces, Carnes, Pescados, etc.)
+   • Costes y pesos por plato
+
+📦 Envases:
+   • Cubetas (50 raciones)
+   • Barqueta GN 100 (100 raciones)
+   • Barqueta GN 60 (60 raciones)
+   • Barqueta GN 30 (30 raciones)
+   • Mono (1 ración)
+
+🎯 Partidas de Cocina:
+   • Arroces
+   • Carnes
+   • Pescados
+   • Verduras
+   • Pastas
+   • Salsas
+   • Postres
+
+📊 Registros Históricos:
+   • 681 registros de producción
+   • 2,130 etiquetas de trazabilidad
+   • 414 pedidos a proveedores
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                       API REST (AVANZADO)                          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+Para desarrolladores, la API está disponible en:
+
+  Base: http://localhost:3000/api
+
+Ejemplos de uso con curl:
+
+  • Obtener todos los platos:
+    curl http://localhost:3000/api/platos
+
+  • Obtener plato por código:
+    curl http://localhost:3000/api/platos/PL-1
+
+  • Obtener estadísticas:
+    curl http://localhost:3000/api/platos/estadisticas
+
+  • Crear plato:
+    curl -X POST http://localhost:3000/api/platos \
+      -H "Content-Type: application/json" \
+      -d '{"codigo":"PL-100","nombre":"Mi Plato"}'
+
+  • Ver salud del servidor:
+    curl http://localhost:3000/api/health
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    SOLUCIÓN DE PROBLEMAS                           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+❌ Error: "No se puede establecer conexión"
+   ✓ Solución: Asegúrate de que npm start está ejecutándose
+   ✓ Comprueba que el puerto 3000 está libre
+   ✓ Intenta recargar la página (F5)
+
+❌ Error: "Base de datos no encontrada"
+   ✓ Solución: Ejecuta "npm run build" en la terminal
+   ✓ Esto reinicializará la base de datos
+
+❌ Error: "Módulos no encontrados"
+   ✓ Solución: Ejecuta "npm install --force"
+   ✓ Borra la carpeta node_modules y reinstala
+
+❌ Puerto 3000 en uso:
+   ✓ Solución: Ejecuta "netstat -ano | findstr :3000"
+   ✓ Luego: "taskkill /PID [PID] /F"
+
+❌ Interfaz no se actualiza:
+   ✓ Solución: Presiona CTRL+F5 para limpiar caché
+   ✓ Abre las herramientas de desarrollador (F12)
+   ✓ Revisa la consola para ver errores
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                      COMANDOS ÚTILES                               │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+En la carpeta c:\hibo-cocina ejecuta:
+
+  npm start          → Inicia el servidor
+  npm run dev        → Modo desarrollo (reinicio automático)
+  npm run build      → Inicializa la base de datos
+  npm install        → Instala dependencias
+  npm audit fix      → Arregla vulnerabilidades
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    DOCUMENTACIÓN DISPONIBLE                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+En la carpeta encontrarás:
+
+  📄 00_LEEME_PRIMERO.txt     ← Instrucciones iniciales
+  📄 README.md                ← Documentación completa
+  📄 QUICK_START.md           ← Guía rápida
+  📄 MANUAL_TECNICO.md        ← Referencia técnica
+  📄 RESUMEN.md               ← Resumen ejecutivo
+  📄 ENTREGA.txt              ← Resumen de entrega
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    CONTACTO Y SOPORTE                              │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+Para problemas o consultas:
+
+  1. Revisa la documentación (README.md)
+  2. Consulta MANUAL_TECNICO.md
+  3. Verifica los logs del servidor
+  4. Intenta reiniciar con: npm start
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│                    ¡YA ESTÁS LISTO PARA COMENZAR!                 │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+
+Próximos pasos:
+
+  1. ✓ Abre una terminal en c:\hibo-cocina
+  2. ✓ Ejecuta: npm start
+  3. ✓ Abre: http://localhost:3000
+  4. ✓ ¡Comienza a usar la aplicación!
+
+Todas las funcionalidades están listas. No se requiere configuración
+adicional.
+
+═══════════════════════════════════════════════════════════════════════
+
+                    HIBO COCINA v1.0.0 - ✅ LISTO
+
+═══════════════════════════════════════════════════════════════════════
+
+¡Disfruta gestionando tu cocina! 🍳

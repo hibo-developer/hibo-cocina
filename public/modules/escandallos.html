@@ -1,0 +1,35 @@
+<!-- Sección Escandallos -->
+<section id="escandallos" class="section" style="display:none;">
+  <h2>📋 Gestión de Escandallos (Recetas)</h2>
+  
+  <div class="toolbar">
+    <div class="search-group">
+      <input type="text" id="searchEscandallos" placeholder="Buscar por plato...">
+      <select id="filterPlatoEscandallo">
+        <option value="">Todos los platos</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalDinamico('escandallo')">🔧 Crear Escandallo</button>
+    <button id="btn-eliminar-escandallos" class="btn btn-danger" onclick="eliminarSeleccionados('escandallos', 'escandallos')" disabled>🗑️ Eliminar (0)</button>
+  </div>
+
+  <div id="escandallosTable" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="check-all-escandallos" onchange="toggleSeleccionTodos('escandallos', [])"></th>
+          <th>ID</th>
+          <th>Plato</th>
+          <th>Ingrediente</th>
+          <th>Cantidad</th>
+          <th>Unidad</th>
+          <th>Coste</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="escandallosTableBody">
+      </tbody>
+    </table>
+    <div id="escandallos-paginacion" class="pagination-container"></div>
+  </div>
+</section>

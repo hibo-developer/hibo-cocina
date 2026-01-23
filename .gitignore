@@ -1,0 +1,32 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+
+# Excel files temporales
+~$*.xlsx
+~$*.xlsb

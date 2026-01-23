@@ -1,0 +1,94 @@
+<!-- Sección Producción -->
+<section id="produccion" class="section" style="display:none;">
+  <h2>🍳 Control de Producción</h2>
+  
+  <!-- Tabs de producción -->
+  <div class="tabs">
+    <button class="tab-button active" onclick="cambiarTab('partidas')">Partidas de Cocina</button>
+    <button class="tab-button" onclick="cambiarTab('trazabilidad')">Trazabilidad</button>
+    <button class="tab-button" onclick="cambiarTab('resumen')">Resumen</button>
+  </div>
+
+  <!-- Tab: Partidas -->
+  <div id="tab-partidas" class="tab-content">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="abrirModalDinamico('partida_cocina')">🍳 Nueva Partida</button>
+      <button class="btn btn-primary" onclick="abrirModalDinamico('sanidad')">⚕️ Control Sanidad</button>
+      <button class="btn btn-primary" onclick="abrirModalDinamico('etiquetas')">🏷️ Crear Etiqueta</button>
+      <button id="btn-eliminar-partidas" class="btn btn-danger" onclick="eliminarSeleccionados('partidas', 'partidas')" disabled>🗑️ Eliminar (0)</button>
+    </div>
+
+    <div id="partidasTable" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="check-all-partidas" onchange="toggleSeleccionTodos('partidas', [])"></th>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Responsable</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="partidasTableBody">
+        </tbody>
+      </table>
+      <div id="partidas-paginacion" class="pagination-container"></div>
+    </div>
+  </div>
+
+  <!-- Tab: Resumen -->
+  <div id="tab-resumen" class="tab-content">
+    <div class="production-grid">
+      <div class="card">
+        <h3>📋 Trazabilidad Activa</h3>
+        <div class="metric" id="totalTrazabilidad">0</div>
+        <p>Registros de trazabilidad</p>
+      </div>
+
+      <div class="card">
+        <h3>🍳 Partidas Activas</h3>
+        <div class="metric" id="totalPartidas">0</div>
+        <p>En producción actualmente</p>
+      </div>
+
+      <div class="card">
+        <h3>⚠️ Control de Sanidad</h3>
+        <div class="metric">✓</div>
+        <p>Todo bajo control</p>
+      </div>
+
+      <div class="card">
+        <h3>🏷️ Etiquetas Generadas</h3>
+        <div class="metric">0</div>
+        <p>Hoy</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Trazabilidad -->
+  <div id="tab-trazabilidad" class="tab-content">
+    <div class="toolbar">
+      <input type="text" id="searchTrazabilidad" placeholder="Buscar en trazabilidad...">
+      <button class="btn btn-primary" onclick="abrirModalDinamico('produccion')">➕ Nueva Trazabilidad</button>
+    </div>
+
+    <div id="trazabilidadTable" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Partida</th>
+            <th>Fecha/Hora</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="trazabilidadTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

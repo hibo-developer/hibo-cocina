@@ -1,0 +1,46 @@
+<!-- Sección Inventario -->
+<section id="inventario" class="section" style="display:none;">
+  <h2>📊 Control de Inventario</h2>
+  
+  <div class="toolbar">
+    <div class="search-group">
+      <input type="text" id="searchInventario" placeholder="Buscar artículo...">
+      <select id="filterGrupoConservacion">
+        <option value="">Todos los grupos</option>
+        <option value="Fresco">Fresco</option>
+        <option value="Congelado">Congelado</option>
+        <option value="Neutro">Neutro</option>
+        <option value="Refrigerado">Refrigerado</option>
+      </select>
+      <select id="filterStockBajo">
+        <option value="">Todos</option>
+        <option value="bajo">Stock Bajo</option>
+        <option value="normal">Stock Normal</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalDinamico('inventario')">📦 Actualizar Inventario</button>
+    <button id="btn-eliminar-inventario" class="btn btn-danger" onclick="eliminarSeleccionados('inventario', 'inventario')" disabled>🗑️ Eliminar (0)</button>
+  </div>
+
+  <div id="inventarioTable" class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="check-all-inventario" onchange="toggleSeleccionTodos('inventario', [])"></th>
+          <th>Código</th>
+          <th>Artículo</th>
+          <th>Grupo</th>
+          <th>Familia</th>
+          <th>Stock Actual</th>
+          <th>Stock Deseado</th>
+          <th>Stock Reserva</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="inventarioTableBody">
+      </tbody>
+    </table>
+    <div id="inventario-paginacion" class="pagination-container"></div>
+  </div>
+</section>

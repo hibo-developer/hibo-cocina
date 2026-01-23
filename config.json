@@ -1,0 +1,65 @@
+{
+  "aplicacion": {
+    "nombre": "HIBO COCINA",
+    "version": "1.0.0",
+    "descripcion": "Sistema integral de gestión de cocina y catering",
+    "autor": "Desarrollo - 2026",
+    "licencia": "Privada"
+  },
+  "servidor": {
+    "puerto": 3000,
+    "host": "localhost",
+    "ambiente": "development",
+    "baseUrl": "http://localhost:3000"
+  },
+  "base_datos": {
+    "tipo": "sqlite3",
+    "archivo": "data/hibo-cocina.db",
+    "timeout": 30000
+  },
+  "modulos_activos": {
+    "platos": true,
+    "pedidos": true,
+    "produccion": true,
+    "envases": true,
+    "partidas": true,
+    "etiquetas": true,
+    "estadisticas": true
+  },
+  "datos_importados_de_archivos_excel": {
+    "fabricacion.xlsb": {
+      "hojas_procesadas": [
+        "Platos Menu",
+        "Articulos Escandallos",
+        "Produccion",
+        "Envases",
+        "Partidas",
+        "Datos_Etiquetas",
+        "Impreso"
+      ],
+      "total_platos": 84,
+      "total_articulos": 1639,
+      "total_etiquetas": 2130,
+      "grupos_menu": [
+        "Arroces",
+        "Carnes",
+        "Pescados",
+        "Verduras",
+        "Pastas",
+        "Salsas",
+        "Postres"
+      ]
+    }
+  },
+  "features": [
+    "Catálogo de platos con 1600+ artículos",
+    "Gestión de pedidos con seguimiento de estado",
+    "Sistema de escandallos (recetas detalladas)",
+    "Trazabilidad de producción",
+    "Control de envases",
+    "Generación de etiquetas",
+    "Estadísticas y reportes",
+    "Dashboard de métricas",
+    "API REST completa"
+  ]
+}
