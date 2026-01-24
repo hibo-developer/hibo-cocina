@@ -44,7 +44,10 @@ class Escandallo {
       try {
         // Obtener el plato primero
         const plato = await Plato.obtenerPorCodigo(codigo_plato);
-        if (!plato) return resolve([]);
+        
+        if (!plato) {
+          return resolve([]);
+        }
         
         const sql = `
           SELECT 
@@ -54,16 +57,42 @@ class Escandallo {
             e.cantidad,
             e.unidad,
             e.coste,
-            i.nombre as ingrediente_nombre
+            i.nombre as ingrediente_nombre,
+            i.codigo as ingrediente_codigo,
+            i.tipo_entidad,
+            i.coste_unidad,
+            i.coste_kilo,
+            i.unidad_economato,
+            CASE 
+              WHEN e.coste > 0 THEN e.coste
+              WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('kg', 'kilo', 'kilos') THEN e.cantidad * i.coste_kilo
+              WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('g', 'gr', 'gramo', 'gramos') THEN (e.cantidad / 1000.0) * i.coste_kilo
+              WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('lt', 'l', 'litro', 'litros') THEN e.cantidad * i.coste_kilo
+              WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('ml', 'mililitro', 'mililitros') THEN (e.cantidad / 1000.0) * i.coste_kilo
+              WHEN i.coste_unidad > 0 AND LOWER(e.unidad) IN ('ud', 'unidad', 'unidades', 'u') THEN e.cantidad * i.coste_unidad
+              WHEN i.coste_kilo > 0 THEN e.cantidad * i.coste_kilo
+              WHEN i.coste_unidad > 0 THEN e.cantidad * i.coste_unidad
+              ELSE 0
+            END as coste_calculado
           FROM escandallos e
           LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
           WHERE e.plato_id = ?
-          ORDER BY i.nombre
+          ORDER BY 
+            CASE 
+              WHEN i.tipo_entidad = 'ingrediente' THEN 1
+              WHEN i.tipo_entidad = 'preelaborado' THEN 2
+              WHEN i.tipo_entidad = 'elaborado' THEN 3
+              ELSE 4
+            END,
+            i.nombre
         `;
         
         db.all(sql, [plato.id], (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows || []);
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rows || []);
+          }
         });
       } catch (error) {
         reject(error);
@@ -84,7 +113,21 @@ class Escandallo {
           e.coste,
           p.nombre as plato_nombre,
           p.codigo as plato_codigo,
-          i.nombre as ingrediente_nombre
+          i.nombre as ingrediente_nombre,
+          i.codigo as ingrediente_codigo,
+          i.coste_unidad,
+          i.coste_kilo,
+          CASE 
+            WHEN e.coste > 0 THEN e.coste
+            WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('kg', 'kilo', 'kilos') THEN e.cantidad * i.coste_kilo
+            WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('g', 'gr', 'gramo', 'gramos') THEN (e.cantidad / 1000.0) * i.coste_kilo
+            WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('lt', 'l', 'litro', 'litros') THEN e.cantidad * i.coste_kilo
+            WHEN i.coste_kilo > 0 AND LOWER(e.unidad) IN ('ml', 'mililitro', 'mililitros') THEN (e.cantidad / 1000.0) * i.coste_kilo
+            WHEN i.coste_unidad > 0 AND LOWER(e.unidad) IN ('ud', 'unidad', 'unidades', 'u') THEN e.cantidad * i.coste_unidad
+            WHEN i.coste_kilo > 0 THEN e.cantidad * i.coste_kilo
+            WHEN i.coste_unidad > 0 THEN e.cantidad * i.coste_unidad
+            ELSE 0
+          END as coste_calculado
         FROM escandallos e
         LEFT JOIN platos p ON e.plato_id = p.id
         LEFT JOIN ingredientes i ON e.ingrediente_id = i.id

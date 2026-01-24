@@ -48,6 +48,15 @@ class Plato {
     });
   }
 
+  static obtenerPorId(id) {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM platos WHERE id = ?', [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
   static obtenerTodos(filtro = {}) {
     return new Promise((resolve, reject) => {
       let sql = 'SELECT * FROM platos WHERE 1=1';

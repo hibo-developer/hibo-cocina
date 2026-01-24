@@ -15,6 +15,23 @@ exports.obtenerTodos = async (req, res) => {
   }
 };
 
+// Obtener escandallo por ID
+exports.obtenerPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const escandallo = await Escandallo.obtenerPorId(id);
+    
+    if (!escandallo) {
+      return res.status(404).json({ error: 'Escandallo no encontrado' });
+    }
+    
+    res.json(escandallo);
+  } catch (error) {
+    console.error('Error al obtener escandallo:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Obtener escandallos por plato
 exports.obtenerPorPlato = async (req, res) => {
   try {

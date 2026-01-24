@@ -4,7 +4,7 @@ const controlSanidadController = require('../controllers/controlSanidadControlle
 
 router.get('/', controlSanidadController.obtenerTodos);
 router.get('/count', controlSanidadController.contar);
-router.get('/id/:id', controlSanidadController.obtenerPorId);
+router.get('/:id', controlSanidadController.obtenerPorId);
 router.get('/plato/:plato_codigo', controlSanidadController.obtenerPorPlato);
 
 router.post('/', controlSanidadController.crear);

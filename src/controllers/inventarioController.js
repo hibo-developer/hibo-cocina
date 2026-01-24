@@ -23,17 +23,37 @@ exports.obtenerPorArticulo = async (req, res) => {
   }
 };
 
+// Obtener inventario por ID
+exports.obtenerPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const inventario = await Inventario.obtenerPorId(id);
+    
+    if (!inventario) {
+      return res.status(404).json({ error: 'Registro de inventario no encontrado' });
+    }
+    
+    res.json(inventario);
+  } catch (error) {
+    console.error('Error al obtener inventario:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Crear nuevo registro de inventario
 exports.crear = async (req, res) => {
   try {
-    const { articulo_id, cantidad, fecha_registro } = req.body;
+    const { ingrediente_id, articulo_id, cantidad, fecha_registro } = req.body;
     
-    if (!articulo_id || cantidad === undefined) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    // Aceptar tanto ingrediente_id como articulo_id para compatibilidad
+    const id = ingrediente_id || articulo_id;
+    
+    if (!id || cantidad === undefined) {
+      return res.status(400).json({ error: 'Faltan datos requeridos (ingrediente_id y cantidad)' });
     }
     
     const inventario = await Inventario.crear({
-      articulo_id,
+      ingrediente_id: id,
       cantidad,
       fecha_registro: fecha_registro || new Date().toISOString().split('T')[0]
     });

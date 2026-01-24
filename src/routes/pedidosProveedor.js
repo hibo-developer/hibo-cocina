@@ -4,7 +4,7 @@ const pedidosProveedorController = require('../controllers/pedidosProveedorContr
 
 router.get('/', pedidosProveedorController.obtenerTodos);
 router.get('/count', pedidosProveedorController.contar);
-router.get('/id/:id', pedidosProveedorController.obtenerPorId);
+router.get('/:id', pedidosProveedorController.obtenerPorId);
 router.get('/proveedor/:proveedor_id', pedidosProveedorController.obtenerPorProveedor);
 
 router.post('/', pedidosProveedorController.crear);

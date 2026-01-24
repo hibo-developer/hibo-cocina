@@ -31,6 +31,18 @@ exports.obtenerPorCodigo = async (req, res) => {
   }
 };
 
+exports.obtenerPorId = async (req, res) => {
+  try {
+    const plato = await Plato.obtenerPorId(req.params.id);
+    if (!plato) {
+      return res.status(404).json({ success: false, error: 'Plato no encontrado' });
+    }
+    res.json({ success: true, data: plato });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 exports.crear = async (req, res) => {
   try {
     const plato = await Plato.crear(req.body);

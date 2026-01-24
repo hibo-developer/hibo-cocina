@@ -2,7 +2,13 @@ const Ingrediente = require('../models/Ingrediente');
 
 exports.obtenerTodos = async (req, res) => {
   try {
-    const ingredientes = await Ingrediente.obtenerTodos();
+    // Si se pide incluir todos los tipos (elaborados, preelaborados)
+    const incluirTodos = req.query.incluir_todos === 'true';
+    
+    const ingredientes = incluirTodos 
+      ? await Ingrediente.obtenerTodosCompleto()
+      : await Ingrediente.obtenerTodos();
+      
     res.json(ingredientes);
   } catch (error) {
     console.error('Error al obtener ingredientes:', error);

@@ -5,7 +5,7 @@ const etiquetasController = require('../controllers/etiquetasController');
 // Rutas para etiquetas
 router.get('/', etiquetasController.obtenerTodas);
 router.get('/count', etiquetasController.contar);
-router.get('/id/:id', etiquetasController.obtenerPorId);
+router.get('/:id', etiquetasController.obtenerPorId);
 router.get('/plato/:codigo_plato', etiquetasController.obtenerPorPlato);
 router.get('/lote/:lote', etiquetasController.obtenerPorLote);
 router.get('/alergeno/:alergeno', etiquetasController.obtenerPorAlergeno);

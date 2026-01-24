@@ -18,6 +18,7 @@ const controlSanidadRoutes = require('./src/routes/controlSanidad');
 const proveedoresRoutes = require('./src/routes/proveedores');
 const pedidosProveedorRoutes = require('./src/routes/pedidosProveedor');
 const stockRoutes = require('./src/routes/stock');
+const alergenosPersonalizadosRoutes = require('./src/routes/alergenosPersonalizados');
 const { crearTablas } = require('./src/db/schema');
 
 const app = express();
@@ -58,6 +59,7 @@ app.use('/api/control-sanidad', controlSanidadRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/pedidos-proveedor', pedidosProveedorRoutes);
 app.use('/api/stock', stockRoutes);
+app.use('/api/alergenos-personalizados', alergenosPersonalizadosRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {

@@ -22,10 +22,11 @@ class CalculadoraCostes {
   calcularCosteIngrediente(cantidadBruta, unidad, perdida, costeKilo, pesoUnidad = 0) {
     // Calcular cantidad en kg/lt según unidad
     // Fórmula Excel I: IF(F="kg",H) + IF(F="ud",H*G) + IF(F="lt",H)
+    const unidadLower = (unidad || '').toLowerCase();
     let cantidadKilos = 0;
-    if (unidad === 'kg' || unidad === 'lt') {
+    if (unidadLower === 'kg' || unidadLower === 'lt' || unidadLower === 'l') {
       cantidadKilos = cantidadBruta;
-    } else if (unidad === 'ud') {
+    } else if (unidadLower === 'ud' || unidadLower === 'un') {
       cantidadKilos = cantidadBruta * pesoUnidad;
     }
 
@@ -48,20 +49,21 @@ class CalculadoraCostes {
    * Calcula el coste total de un escandallo (receta)
    * Fórmula Excel: SUM(M8:M27) - suma de todos los costes de ingredientes
    * 
-   * @param {string} platoId - ID del plato
+   * @param {number} platoId - ID del plato
    * @returns {Promise<Object>} {costeTotal, perdidaTotal, ingredientes[]}
    */
   async calcularCosteEscandallo(platoId) {
     return new Promise((resolve, reject) => {
-      // Obtener todos los ingredientes del escandallo
+      // Obtener todos los ingredientes del escandallo usando IDs
       this.db.all(
         `SELECT e.*, 
                 i.coste_kilo, 
-                i.peso_unidad,
-                i.nombre as nombre_ingrediente
+                i.peso_neto_envase as peso_unidad,
+                i.nombre as nombre_ingrediente,
+                i.codigo as codigo_ingrediente
          FROM escandallos e
-         LEFT JOIN ingredientes i ON e.ingrediente_codigo = i.codigo
-         WHERE e.plato_codigo = ?`,
+         LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+         WHERE e.plato_id = ?`,
         [platoId],
         (err, ingredientes) => {
           if (err) return reject(err);
@@ -76,7 +78,7 @@ class CalculadoraCostes {
             const calculo = this.calcularCosteIngrediente(
               ing.cantidad,
               ing.unidad,
-              ing.perdida || 0,
+              0, // pérdida por ahora en 0
               ing.coste_kilo || 0,
               ing.peso_unidad || 0
             );
@@ -87,7 +89,7 @@ class CalculadoraCostes {
 
             detalles.push({
               ingrediente: ing.nombre_ingrediente,
-              codigo: ing.ingrediente_codigo,
+              codigo: ing.codigo_ingrediente,
               cantidad: ing.cantidad,
               unidad: ing.unidad,
               ...calculo
@@ -101,6 +103,7 @@ class CalculadoraCostes {
 
           resolve({
             costeTotal,
+            costeEscandallo: costeTotal,
             pesoNetoTotal,
             pesoBrutoTotal,
             perdidaTotal,
@@ -135,7 +138,7 @@ class CalculadoraCostes {
    * Calcula los alérgenos de un plato basándose en sus ingredientes
    * Fórmula Excel: IF(COUNTIF(AO8:AO27,"X"),"x",0) para cada alérgeno
    * 
-   * @param {string} platoId - ID del plato
+   * @param {number} platoId - ID del plato
    * @returns {Promise<Object>} Objeto con alérgenos
    */
   async calcularAlergenosPlato(platoId) {
@@ -143,11 +146,10 @@ class CalculadoraCostes {
       // Obtener ingredientes del escandallo con sus alérgenos
       this.db.all(
         `SELECT i.sesamo, i.pescado, i.mariscos, i.apio, i.frutos_secos,
-                i.sulfitos, i.lacteos, i.altramuces, i.gluten, i.ovoproductos,
-                i.fiambre, i.purine, i.mostaza, i.cacahuetes, i.soja, i.moluscos
+                i.sulfitos, i.lacteos, i.altramuces, i.gluten, i.ovoproductos
          FROM escandallos e
-         JOIN ingredientes i ON e.ingrediente_codigo = i.codigo
-         WHERE e.plato_codigo = ? AND e.cantidad > 0`,
+         JOIN ingredientes i ON e.ingrediente_id = i.id
+         WHERE e.plato_id = ? AND e.cantidad > 0`,
         [platoId],
         (err, rows) => {
           if (err) return reject(err);
@@ -163,19 +165,13 @@ class CalculadoraCostes {
             lacteos: 0,
             altramuces: 0,
             gluten: 0,
-            ovoproductos: 0,
-            fiambre: 0,
-            purine: 0,
-            mostaza: 0,
-            cacahuetes: 0,
-            soja: 0,
-            moluscos: 0
+            ovoproductos: 0
           };
 
           // Si algún ingrediente tiene el alérgeno, marcar en el plato
           rows.forEach(ing => {
             Object.keys(alergenos).forEach(alergeno => {
-              if (ing[alergeno] === 'X' || ing[alergeno] === 'x') {
+              if (ing[alergeno] === 1 || ing[alergeno] === 'X' || ing[alergeno] === 'x') {
                 alergenos[alergeno] = 'x';
               }
             });
@@ -197,8 +193,9 @@ class CalculadoraCostes {
     return new Promise(async (resolve, reject) => {
       try {
         // Obtener peso de ración del plato
+        // Obtener datos del plato usando ID
         this.db.get(
-          'SELECT peso_raciones FROM platos WHERE codigo = ?',
+          'SELECT peso_raciones FROM platos WHERE id = ?',
           [platoId],
           async (err, plato) => {
             if (err) return reject(err);
@@ -206,27 +203,31 @@ class CalculadoraCostes {
 
             const pesoRacion = plato.peso_raciones || 0;
             
+            // Calcular coste de escandallo
+            const escandallo = await this.calcularCosteEscandallo(platoId);
+            
             // Calcular coste de ración
-            const costeRacion = await this.calcularCosteRacion(platoId, pesoRacion);
+            const costeRacion = pesoRacion > 0 && escandallo.pesoNetoTotal > 0
+              ? (escandallo.costeTotal / escandallo.pesoNetoTotal) * pesoRacion
+              : 0;
             
             // Calcular alérgenos heredados
             const alergenos = await this.calcularAlergenosPlato(platoId);
 
-            // Actualizar plato en la BD
+            // Actualizar plato en la BD usando ID
             this.db.run(
               `UPDATE platos 
                SET coste_racion = ?,
+                   coste_escandallo = ?,
                    sesamo = ?, pescado = ?, mariscos = ?, apio = ?, frutos_secos = ?,
-                   sulfitos = ?, lacteos = ?, altramuces = ?, gluten = ?, ovoproductos = ?,
-                   fiambre = ?, purine = ?, mostaza = ?, cacahuetes = ?, soja = ?, moluscos = ?
-               WHERE codigo = ?`,
+                   sulfitos = ?, lacteos = ?, altramuces = ?, gluten = ?, ovoproductos = ?
+               WHERE id = ?`,
               [
                 costeRacion,
+                escandallo.costeTotal,
                 alergenos.sesamo, alergenos.pescado, alergenos.mariscos, alergenos.apio,
                 alergenos.frutos_secos, alergenos.sulfitos, alergenos.lacteos,
                 alergenos.altramuces, alergenos.gluten, alergenos.ovoproductos,
-                alergenos.fiambre, alergenos.purine, alergenos.mostaza,
-                alergenos.cacahuetes, alergenos.soja, alergenos.moluscos,
                 platoId
               ],
               function(err) {
@@ -235,6 +236,7 @@ class CalculadoraCostes {
                 resolve({
                   platoId,
                   costeRacion,
+                  costeEscandallo: escandallo.costeTotal,
                   alergenos,
                   actualizado: true
                 });

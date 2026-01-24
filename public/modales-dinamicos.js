@@ -433,7 +433,8 @@ const MODAL_CONFIGS = {
         nombre: 'nombre',
         etiqueta: 'Nombre Plato',
         tipo: 'text',
-        required: true
+        required: true,
+        onInput: 'buscarDuplicadosPlato'
       },
       {
         nombre: 'grupo_menu',
@@ -875,10 +876,12 @@ const MODAL_CONFIGS = {
       },
       {
         nombre: 'nombre',
-        etiqueta: 'Nombre Artículo',
+        etiqueta: 'Nombre Artículo *',
         tipo: 'text',
         required: true,
-        placeholder: 'Ej: Aceite de Oliva Virgen Extra'
+        placeholder: 'Ej: Aceite de Oliva Virgen Extra',
+        onBlur: 'detectarAlergenosAutomatico',
+        onInput: 'buscarDuplicadosIngrediente'
       },
       {
         nombre: 'descripcion',
@@ -888,11 +891,89 @@ const MODAL_CONFIGS = {
         placeholder: 'Descripción detallada del artículo'
       },
       {
+        nombre: 'familia',
+        etiqueta: 'Familia',
+        tipo: 'autocomplete',
+        required: false,
+        placeholder: 'Escribe para buscar familia...',
+        options: ['Aceites y Grasas', 'Agua', 'Arroz', 'Articulos', 'Azúcar y derivados', 'Base culinaria', 
+                  'Bebidas con alcohol', 'Bebidas sin alcohol', 'Café y derivado', 'Carnes', 'Cereales', 'Cerveza', 
+                  'Condimentos y especias', 'Desechable', 'Encurtidos', 'Fiambres', 'Frutas', 'Fruto seco', 'General', 
+                  'Harina y derivado', 'Infusión', 'Legumbres', 'Limpieza', 'Lácteos y deri.', 'Marisco', 'Masa', 'Menaje', 
+                  'Ovoproductos', 'Panadería', 'Pasta', 'Pastelería', 'Pescados', 'Planta aromáticas', 'Platos', 'Postres', 
+                  'Preparado', 'Preparado entremet.', 'Salsas', 'Tubérculos', 'Verduras', 'Vinagre', 'Zumo y jugo']
+      },
+      {
         nombre: 'grupo_conservacion',
-        etiqueta: 'Grupo Conservación',
+        etiqueta: 'Grupo Conservación *',
         tipo: 'select',
         required: true,
         options: ['Fresco', 'Congelado', 'Neutro', 'Refrigerado']
+      },
+      {
+        nombre: 'unidad_economato',
+        etiqueta: 'Unidad Economato',
+        tipo: 'select',
+        required: false,
+        options: ['Ud', 'Kg', 'Lt']
+      },
+      {
+        nombre: 'unidad_escandallo',
+        etiqueta: 'Unidad Escandallo',
+        tipo: 'select',
+        required: false,
+        options: ['Ud', 'Kg', 'Lt']
+      },
+      {
+        nombre: 'coste_unidad',
+        etiqueta: 'Coste Unidad (€)',
+        tipo: 'number',
+        required: false,
+        step: '0.001',
+        min: '0'
+      },
+      {
+        nombre: 'coste_kilo',
+        etiqueta: 'Coste Kilo (€/kg)',
+        tipo: 'number',
+        required: false,
+        step: '0.001',
+        min: '0'
+      },
+      {
+        nombre: 'peso_neto_envase',
+        etiqueta: 'Peso Neto Envase (kg)',
+        tipo: 'number',
+        required: false,
+        step: '0.001',
+        min: '0'
+      },
+      {
+        nombre: 'alergenosMulti',
+        etiqueta: '⚠️ Alérgenos (14 oficiales)',
+        tipo: 'multiCheckbox',
+        required: false,
+        opciones: [
+          { nombre: 'gluten', etiqueta: 'Gluten' },
+          { nombre: 'cereales', etiqueta: 'Cereales' },
+          { nombre: 'crustaceos', etiqueta: 'Crustáceos' },
+          { nombre: 'moluscos', etiqueta: 'Moluscos' },
+          { nombre: 'pescado', etiqueta: 'Pescado' },
+          { nombre: 'cacahuetes', etiqueta: 'Cacahuetes' },
+          { nombre: 'frutos_secos', etiqueta: 'Frutos secos' },
+          { nombre: 'soja', etiqueta: 'Soja' },
+          { nombre: 'lacteos', etiqueta: 'Lácteos' },
+          { nombre: 'ovoproductos', etiqueta: 'Huevo' },
+          { nombre: 'apio', etiqueta: 'Apio' },
+          { nombre: 'mostaza', etiqueta: 'Mostaza' },
+          { nombre: 'sesamo', etiqueta: 'Sésamo' },
+          { nombre: 'sulfitos', etiqueta: 'Sulfitos' },
+          { nombre: 'altramuces', etiqueta: 'Altramuces' },
+          { nombre: 'mariscos', etiqueta: 'Mariscos' },
+          { nombre: 'ajo', etiqueta: 'Ajo' }
+        ],
+        columnas: 3,
+        autoDetect: true
       },
       {
         nombre: 'proveedor',
@@ -908,9 +989,9 @@ const MODAL_CONFIGS = {
     ]
   },
 
-  // MODAL 11: Escandallo (Receta)
-  escandallo: {
-    titulo: '📋 Nuevo Escandallo',
+  // MODAL 11: Escandallo (Receta) - VERSIÓN INDIVIDUAL (mantener por compatibilidad)
+  escandallo_simple: {
+    titulo: '📋 Agregar Ingrediente al Escandallo',
     hoja_origen: 'Escandallo (fabricación.xlsb)',
     campos: [
       {
@@ -942,7 +1023,7 @@ const MODAL_CONFIGS = {
       },
       {
         nombre: 'cantidad',
-        etiqueta: 'Cantidad Ud Escandallo',
+        etiqueta: 'Cantidad',
         tipo: 'number',
         required: true,
         min: 0.001,
@@ -957,88 +1038,11 @@ const MODAL_CONFIGS = {
         options: ['Kg', 'g', 'L', 'ml', 'Ud', 'Pieza', 'Lt']
       },
       {
-        nombre: 'peso_unidad',
-        etiqueta: 'Peso Unidad (Kg)',
-        tipo: 'number',
-        required: false,
-        min: 0,
-        step: 0.001,
-        placeholder: '0.000'
-      },
-      {
-        nombre: 'kilo_bruto',
-        etiqueta: 'Kilo Bruto',
-        tipo: 'number',
-        required: false,
-        min: 0,
-        step: 0.001,
-        placeholder: '0.000'
-      },
-      {
-        nombre: 'perdida_elaboracion',
-        etiqueta: '% Pérdida 1º Elaboración',
-        tipo: 'number',
-        required: false,
-        min: 0,
-        max: 100,
-        step: 0.01,
-        placeholder: '0.00'
-      },
-      {
-        nombre: 'peso_neto_real',
-        etiqueta: 'Peso Neto Real (Kg)',
-        tipo: 'number',
-        required: false,
-        readonly: true,
-        autoCalc: true,
-        placeholder: 'Se calcula automáticamente'
-      },
-      {
-        nombre: 'coste',
-        etiqueta: 'Coste (€)',
-        tipo: 'number',
-        required: false,
-        readonly: true,
-        autoCalc: true,
-        placeholder: 'Se calcula automáticamente'
-      },
-      {
-        nombre: 'partidas',
-        etiqueta: 'Partida Cocina',
-        tipo: 'select',
-        required: false,
-        lookup: 'partidas-cocina',
-        lookup_key: 'id',
-        lookup_display: 'nombre'
-      },
-      {
         nombre: 'activa',
         etiqueta: 'Activa',
         tipo: 'checkbox',
         required: false,
         default: true
-      },
-      {
-        nombre: 'mise_en_place',
-        etiqueta: 'Mise en Place',
-        tipo: 'textarea',
-        required: false,
-        rows: 2,
-        placeholder: 'Instrucciones de preparación previa'
-      },
-      {
-        nombre: 'punto_critico',
-        etiqueta: 'Punto Crítico',
-        tipo: 'text',
-        required: false,
-        placeholder: 'Ej: Temperatura mínima 75°C'
-      },
-      {
-        nombre: 'punto_corrector',
-        etiqueta: 'Acción Correctora',
-        tipo: 'text',
-        required: false,
-        placeholder: 'Ej: Cocinar hasta alcanzar temperatura'
       }
     ],
     validaciones: [
@@ -1048,39 +1052,165 @@ const MODAL_CONFIGS = {
     ]
   },
 
+  // MODAL 11B: Escandallo MÚLTIPLE - Crear receta completa de un plato
+  escandallo: {
+    titulo: '📖 Crear Receta Completa (Escandallo)',
+    hoja_origen: 'Escandallo (fabricación.xlsb)',
+    descripcion: 'Agrega todos los ingredientes, pre-elaborados y elaborados que componen este plato',
+    campos: [
+      {
+        nombre: 'plato_id',
+        etiqueta: 'Plato',
+        tipo: 'select',
+        required: true,
+        lookup: 'platos',
+        lookup_key: 'id',
+        lookup_display: 'nombre',
+        onChange: 'cargarEscandalloExistente',
+        help: 'Selecciona el plato para el que vas a crear la receta'
+      },
+      {
+        nombre: 'ingredientes',
+        etiqueta: '🥘 Ingredientes de la Receta',
+        tipo: 'array_dinamico',
+        required: true,
+        min_items: 1,
+        item_template: {
+          ingrediente_id: {
+            etiqueta: 'Ingrediente/Elaborado/Pre-elaborado',
+            tipo: 'select',
+            required: true,
+            lookup: 'ingredientes',
+            lookup_key: 'id',
+            lookup_display: 'nombre',
+            placeholder: 'Buscar ingrediente...',
+            width: '40%'
+          },
+          cantidad: {
+            etiqueta: 'Cantidad',
+            tipo: 'number',
+            required: true,
+            min: 0.001,
+            step: 0.001,
+            placeholder: '0.000',
+            width: '20%'
+          },
+          unidad: {
+            etiqueta: 'Unidad',
+            tipo: 'select',
+            required: true,
+            options: ['Kg', 'g', 'L', 'ml', 'Ud', 'Pieza', 'Lt'],
+            default: 'Kg',
+            width: '15%'
+          },
+          planning: {
+            etiqueta: 'Preparación',
+            tipo: 'select',
+            required: false,
+            options: ['Medir', 'Pesar', 'Contar', 'Troceado', 'Cocido', 'Otro'],
+            width: '20%'
+          }
+        },
+        botones: {
+          agregar: '➕ Agregar ingrediente',
+          eliminar: '🗑️'
+        }
+      },
+      {
+        nombre: 'alergenos_seccion',
+        etiqueta: '⚠️ Alérgenos - Edición Manual',
+        tipo: 'multi-checkbox',
+        help: 'Los alérgenos se detectan automáticamente, pero puedes ajustarlos manualmente',
+        opciones: [
+          { nombre: 'gluten', etiqueta: 'Gluten' },
+          { nombre: 'cereales', etiqueta: 'Cereales' },
+          { nombre: 'lacteos', etiqueta: 'Lácteos' },
+          { nombre: 'huevo', etiqueta: 'Huevo' },
+          { nombre: 'pescado', etiqueta: 'Pescado' },
+          { nombre: 'mariscos', etiqueta: 'Mariscos' },
+          { nombre: 'crustaceos', etiqueta: 'Crustáceos' },
+          { nombre: 'moluscos', etiqueta: 'Moluscos' },
+          { nombre: 'frutos_secos', etiqueta: 'Frutos secos' },
+          { nombre: 'cacahuetes', etiqueta: 'Cacahuetes' },
+          { nombre: 'soja', etiqueta: 'Soja' },
+          { nombre: 'sesamo', etiqueta: 'Sésamo' },
+          { nombre: 'apio', etiqueta: 'Apio' },
+          { nombre: 'mostaza', etiqueta: 'Mostaza' },
+          { nombre: 'sulfitos', etiqueta: 'Sulfitos' },
+          { nombre: 'altramuces', etiqueta: 'Altramuces' }
+        ],
+        columnas: 3,
+        cargarPersonalizados: true // Flag para cargar alérgenos personalizados
+      },
+      {
+        nombre: 'notas_generales',
+        etiqueta: '📝 Notas Generales de la Receta',
+        tipo: 'textarea',
+        required: false,
+        rows: 3,
+        placeholder: 'Instrucciones generales, mise en place, puntos críticos...'
+      }
+    ],
+    validaciones: [
+      { campo: 'plato_id', regla: 'existe', error: 'Debes seleccionar un plato' },
+      { campo: 'ingredientes', regla: 'array_no_vacio', error: 'Debes agregar al menos un ingrediente' }
+    ],
+    onSubmit: 'guardarEscandalloMultiple'
+  },
+
   // MODAL 12: Inventario
   inventario: {
     titulo: '📦 Actualizar Inventario',
     hoja_origen: 'Inventario (fabricación.xlsb)',
     campos: [
       {
-        nombre: 'codigo_interno',
+        nombre: 'ingrediente_id',
         etiqueta: 'Código Artículo',
         tipo: 'select',
         required: true,
         lookup: 'ingredientes',
-        lookup_key: 'codigo',
+        lookup_key: 'id',
         lookup_display: 'nombre',
-        onChange: 'autoFillInventarioInfo'
+        onChange: 'autoFillInventarioInfo',
+        onInput: 'buscarDuplicadosInventario'
       },
       {
-        nombre: 'articulo',
+        nombre: 'nombre_articulo',
         etiqueta: 'Nombre Artículo',
         tipo: 'text',
         required: false,
         readonly: true,
-        dependsOn: 'codigo_interno'
+        dependsOn: 'ingrediente_id'
       },
       {
-        nombre: 'grupo_conservacion',
-        etiqueta: 'Grupo Conservación',
-        tipo: 'text',
+        nombre: 'ubicacion',
+        etiqueta: 'Ubicación (Partida/Almacén)',
+        tipo: 'select',
         required: false,
-        readonly: true,
-        dependsOn: 'codigo_interno'
+        options: ['Economato', 'Bodega', 'Carnicería', 'Pescaderías', 'Verduras', 'Frutas', 
+                  'Cuarto frio', 'Panaderia', 'Pastelería', 'Caliente', 'Guarniciones', 
+                  'Salsas', 'Aperitivos', 'Desayuno', 'OFFICE', 'Precocinado', 
+                  'Verduras Cong', 'Frutas Cong', 'Desechable', 'Envases'],
+        dependsOn: 'ingrediente_id'
       },
       {
-        nombre: 'inventario',
+        nombre: 'unidad_economato',
+        etiqueta: 'Unidad Economato',
+        tipo: 'select',
+        required: false,
+        options: ['Ud', 'Kg', 'Lt'],
+        dependsOn: 'ingrediente_id'
+      },
+      {
+        nombre: 'unidad_escandallo',
+        etiqueta: 'Unidad Escandallo',
+        tipo: 'select',
+        required: false,
+        options: ['Ud', 'Kg', 'Lt'],
+        dependsOn: 'ingrediente_id'
+      },
+      {
+        nombre: 'cantidad',
         etiqueta: 'Cantidad en Stock',
         tipo: 'number',
         required: true,
@@ -1089,36 +1219,23 @@ const MODAL_CONFIGS = {
         placeholder: '0.00'
       },
       {
-        nombre: 'stock_deseado',
-        etiqueta: 'Stock Deseado (%)',
-        tipo: 'number',
+        nombre: 'lote',
+        etiqueta: 'Lote',
+        tipo: 'text',
         required: false,
-        min: 0,
-        max: 100,
-        default: 100
+        placeholder: 'Ej: 20260124-001',
+        autoGenerate: true
       },
       {
-        nombre: 'stock_reserva',
-        etiqueta: 'Stock de Reserva',
-        tipo: 'number',
-        required: false,
-        min: 0,
-        step: 0.01,
-        placeholder: '0.00'
-      },
-      {
-        nombre: 'pedidos',
-        etiqueta: 'Pedidos Pendientes',
-        tipo: 'number',
-        required: false,
-        min: 0,
-        step: 0.01,
-        default: 0
+        nombre: 'fecha_caducidad',
+        etiqueta: 'Fecha Caducidad',
+        tipo: 'date',
+        required: false
       }
     ],
     validaciones: [
-      { campo: 'codigo_interno', regla: 'existe', error: 'El código interno no existe' },
-      { campo: 'inventario', regla: 'mayor_igual_cero', error: 'El inventario no puede ser negativo' }
+      { campo: 'ingrediente_id', regla: 'existe', error: 'El ingrediente no existe' },
+      { campo: 'cantidad', regla: 'mayor_igual_cero', error: 'La cantidad no puede ser negativa' }
     ]
   }
 };
@@ -1188,14 +1305,70 @@ async function autoFillPlatoInfo(codigoSeleccionado) {
 }
 
 async function autoFillSanidadData(loteProduccion) {
-  const trazabilidad = await fetch(`/api/trazabilidad/${loteProduccion}`).then(r => r.json());
+  try {
+    // Buscar trazabilidad por lote usando el endpoint correcto
+    const trazabilidad = await fetch(`/api/trazabilidad/lote/${loteProduccion}`).then(r => {
+      if (!r.ok) throw new Error('Trazabilidad no encontrada');
+      return r.json();
+    });
+    
+    // Si devuelve array, tomar el primero
+    const traz = Array.isArray(trazabilidad) ? trazabilidad[0] : trazabilidad;
+    
+    if (traz) {
+      document.querySelector('[name="plato"]').value = traz.codigo_plato || traz.plato_codigo;
+      document.querySelector('[name="fecha_produccion"]').value = traz.fecha_produccion;
+      
+      // Cargar puntos críticos según plato
+      const platoId = traz.plato_id;
+      if (platoId) {
+        const plato = await fetch(`/api/platos/${platoId}`).then(r => r.json());
+        cargarPuntosControlSanidad(plato.preparacion || 'Caliente');
+      }
+    }
+  } catch (error) {
+    console.error('Error al cargar datos de sanidad:', error);
+    // Cargar valores por defecto
+    cargarPuntosControlSanidad('Caliente');
+  }
+}
+
+async function autoFillInventarioInfo(ingredienteId) {
+  if (!ingredienteId) return;
   
-  document.querySelector('[name="plato"]').value = trazabilidad.codigo_plato;
-  document.querySelector('[name="fecha_produccion"]').value = trazabilidad.fecha_produccion;
-  
-  // Cargar puntos críticos según plato
-  const plato = await fetch(`/api/platos/${trazabilidad.codigo_plato}`).then(r => r.json());
-  cargarPuntosControlSanidad(plato.preparacion);
+  try {
+    const ingrediente = await fetch(`/api/ingredientes/${ingredienteId}`).then(r => {
+      if (!r.ok) throw new Error('Ingrediente no encontrado');
+      return r.json();
+    });
+    
+    // Autorrellena campos del modal
+    const nombreField = document.querySelector('[name="nombre_articulo"]');
+    if (nombreField) nombreField.value = ingrediente.nombre || '';
+    
+    const ubicacionField = document.querySelector('[name="ubicacion"]');
+    if (ubicacionField && ingrediente.partidas_almacen) {
+      ubicacionField.value = ingrediente.partidas_almacen;
+    }
+    
+    const unidadEconomatoField = document.querySelector('[name="unidad_economato"]');
+    if (unidadEconomatoField && ingrediente.unidad_economato) {
+      unidadEconomatoField.value = ingrediente.unidad_economato;
+    }
+    
+    const unidadEscandalloField = document.querySelector('[name="unidad_escandallo"]');
+    if (unidadEscandalloField && ingrediente.unidad_escandallo) {
+      unidadEscandalloField.value = ingrediente.unidad_escandallo;
+    }
+    
+    // Generar lote automáticamente
+    const loteField = document.querySelector('[name="lote"]');
+    if (loteField && !loteField.value) {
+      loteField.value = generateLote();
+    }
+  } catch (error) {
+    console.error('Error al cargar información del ingrediente:', error);
+  }
 }
 
 function cargarPuntosControlSanidad(preparacion) {
@@ -1277,9 +1450,10 @@ function calcularCostePedido(cantidad) {
 // ============================================================================
 
 class ModalDinamico {
-  constructor(nombreConfig) {
+  constructor(nombreConfig, parametros = {}) {
     this.config = MODAL_CONFIGS[nombreConfig];
     this.data = {};
+    this.parametros = parametros; // Guardar parámetros adicionales
   }
 
   async render() {
@@ -1299,7 +1473,11 @@ class ModalDinamico {
     `;
     content.appendChild(header);
 
-    // Formulario
+    // Formulario con scroll
+    const formContainer = document.createElement('div');
+    formContainer.id = 'modalFormContainer';
+    formContainer.style.cssText = 'overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0; padding: 0;';
+    
     const form = document.createElement('form');
     form.id = `form-${this.config.titulo.replace(/\s+/g, '-')}`;
     form.className = 'modal-form';
@@ -1309,20 +1487,40 @@ class ModalDinamico {
       form.appendChild(formGroup);
     }
 
-    // Footer
+    formContainer.appendChild(form);
+    content.appendChild(formContainer);
+
+    // Si es modo edición, pre-cargar datos
+    if (this.parametros.modo === 'editar' && this.parametros.plato) {
+      setTimeout(() => {
+        const platoSelect = form.querySelector('select[name="plato_id"]');
+        if (platoSelect && this.parametros.plato.id) {
+          platoSelect.value = this.parametros.plato.id;
+          // Disparar el onChange con los parámetros
+          if (typeof window.cargarEscandalloExistente === 'function') {
+            window.cargarEscandalloExistente(this.parametros.plato.id, this.parametros);
+          }
+        }
+      }, 200);
+    }
+
+    // Footer (botones sticky fuera del scroll)
     const footer = document.createElement('div');
-    footer.className = 'modal-footer';
+    footer.className = 'modal-buttons';
     footer.innerHTML = `
       <button type="button" class="btn-cancel" onclick="cerrarModalDinamico(this)">Cancelar</button>
-      <button type="submit" class="btn-primary">Guardar</button>
+      <button type="submit" class="btn-primary" id="btn-submit-${this.config.titulo.replace(/\s+/g, '-')}">Guardar</button>
     `;
 
-    form.appendChild(footer);
-    content.appendChild(form);
+    content.appendChild(footer);
     modal.appendChild(content);
 
     // Event listeners
-    form.addEventListener('submit', (e) => this.guardar(e));
+    const submitBtn = footer.querySelector('.btn-primary');
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.guardar(e);
+    });
     
     // Cerrar al hacer clic fuera del modal
     modal.addEventListener('click', (e) => {
@@ -1339,7 +1537,14 @@ class ModalDinamico {
     group.className = 'form-group';
     group.id = `group-${campo.nombre}`;
     
-    // Label
+    // Para array_dinamico, no agregamos label aquí porque el componente lo maneja internamente
+    if (campo.tipo === 'array_dinamico') {
+      const input = this.crearArrayDinamico(campo);
+      group.appendChild(input);
+      return group;
+    }
+    
+    // Label para campos normales
     const label = document.createElement('label');
     label.htmlFor = campo.nombre;
     label.innerHTML = `
@@ -1372,9 +1577,21 @@ class ModalDinamico {
       case 'search-select':
         input = this.crearSearchSelect(campo);
         break;
-      case 'dinamico_array':
+      case 'autocomplete':
+        input = this.crearAutocomplete(campo);
+        break;
+      case 'array_dinamico':
         input = this.crearArrayDinamico(campo);
         break;
+      case 'checkbox':
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        if (campo.default) input.checked = true;
+        break;
+      case 'multi-checkbox':
+        input = this.crearMultiCheckbox(campo);
+        group.appendChild(input);
+        return group; // Retornar directamente porque ya tiene su estructura
       default:
         input = document.createElement('input');
         input.type = 'text';
@@ -1385,14 +1602,52 @@ class ModalDinamico {
     input.required = campo.required;
     input.readOnly = campo.readonly;
     
+    // El array_dinamico no necesita estos atributos porque maneja sus propios inputs internos
+    if (campo.tipo === 'array_dinamico') {
+      group.appendChild(input);
+      return group;
+    }
+    
     if (campo.placeholder) input.placeholder = campo.placeholder;
     if (campo.min !== undefined) input.min = campo.min;
     if (campo.pattern) input.pattern = campo.pattern;
 
+    // Auto-generar valor inicial si está marcado
+    if (campo.autoGenerate && input.type === 'text') {
+      input.value = generateLote();
+    }
+
     // Event listeners para auto-relleno
     if (campo.onChange) {
       input.addEventListener('change', () => {
-        window[campo.onChange](input.value);
+        if (typeof window[campo.onChange] === 'function') {
+          // Pasar el valor y los parámetros adicionales del modal
+          window[campo.onChange](input.value, this.parametros);
+        } else {
+          console.warn(`Función ${campo.onChange} no está definida`);
+        }
+      });
+    }
+
+    // Event listener para onBlur (detectar alérgenos, etc)
+    if (campo.onBlur) {
+      input.addEventListener('blur', () => {
+        if (typeof window[campo.onBlur] === 'function') {
+          window[campo.onBlur](input.value, this);
+        } else {
+          console.warn(`Función ${campo.onBlur} no está definida`);
+        }
+      });
+    }
+
+    // Event listener para onInput (búsqueda de duplicados, etc)
+    if (campo.onInput) {
+      input.addEventListener('input', () => {
+        if (typeof window[campo.onInput] === 'function') {
+          window[campo.onInput](input.value, this);
+        } else {
+          console.warn(`Función ${campo.onInput} no está definida`);
+        }
       });
     }
 
@@ -1479,6 +1734,120 @@ class ModalDinamico {
     return div;
   }
 
+  crearMultiCheckbox(campo) {
+    const container = document.createElement('div');
+    container.className = 'multi-checkbox-container';
+    container.id = `alergenos-container`;
+    container.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107;';
+
+    // Título
+    const titulo = document.createElement('h4');
+    titulo.textContent = campo.etiqueta;
+    titulo.style.cssText = 'margin: 0 0 10px 0; color: #333; font-size: 1em; display: flex; align-items: center; gap: 8px;';
+    container.appendChild(titulo);
+
+    // Help text
+    if (campo.help) {
+      const help = document.createElement('small');
+      help.textContent = campo.help;
+      help.style.cssText = 'display: block; margin-bottom: 15px; color: #666; font-size: 0.85em;';
+      container.appendChild(help);
+    }
+
+    // Grid de checkboxes
+    const grid = document.createElement('div');
+    grid.className = 'multi-checkbox-grid';
+    const columnas = campo.columnas || 3;
+    grid.style.cssText = `display: grid; grid-template-columns: repeat(${columnas}, 1fr); gap: 12px;`;
+
+    // Función para crear un checkbox
+    const crearCheckbox = (opcion, icono = '') => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display: flex; align-items: center; cursor: pointer; padding: 10px; border-radius: 6px; background: white; border: 2px solid #e0e0e0; transition: all 0.2s;';
+      label.addEventListener('mouseenter', () => {
+        label.style.borderColor = '#2c5f8d';
+        label.style.background = '#f0f7ff';
+      });
+      label.addEventListener('mouseleave', () => {
+        const checkbox = label.querySelector('input[type="checkbox"]');
+        if (!checkbox.checked) {
+          label.style.borderColor = '#e0e0e0';
+          label.style.background = 'white';
+        }
+      });
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = `alergenos_${opcion.nombre}`;
+      checkbox.id = `alergeno_${opcion.nombre}`;
+      checkbox.value = opcion.nombre;
+      checkbox.style.cssText = 'margin-right: 10px; width: 18px; height: 18px; cursor: pointer;';
+      
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          label.style.borderColor = '#2c5f8d';
+          label.style.background = '#e3f2fd';
+        } else {
+          label.style.borderColor = '#e0e0e0';
+          label.style.background = 'white';
+        }
+      });
+
+      const texto = document.createElement('span');
+      texto.textContent = `${icono} ${opcion.etiqueta}`.trim();
+      texto.style.cssText = 'font-size: 0.9em; user-select: none;';
+
+      label.appendChild(checkbox);
+      label.appendChild(texto);
+      return label;
+    };
+
+    // Agregar alérgenos oficiales
+    campo.opciones.forEach(opcion => {
+      grid.appendChild(crearCheckbox(opcion));
+    });
+
+    container.appendChild(grid);
+
+    // Cargar alérgenos personalizados si está habilitado
+    if (campo.cargarPersonalizados) {
+      fetch('/api/alergenos-personalizados')
+        .then(r => r.json())
+        .then(datos => {
+          const personalizados = datos.data || datos;
+          const activos = personalizados.filter(a => a.activo === 1);
+          
+          if (activos.length > 0) {
+            // Separador
+            const separador = document.createElement('div');
+            separador.style.cssText = 'grid-column: 1 / -1; border-top: 2px dashed #ccc; margin: 10px 0; padding-top: 10px;';
+            separador.innerHTML = '<small style="color: #666; font-weight: 600;">✨ Alérgenos Personalizados:</small>';
+            grid.appendChild(separador);
+            
+            // Agregar alérgenos personalizados usando el nombre como ID
+            activos.forEach(alergeno => {
+              // Convertir nombre a formato de ID: "Chile Picante" → "chile_picante"
+              const nombreId = alergeno.nombre.toLowerCase()
+                .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
+                .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
+                .replace(/[úùüû]/g, 'u').replace(/ñ/g, 'n')
+                .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+              
+              const opcion = {
+                nombre: nombreId,
+                etiqueta: alergeno.nombre
+              };
+              grid.appendChild(crearCheckbox(opcion, alergeno.icono || ''));
+            });
+          }
+        })
+        .catch(err => console.error('Error cargando alérgenos personalizados:', err));
+    }
+
+    return container;
+    return container;
+  }
+
   crearDate(campo) {
     const input = document.createElement('input');
     input.type = 'date';
@@ -1557,39 +1926,580 @@ class ModalDinamico {
     return container;
   }
 
-  crearArrayDinamico(campo) {
+  crearAutocomplete(campo) {
     const container = document.createElement('div');
-    container.className = 'dynamic-array-container';
+    container.className = 'autocomplete-container';
+    container.style.cssText = 'position: relative;';
 
-    const agregarBtn = document.createElement('button');
-    agregarBtn.type = 'button';
-    agregarBtn.textContent = '+ Agregar Item';
-    agregarBtn.className = 'btn-add';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'autocomplete-input';
+    input.placeholder = campo.placeholder || `Buscar ${campo.etiqueta}...`;
+    input.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1em;
+      font-family: inherit;
+    `;
 
-    const itemsContainer = document.createElement('div');
-    itemsContainer.className = 'dynamic-items';
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'autocomplete-dropdown';
+    dropdown.style.cssText = `
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    `;
 
-    agregarBtn.addEventListener('click', () => {
-      const item = document.createElement('div');
-      item.className = 'dynamic-item';
+    const opciones = campo.options || [];
 
-      campo.subitems.forEach(subfield => {
-        const grupo = this.crearCampo(subfield);
-        item.appendChild(grupo);
+    // Función auxiliar para normalizar texto (sin tildes)
+    const normalizarTexto = (texto) => {
+      return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    };
+
+    input.addEventListener('input', (e) => {
+      const valorNormalizado = normalizarTexto(e.target.value.trim());
+      
+      dropdown.innerHTML = '';
+      
+      if (valorNormalizado.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      // Filtrar opciones que coincidan (sin tildes)
+      const coincidencias = opciones.filter(opcion =>
+        normalizarTexto(opcion).includes(valorNormalizado)
+      );
+
+      if (coincidencias.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      // Mostrar opciones coincidentes
+      coincidencias.forEach(opcion => {
+        const li = document.createElement('li');
+        li.textContent = opcion;
+        li.style.cssText = `
+          padding: 10px 12px;
+          cursor: pointer;
+          border-bottom: 1px solid #f0f0f0;
+          transition: background-color 0.2s;
+        `;
+        
+        li.addEventListener('mouseenter', () => {
+          li.style.backgroundColor = '#f5f5f5';
+        });
+        
+        li.addEventListener('mouseleave', () => {
+          li.style.backgroundColor = 'transparent';
+        });
+        
+        li.addEventListener('click', () => {
+          input.value = opcion;
+          dropdown.style.display = 'none';
+          input.dispatchEvent(new Event('change'));
+          input.dispatchEvent(new Event('blur'));
+        });
+        
+        dropdown.appendChild(li);
       });
 
-      const eliminarBtn = document.createElement('button');
-      eliminarBtn.type = 'button';
-      eliminarBtn.textContent = '✕ Eliminar';
-      eliminarBtn.className = 'btn-remove';
-      eliminarBtn.addEventListener('click', () => item.remove());
-
-      item.appendChild(eliminarBtn);
-      itemsContainer.appendChild(item);
+      dropdown.style.display = 'block';
     });
 
-    container.appendChild(agregarBtn);
-    container.appendChild(itemsContainer);
+    // Cerrar dropdown al perder el foco
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        dropdown.style.display = 'none';
+      }, 200);
+    });
+
+    // Mostrar todas las opciones al hacer focus si está vacío
+    input.addEventListener('focus', () => {
+      if (input.value.length === 0) {
+        dropdown.innerHTML = '';
+        opciones.forEach(opcion => {
+          const li = document.createElement('li');
+          li.textContent = opcion;
+          li.style.cssText = `
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+          `;
+          
+          li.addEventListener('mouseenter', () => {
+            li.style.backgroundColor = '#f5f5f5';
+          });
+          
+          li.addEventListener('mouseleave', () => {
+            li.style.backgroundColor = 'transparent';
+          });
+          
+          li.addEventListener('click', () => {
+            input.value = opcion;
+            dropdown.style.display = 'none';
+            input.dispatchEvent(new Event('change'));
+          });
+          
+          dropdown.appendChild(li);
+        });
+        dropdown.style.display = 'block';
+      }
+    });
+
+    container.appendChild(input);
+    container.appendChild(dropdown);
+    return container;
+  }
+
+  crearArrayDinamico(campo) {
+    const container = document.createElement('div');
+    container.className = 'dynamic-array-elegant';
+    container.style.cssText = 'margin: 20px 0;';
+
+    // Sección de ingredientes agregados (tabla resumen)
+    const resumenSection = document.createElement('div');
+    resumenSection.style.cssText = 'background: white; border: 2px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px;';
+    
+    const resumenHeader = document.createElement('div');
+    resumenHeader.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 15px;';
+    resumenHeader.innerHTML = `
+      <span style="font-size: 1.1em;">🥘</span>
+      <strong style="font-size: 1em; color: #333;">Ingredientes</strong>
+      <span id="contador-ingredientes" style="background: #4caf50; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">0</span>
+    `;
+    resumenSection.appendChild(resumenHeader);
+
+    // Tabla de ingredientes
+    const tablaResumen = document.createElement('table');
+    tablaResumen.id = 'tabla-resumen-ingredientes';
+    tablaResumen.style.cssText = 'width: 100%; border-collapse: collapse;';
+    tablaResumen.innerHTML = `
+      <thead>
+        <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+          <th style="padding: 10px; text-align: left; font-size: 0.85em; color: #666;">Ingrediente</th>
+          <th style="padding: 10px; text-align: center; font-size: 0.85em; color: #666;">Cantidad</th>
+          <th style="padding: 10px; text-align: center; font-size: 0.85em; color: #666;">Unit.</th>
+          <th style="padding: 10px; text-align: right; font-size: 0.85em; color: #666;">€/Unit</th>
+          <th style="padding: 10px; text-align: right; font-size: 0.85em; color: #666;">Total €</th>
+          <th style="padding: 10px; text-align: center; font-size: 0.85em; color: #666;"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody-resumen"></tbody>
+      <tfoot>
+        <tr style="background: #e8f5e9; border-top: 2px solid #4caf50;">
+          <td colspan="4" style="padding: 12px; text-align: right; font-weight: 600; color: #2e7d32;">COSTE TOTAL INGREDIENTES:</td>
+          <td id="coste-total" style="padding: 12px; text-align: right; font-weight: 700; font-size: 1.1em; color: #2e7d32;">€0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    `;
+    resumenSection.appendChild(tablaResumen);
+    container.appendChild(resumenSection);
+
+    // Sección de edición/agregar
+    const edicionSection = document.createElement('div');
+    edicionSection.style.cssText = 'background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px;';
+    
+    const edicionHeader = document.createElement('div');
+    edicionHeader.style.cssText = 'margin-bottom: 15px;';
+    edicionHeader.innerHTML = '<strong style="font-size: 0.95em; color: #666;">Editar/Agregar Ingredientes:</strong>';
+    edicionSection.appendChild(edicionHeader);
+
+    // Contenedor de filas de edición
+    const filasContainer = document.createElement('div');
+    filasContainer.id = 'filas-edicion-container';
+    filasContainer.style.cssText = 'display: flex; flex-direction: column; gap: 15px;';
+    edicionSection.appendChild(filasContainer);
+
+    // Botón agregar
+    const btnAgregar = document.createElement('button');
+    btnAgregar.type = 'button';
+    btnAgregar.id = 'btn-agregar-ingrediente-escandallo'; // ID único para buscarlo después
+    btnAgregar.innerHTML = '➕ Agregar otro ingrediente';
+    btnAgregar.style.cssText = 'margin-top: 15px; padding: 10px 20px; background: white; border: 2px dashed #9c27b0; color: #9c27b0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.2s;';
+    btnAgregar.addEventListener('mouseenter', () => {
+      btnAgregar.style.background = '#f3e5f5';
+      btnAgregar.style.borderColor = '#7b1fa2';
+    });
+    btnAgregar.addEventListener('mouseleave', () => {
+      btnAgregar.style.background = 'white';
+      btnAgregar.style.borderColor = '#9c27b0';
+    });
+    edicionSection.appendChild(btnAgregar);
+    container.appendChild(edicionSection);
+
+    // Array para almacenar ingredientes
+    let ingredientes = [];
+    let nextIndex = 0;
+
+    // Función para agregar fila de edición
+    const agregarFilaEdicion = () => {
+      const index = nextIndex++;
+      const fila = document.createElement('div');
+      fila.className = 'fila-edicion';
+      fila.dataset.index = index;
+      fila.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; background: white; padding: 15px; border-radius: 6px; border: 1px solid #e0e0e0;';
+
+      // Campo ingrediente (autocomplete)
+      const colIngrediente = document.createElement('div');
+      const labelIng = document.createElement('label');
+      labelIng.textContent = 'Ingrediente/Elaborado/Pre-elaborado';
+      labelIng.style.cssText = 'display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85em; color: #555;';
+      colIngrediente.appendChild(labelIng);
+
+      // Input de búsqueda
+      const inputBusqueda = document.createElement('input');
+      inputBusqueda.type = 'text';
+      inputBusqueda.placeholder = '🔍 Escribe para buscar...';
+      inputBusqueda.style.cssText = 'width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.9em; margin-bottom: 8px;';
+      colIngrediente.appendChild(inputBusqueda);
+
+      const selectIng = document.createElement('select');
+      selectIng.name = `${campo.nombre}[${index}][ingrediente_id]`;
+      selectIng.required = true;
+      selectIng.style.cssText = 'width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.95em; display: none;'; // Oculto inicialmente
+      selectIng.innerHTML = '<option value="">-- Seleccionar --</option>';
+      
+      // Cargar TODOS los ingredientes (ingrediente, preelaborado, elaborado)
+      fetch('/api/ingredientes?incluir_todos=true')
+        .then(r => r.json())
+        .then(datos => {
+          const items = datos.data || datos;
+          
+          // Agrupar por tipo_entidad
+          const ingredientes = items.filter(i => !i.tipo_entidad || i.tipo_entidad === 'ingrediente');
+          const preelaborados = items.filter(i => i.tipo_entidad === 'preelaborado');
+          const elaborados = items.filter(i => i.tipo_entidad === 'elaborado');
+          
+          // Crear optgroup para ingredientes
+          if (ingredientes.length > 0) {
+            const group1 = document.createElement('optgroup');
+            group1.label = '🥬 Ingredientes';
+            ingredientes.forEach(item => {
+              const opt = document.createElement('option');
+              opt.value = item.id;
+              opt.textContent = item.nombre;
+              opt.dataset.coste = item.coste_kilo || item.coste_unidad || 0;
+              group1.appendChild(opt);
+            });
+            selectIng.appendChild(group1);
+          }
+          
+          // Crear optgroup para preelaborados
+          if (preelaborados.length > 0) {
+            const group2 = document.createElement('optgroup');
+            group2.label = '🔪 Pre-elaborados';
+            preelaborados.forEach(item => {
+              const opt = document.createElement('option');
+              opt.value = item.id;
+              opt.textContent = item.nombre;
+              opt.dataset.coste = item.coste_kilo || item.coste_unidad || 0;
+              group2.appendChild(opt);
+            });
+            selectIng.appendChild(group2);
+          }
+          
+          // Crear optgroup para elaborados
+          if (elaborados.length > 0) {
+            const group3 = document.createElement('optgroup');
+            group3.label = '🍳 Elaborados';
+            elaborados.forEach(item => {
+              const opt = document.createElement('option');
+              opt.value = item.id;
+              opt.textContent = item.nombre;
+              opt.dataset.coste = item.coste_kilo || item.coste_unidad || 0;
+              group3.appendChild(opt);
+            });
+            selectIng.appendChild(group3);
+          }
+          
+          // Agregar funcionalidad de búsqueda
+          let resultadosDiv = document.createElement('div');
+          resultadosDiv.style.cssText = 'max-height: 300px; overflow-y: auto; border: 2px solid #e0e0e0; border-radius: 6px; background: white; display: none;';
+          colIngrediente.insertBefore(resultadosDiv, selectIng);
+          
+          inputBusqueda.addEventListener('input', (e) => {
+            const busqueda = e.target.value.toLowerCase().trim();
+            
+            if (busqueda.length < 2) {
+              resultadosDiv.style.display = 'none';
+              resultadosDiv.innerHTML = '';
+              return;
+            }
+            
+            // Buscar coincidencias en todas las opciones del select
+            const opciones = Array.from(selectIng.querySelectorAll('option')).filter(opt => opt.value !== '');
+            const coincidencias = opciones.filter(opt => 
+              opt.textContent.toLowerCase().includes(busqueda)
+            ).slice(0, 20); // Máximo 20 resultados
+            
+            if (coincidencias.length === 0) {
+              resultadosDiv.innerHTML = '<div style="padding: 15px; text-align: center; color: #999;">No se encontraron resultados</div>';
+              resultadosDiv.style.display = 'block';
+              return;
+            }
+            
+            // Mostrar resultados
+            resultadosDiv.innerHTML = '';
+            coincidencias.forEach(opt => {
+              const item = document.createElement('div');
+              item.style.cssText = 'padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 0.9em;';
+              item.textContent = opt.textContent;
+              item.dataset.value = opt.value;
+              item.dataset.coste = opt.dataset.coste || '0';
+              
+              item.addEventListener('mouseenter', () => {
+                item.style.background = '#f3e5f5';
+              });
+              item.addEventListener('mouseleave', () => {
+                item.style.background = 'white';
+              });
+              item.addEventListener('click', () => {
+                selectIng.value = item.dataset.value;
+                inputBusqueda.value = item.textContent;
+                resultadosDiv.style.display = 'none';
+                resultadosDiv.innerHTML = '';
+                selectIng.dispatchEvent(new Event('change', { bubbles: true }));
+              });
+              
+              resultadosDiv.appendChild(item);
+            });
+            
+            resultadosDiv.style.display = 'block';
+          });
+          
+          // Cerrar resultados al hacer click fuera
+          document.addEventListener('click', (e) => {
+            if (!colIngrediente.contains(e.target)) {
+              resultadosDiv.style.display = 'none';
+            }
+          });
+          
+          // Al seleccionar del select oculto
+          selectIng.addEventListener('change', () => {
+            if (selectIng.value && !inputBusqueda.value) {
+              const selectedOption = selectIng.options[selectIng.selectedIndex];
+              inputBusqueda.value = selectedOption.textContent;
+            }
+          });
+        });
+      
+      colIngrediente.appendChild(selectIng);
+      fila.appendChild(colIngrediente);
+
+      // Campo cantidad
+      const colCantidad = document.createElement('div');
+      const labelCant = document.createElement('label');
+      labelCant.textContent = 'Cantidad';
+      labelCant.style.cssText = 'display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85em; color: #555;';
+      colCantidad.appendChild(labelCant);
+      
+      const inputCant = document.createElement('input');
+      inputCant.type = 'number';
+      inputCant.name = `${campo.nombre}[${index}][cantidad]`;
+      inputCant.step = '0.001';
+      inputCant.min = '0';
+      inputCant.required = true;
+      inputCant.style.cssText = 'width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.95em;';
+      colCantidad.appendChild(inputCant);
+      fila.appendChild(colCantidad);
+
+      // Campo unidad
+      const colUnidad = document.createElement('div');
+      const labelUni = document.createElement('label');
+      labelUni.textContent = 'Kg';
+      labelUni.style.cssText = 'display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85em; color: #555;';
+      colUnidad.appendChild(labelUni);
+      
+      const selectUni = document.createElement('select');
+      selectUni.name = `${campo.nombre}[${index}][unidad]`;
+      selectUni.style.cssText = 'width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 0.95em;';
+      selectUni.innerHTML = `
+        <option value="Kg">Kg</option>
+        <option value="g">g</option>
+        <option value="L">L</option>
+        <option value="ml">ml</option>
+        <option value="Ud">Ud</option>
+      `;
+      colUnidad.appendChild(selectUni);
+      fila.appendChild(colUnidad);
+
+      // Costes (calculados)
+      const colCostes = document.createElement('div');
+      colCostes.style.cssText = 'display: flex; flex-direction: column; gap: 4px;';
+      
+      const costeLabelDiv = document.createElement('div');
+      costeLabelDiv.style.cssText = 'display: flex; justify-content: space-between; font-size: 0.8em; color: #666;';
+      costeLabelDiv.innerHTML = '<span>€/Unit</span><span>Total</span>';
+      
+      const costeValoresDiv = document.createElement('div');
+      costeValoresDiv.style.cssText = 'display: flex; justify-content: space-between; font-size: 0.9em; font-weight: 600;';
+      costeValoresDiv.innerHTML = '<span class="coste-unitario" style="color: #2196f3;">€0.00</span><span class="coste-total-fila" style="color: #4caf50;">€0.00</span>';
+      
+      colCostes.appendChild(costeLabelDiv);
+      colCostes.appendChild(costeValoresDiv);
+      fila.appendChild(colCostes);
+
+      // Botón eliminar
+      const colEliminar = document.createElement('div');
+      colEliminar.style.cssText = 'padding-top: 24px;';
+      const btnEliminar = document.createElement('button');
+      btnEliminar.type = 'button';
+      btnEliminar.innerHTML = '✕';
+      btnEliminar.style.cssText = 'padding: 10px 14px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; font-weight: 700; transition: background 0.2s;';
+      btnEliminar.addEventListener('mouseenter', () => btnEliminar.style.background = '#d32f2f');
+      btnEliminar.addEventListener('mouseleave', () => btnEliminar.style.background = '#f44336');
+      btnEliminar.addEventListener('click', () => {
+        fila.remove();
+        actualizarResumen();
+      });
+      colEliminar.appendChild(btnEliminar);
+      fila.appendChild(colEliminar);
+
+      // Event listeners para actualizar costes
+      [selectIng, inputCant, selectUni].forEach(el => {
+        el.addEventListener('change', () => calcularCostesFila(fila));
+        el.addEventListener('input', () => calcularCostesFila(fila));
+      });
+
+      filasContainer.appendChild(fila);
+      actualizarResumen();
+    };
+
+    // Calcular costes de una fila
+    const calcularCostesFila = (fila) => {
+      const select = fila.querySelector('select[name*="ingrediente_id"]');
+      const inputCant = fila.querySelector('input[name*="cantidad"]');
+      const selectUni = fila.querySelector('select[name*="unidad"]');
+      
+      // Validar que exista una opción seleccionada
+      if (!select || !inputCant || !selectUni || select.selectedIndex < 0) {
+        return;
+      }
+      
+      const selectedOption = select.options[select.selectedIndex];
+      if (!selectedOption || !selectedOption.value) {
+        return;
+      }
+      
+      let costeKilo = parseFloat(selectedOption.dataset.coste) || 0;
+      
+      // Si no hay coste en dataset, intentar obtenerlo del API
+      if (costeKilo === 0 && selectedOption.value) {
+        fetch(`/api/ingredientes/${selectedOption.value}`)
+          .then(r => r.json())
+          .then(data => {
+            const ing = data.data || data;
+            costeKilo = parseFloat(ing.coste_kilo) || parseFloat(ing.coste_unidad) || 0;
+            selectedOption.dataset.coste = costeKilo;
+            // Recalcular con el coste obtenido
+            finalizarCalculo(fila, costeKilo, inputCant, selectUni);
+          })
+          .catch(err => console.error('Error obteniendo coste:', err));
+        return;
+      }
+      
+      finalizarCalculo(fila, costeKilo, inputCant, selectUni);
+    };
+    
+    const finalizarCalculo = (fila, costeKilo, inputCant, selectUni) => {
+      const cantidad = parseFloat(inputCant.value) || 0;
+      const unidad = selectUni.value;
+
+      let cantidadKg = cantidad;
+      if (unidad === 'g') cantidadKg = cantidad / 1000;
+      else if (unidad === 'L') cantidadKg = cantidad;
+      else if (unidad === 'ml') cantidadKg = cantidad / 1000;
+
+      const costeTotal = costeKilo * cantidadKg;
+      
+      const costeUnitarioSpan = fila.querySelector('.coste-unitario');
+      const costeTotalSpan = fila.querySelector('.coste-total-fila');
+      
+      if (costeUnitarioSpan) costeUnitarioSpan.textContent = `€${costeKilo.toFixed(2)}`;
+      if (costeTotalSpan) costeTotalSpan.textContent = `€${costeTotal.toFixed(2)}`;
+      
+      actualizarResumen();
+    };
+
+    // Actualizar tabla resumen
+    const actualizarResumen = () => {
+      const filas = filasContainer.querySelectorAll('.fila-edicion');
+      const tbody = document.getElementById('tbody-resumen');
+      const contador = document.getElementById('contador-ingredientes');
+      const costeTotal = document.getElementById('coste-total');
+      
+      // Verificar que los elementos existan en el DOM
+      if (!tbody || !contador || !costeTotal) {
+        return;
+      }
+      
+      tbody.innerHTML = '';
+      
+      let total = 0;
+      let count = 0;
+
+      filas.forEach(fila => {
+        const select = fila.querySelector('select[name*="ingrediente_id"]');
+        const inputCant = fila.querySelector('input[name*="cantidad"]');
+        const selectUni = fila.querySelector('select[name*="unidad"]');
+        
+        if (select.value && inputCant.value) {
+          count++;
+          const nombreIng = select.options[select.selectedIndex].text;
+          const cantidad = inputCant.value;
+          const unidad = selectUni.value;
+          const costeUnitario = fila.querySelector('.coste-unitario').textContent;
+          const costeTotal = parseFloat(fila.querySelector('.coste-total-fila').textContent.replace('€', ''));
+          total += costeTotal;
+
+          const tr = document.createElement('tr');
+          tr.style.cssText = 'border-bottom: 1px solid #f0f0f0;';
+          tr.innerHTML = `
+            <td style="padding: 10px; font-size: 0.9em;">${nombreIng}</td>
+            <td style="padding: 10px; text-align: center; font-size: 0.9em;">${cantidad}</td>
+            <td style="padding: 10px; text-align: center; font-size: 0.9em;">${unidad}</td>
+            <td style="padding: 10px; text-align: right; font-size: 0.9em; color: #2196f3;">${costeUnitario}</td>
+            <td style="padding: 10px; text-align: right; font-size: 0.9em; font-weight: 600; color: #4caf50;">€${costeTotal.toFixed(2)}</td>
+            <td style="padding: 10px; text-align: center;">⚠️</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+
+      contador.textContent = count;
+      costeTotal.textContent = `€${total.toFixed(2)}`;
+    };
+
+    // Event listener botón agregar
+    btnAgregar.addEventListener('click', agregarFilaEdicion);
+
+    // Agregar primera fila automáticamente SOLO si NO estamos en modo edición
+    // En modo edición, las filas se cargarán desde cargarEscandalloExistente()
+    const esEdicion = this.parametros && this.parametros.modo === 'editar';
+    if (campo.min_items && campo.min_items > 0 && !esEdicion) {
+      agregarFilaEdicion();
+    }
+
     return container;
   }
 
@@ -1600,7 +2510,24 @@ class ModalDinamico {
     if (!this.validar()) return;
 
     // Recolectar datos
-    const formData = new FormData(document.getElementById(`form-${this.config.titulo.replace(/\s+/g, '-')}`));
+    const form = document.getElementById(`form-${this.config.titulo.replace(/\s+/g, '-')}`);
+    const formData = new FormData(form);
+
+    // Verificar si hay un handler personalizado (como para escandallo múltiple)
+    if (this.config.onSubmit && typeof window[this.config.onSubmit] === 'function') {
+      console.log('📤 Usando handler personalizado:', this.config.onSubmit);
+      // Pasar también las opciones (modo, plato, etc.)
+      const resultado = await window[this.config.onSubmit](formData, this.parametros);
+      
+      if (resultado) {
+        const modalElement = document.getElementById(`modal-${this.config.titulo.replace(/\s+/g, '-')}`);
+        cerrarModalDinamico(modalElement);
+        this.recargarDatos();
+      }
+      return;
+    }
+
+    // Guardado estándar
     const data = Object.fromEntries(formData);
 
     // Guardar en BD
@@ -1612,13 +2539,13 @@ class ModalDinamico {
     });
 
     if (response.ok) {
-      mostrarExito('Guardado exitosamente');
+      mostrarNotificacion('✅ Guardado exitosamente', 'success');
       const modalElement = document.getElementById(`modal-${this.config.titulo.replace(/\s+/g, '-')}`);
       cerrarModalDinamico(modalElement);
       // Recargar tabla
       this.recargarDatos();
     } else {
-      mostrarError('Error al guardar');
+      mostrarNotificacion('❌ Error al guardar', 'error');
     }
   }
 
@@ -1670,6 +2597,7 @@ class ModalDinamico {
       'articulo': 'articulos',
       'plato': 'platos',
       'escandallo': 'escandallos',
+      'escandallo_simple': 'escandallos',
       'sanidad': 'sanidad',
       'etiquetas': 'etiquetas',
       'evento': 'eventos',
@@ -1691,8 +2619,8 @@ class ModalDinamico {
 // 6. UTILIDAD: ABRIR MODAL
 // ============================================================================
 
-async function abrirModalDinamico(nombreConfig) {
-  const modal = new ModalDinamico(nombreConfig);
+async function abrirModalDinamico(nombreConfig, parametros = {}) {
+  const modal = new ModalDinamico(nombreConfig, parametros);
   const htmlModal = await modal.render();
   document.body.appendChild(htmlModal);
   
@@ -1717,8 +2645,29 @@ function cerrarModalDinamico(elemento) {
   }
 }
 
+// Funciones stub para evitar errores
+function calcularTrazabilidad(value) {
+  console.log('calcularTrazabilidad:', value);
+  // Implementación futura
+}
+
+function autoFillEtiquetaData(value) {
+  console.log('autoFillEtiquetaData:', value);
+  // Implementación futura - auto-rellenar datos de etiqueta
+}
+
 // Exports
 window.ModalDinamico = ModalDinamico;
 window.abrirModalDinamico = abrirModalDinamico;
 window.cerrarModalDinamico = cerrarModalDinamico;
 window.MODAL_CONFIGS = MODAL_CONFIGS;
+
+// Exportar funciones de auto-fill y cálculo
+window.autoFillPlato = autoFillPlato;
+window.autoFillPlatoInfo = autoFillPlatoInfo;
+window.autoFillSanidadData = autoFillSanidadData;
+window.autoFillInventarioInfo = autoFillInventarioInfo;
+window.autoFillEtiquetaData = autoFillEtiquetaData;
+window.calcularIngredientesNecesarios = calcularIngredientesNecesarios;
+window.calcularCostePedido = calcularCostePedido;
+window.calcularTrazabilidad = calcularTrazabilidad;

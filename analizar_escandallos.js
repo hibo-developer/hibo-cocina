@@ -1,33 +1,141 @@
-const XLSX = require('xlsx');
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./data/hibo-cocina.db');
 
-const wb = XLSX.readFile('fabricación.xlsb');
-const ws = wb.Sheets['Articulos Escandallos'];
+console.log('\n🔍 ANÁLISIS DE ESCANDALLOS\n');
+console.log('=' + '='.repeat(70));
 
-if (ws) {
-  const data = XLSX.utils.sheet_to_json(ws);
-  
-  console.log('📋 ANÁLISIS DE ESCANDALLOS\n');
-  console.log('Total registros:', data.length);
-  
-  // Ver todos los campos únicos
-  const allKeys = new Set();
-  data.forEach(row => Object.keys(row).forEach(k => allKeys.add(k)));
-  
-  console.log('\n📝 CAMPOS DISPONIBLES:');
-  Array.from(allKeys).forEach(k => console.log('  -', k));
-  
-  // Ver ejemplos de cada tipo
-  console.log('\n🍽️  EJEMPLO PLATO:');
-  const plato = data.find(r => r.Tipo === 'Platos');
-  if (plato) console.log(JSON.stringify(plato, null, 2));
-  
-  console.log('\n🥕 EJEMPLO INGREDIENTE:');
-  const ingrediente = data.find(r => r.Tipo === 'Ingredientes');
-  if (ingrediente) console.log(JSON.stringify(ingrediente, null, 2));
-  
-  // Ver estructura de relación
-  console.log('\n🔗 PRIMEROS 10 REGISTROS:');
-  data.slice(0, 10).forEach((r, i) => {
-    console.log(`${i+1}. ${r['Codigo Platos']} | ${r.Ingredientes} | ${r.Tipo}`);
+db.serialize(() => {
+  // Contar total de escandallos
+  db.get(`SELECT COUNT(*) as total FROM escandallos`, [], (err, row) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      return;
+    }
+    console.log(`\n📊 Total de escandallos en BD: ${row.total}`);
   });
-}
+
+  // Contar escandallos con información completa (con JOIN)
+  const queryCompletos = `
+    SELECT COUNT(*) as completos
+    FROM escandallos e
+    LEFT JOIN platos p ON e.plato_id = p.id
+    LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+    WHERE p.nombre IS NOT NULL AND i.nombre IS NOT NULL
+  `;
+
+  db.get(queryCompletos, [], (err, row) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      return;
+    }
+    console.log(`✅ Escandallos con nombre de plato e ingrediente: ${row.completos}`);
+  });
+
+  // Contar escandallos sin nombre de plato
+  const querySinPlato = `
+    SELECT COUNT(*) as sin_plato
+    FROM escandallos e
+    LEFT JOIN platos p ON e.plato_id = p.id
+    WHERE p.nombre IS NULL
+  `;
+
+  db.get(querySinPlato, [], (err, row) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      return;
+    }
+    console.log(`❌ Escandallos sin nombre de plato: ${row.sin_plato}`);
+  });
+
+  // Contar escandallos sin nombre de ingrediente
+  const querySinIngrediente = `
+    SELECT COUNT(*) as sin_ingrediente
+    FROM escandallos e
+    LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+    WHERE i.nombre IS NULL
+  `;
+
+  db.get(querySinIngrediente, [], (err, row) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      return;
+    }
+    console.log(`❌ Escandallos sin nombre de ingrediente: ${row.sin_ingrediente}`);
+  });
+
+  // Ejemplos de escandallos completos
+  const queryEjemplos = `
+    SELECT 
+      e.id,
+      p.codigo as plato_codigo,
+      p.nombre as plato_nombre,
+      i.codigo as ingrediente_codigo,
+      i.nombre as ingrediente_nombre,
+      e.cantidad,
+      e.unidad
+    FROM escandallos e
+    LEFT JOIN platos p ON e.plato_id = p.id
+    LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+    WHERE p.nombre IS NOT NULL AND i.nombre IS NOT NULL
+    LIMIT 5
+  `;
+
+  db.all(queryEjemplos, [], (err, rows) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      return;
+    }
+
+    console.log('\n📋 Ejemplos de escandallos con información completa:\n');
+    if (rows.length === 0) {
+      console.log('   ⚠️  No hay escandallos con información completa');
+    } else {
+      rows.forEach(esc => {
+        console.log(`   ✅ #${esc.id}: ${esc.plato_nombre} (${esc.plato_codigo})`);
+        console.log(`      → ${esc.cantidad} ${esc.unidad} de ${esc.ingrediente_nombre} (${esc.ingrediente_codigo})`);
+        console.log('');
+      });
+    }
+  });
+
+  // Ejemplos de escandallos incompletos
+  const queryIncompletos = `
+    SELECT 
+      e.id,
+      e.plato_id,
+      p.nombre as plato_nombre,
+      e.ingrediente_id,
+      i.nombre as ingrediente_nombre
+    FROM escandallos e
+    LEFT JOIN platos p ON e.plato_id = p.id
+    LEFT JOIN ingredientes i ON e.ingrediente_id = i.id
+    WHERE p.nombre IS NULL OR i.nombre IS NULL
+    LIMIT 5
+  `;
+
+  db.all(queryIncompletos, [], (err, rows) => {
+    if (err) {
+      console.error('❌ Error:', err);
+      db.close();
+      return;
+    }
+
+    console.log('\n⚠️  Ejemplos de escandallos incompletos (OCULTOS en la interfaz):\n');
+    if (rows.length === 0) {
+      console.log('   ✅ Todos los escandallos tienen información completa');
+    } else {
+      rows.forEach(esc => {
+        const platoInfo = esc.plato_nombre || `❌ Plato #${esc.plato_id} sin nombre`;
+        const ingredienteInfo = esc.ingrediente_nombre || `❌ Ingrediente #${esc.ingrediente_id} sin nombre`;
+        console.log(`   #${esc.id}: ${platoInfo} → ${ingredienteInfo}`);
+      });
+    }
+
+    console.log('\n' + '='.repeat(71));
+    console.log('\n💡 RESULTADO:');
+    console.log('   Solo los escandallos con nombres completos se mostrarán en la interfaz.');
+    console.log('   Esto garantiza una experiencia más clara y profesional.\n');
+    
+    db.close();
+  });
+});

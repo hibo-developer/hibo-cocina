@@ -4,7 +4,18 @@ class Ingrediente {
   // Obtener todos los ingredientes
   static async obtenerTodos() {
     return new Promise((resolve, reject) => {
-      const sql = `SELECT * FROM ingredientes ORDER BY nombre`;
+      const sql = `SELECT * FROM ingredientes WHERE tipo_entidad = 'ingrediente' ORDER BY nombre`;
+      db.all(sql, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      });
+    });
+  }
+
+  // Obtener TODOS los ingredientes incluyendo elaborados y preelaborados
+  static async obtenerTodosCompleto() {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM ingredientes ORDER BY tipo_entidad, nombre`;
       db.all(sql, [], (err, rows) => {
         if (err) reject(err);
         else resolve(rows || []);
@@ -109,7 +120,7 @@ class Ingrediente {
   // Contar
   static async contar() {
     return new Promise((resolve, reject) => {
-      const sql = 'SELECT COUNT(*) as total FROM ingredientes';
+      const sql = "SELECT COUNT(*) as total FROM ingredientes WHERE tipo_entidad = 'ingrediente'";
       db.get(sql, [], (err, row) => {
         if (err) reject(err);
         else resolve(row?.total || 0);

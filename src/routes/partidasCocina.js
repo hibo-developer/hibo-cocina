@@ -5,7 +5,7 @@ const partidasCocinaController = require('../controllers/partidasCocinaControlle
 // Rutas para partidas de cocina
 router.get('/', partidasCocinaController.obtenerTodas);
 router.get('/count', partidasCocinaController.contar);
-router.get('/id/:id', partidasCocinaController.obtenerPorId);
+router.get('/:id', partidasCocinaController.obtenerPorId);
 router.get('/responsable/:responsable', partidasCocinaController.obtenerPorResponsable);
 
 router.post('/', partidasCocinaController.crear);

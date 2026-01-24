@@ -6,7 +6,7 @@ const articulosController = require('../controllers/articulosController');
 router.get('/', articulosController.obtenerTodos);
 router.get('/count', articulosController.contar);
 router.get('/codigo/:codigo', articulosController.obtenerPorCodigo);
-router.get('/id/:id', articulosController.obtenerPorId);
+router.get('/:id', articulosController.obtenerPorId);
 router.get('/grupo/:grupo', articulosController.obtenerPorGrupo);
 
 router.post('/', articulosController.crear);

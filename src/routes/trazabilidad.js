@@ -5,7 +5,7 @@ const trazabilidadController = require('../controllers/trazabilidadController');
 // Rutas para trazabilidad
 router.get('/', trazabilidadController.obtenerTodas);
 router.get('/count', trazabilidadController.contar);
-router.get('/id/:id', trazabilidadController.obtenerPorId);
+router.get('/:id', trazabilidadController.obtenerPorId);
 router.get('/plato/:codigo_plato', trazabilidadController.obtenerPorPlato);
 router.get('/lote/:lote', trazabilidadController.obtenerPorLote);
 router.get('/partida/:partida', trazabilidadController.obtenerPorPartida);
