@@ -152,17 +152,22 @@ app.delete('/api/escandallos/:id', (req, res) => {
 // RUTAS API - INVENTARIO
 // ============================================================================
 app.get('/api/inventario', (req, res) => {
-  db.all('SELECT * FROM inventario ORDER BY articulo', (err, rows) => {
+  db.all(`
+    SELECT i.*, ing.nombre as ingrediente_nombre
+    FROM inventario i
+    LEFT JOIN ingredientes ing ON i.ingrediente_id = ing.id
+    ORDER BY i.fecha_registro DESC
+  `, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
 app.post('/api/inventario', (req, res) => {
-  const { articulo, cantidad, precio_unitario, proveedor } = req.body;
+  const { ingrediente_id, cantidad, unidad, lote, fecha, fecha_caducidad, ubicacion } = req.body;
   db.run(
-    'INSERT INTO inventario (articulo, cantidad, precio_unitario, proveedor) VALUES (?, ?, ?, ?)',
-    [articulo, cantidad || 0, precio_unitario || 0, proveedor],
+    'INSERT INTO inventario (ingrediente_id, cantidad, unidad, lote, fecha, fecha_caducidad, ubicacion) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [ingrediente_id, cantidad || 0, unidad || 'kg', lote, fecha, fecha_caducidad, ubicacion],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ id: this.lastID, success: true });
@@ -171,10 +176,10 @@ app.post('/api/inventario', (req, res) => {
 });
 
 app.put('/api/inventario/:id', (req, res) => {
-  const { articulo, cantidad, precio_unitario, proveedor } = req.body;
+  const { ingrediente_id, cantidad, unidad, lote, fecha, fecha_caducidad, ubicacion } = req.body;
   db.run(
-    'UPDATE inventario SET articulo = ?, cantidad = ?, precio_unitario = ?, proveedor = ? WHERE id = ?',
-    [articulo, cantidad, precio_unitario, proveedor, req.params.id],
+    'UPDATE inventario SET ingrediente_id = ?, cantidad = ?, unidad = ?, lote = ?, fecha = ?, fecha_caducidad = ?, ubicacion = ? WHERE id = ?',
+    [ingrediente_id, cantidad, unidad, lote, fecha, fecha_caducidad, ubicacion, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ success: true });
@@ -193,17 +198,17 @@ app.delete('/api/inventario/:id', (req, res) => {
 // RUTAS API - PEDIDOS
 // ============================================================================
 app.get('/api/pedidos', (req, res) => {
-  db.all('SELECT * FROM pedidos ORDER BY fecha DESC', (err, rows) => {
+  db.all('SELECT * FROM pedidos ORDER BY fecha_pedido DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
 app.post('/api/pedidos', (req, res) => {
-  const { proveedor, articulo, cantidad, fecha, estado } = req.body;
+  const { numero, cliente_codigo, fecha_pedido, fecha_entrega, estado, total } = req.body;
   db.run(
-    'INSERT INTO pedidos (proveedor, articulo, cantidad, fecha, estado) VALUES (?, ?, ?, ?, ?)',
-    [proveedor, articulo, cantidad || 0, fecha || new Date().toISOString(), estado || 'pendiente'],
+    'INSERT INTO pedidos (numero, cliente_codigo, fecha_pedido, fecha_entrega, estado, total) VALUES (?, ?, ?, ?, ?, ?)',
+    [numero, cliente_codigo, fecha_pedido || new Date().toISOString(), fecha_entrega, estado || 'pendiente', total || 0],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ id: this.lastID, success: true });
@@ -212,10 +217,10 @@ app.post('/api/pedidos', (req, res) => {
 });
 
 app.put('/api/pedidos/:id', (req, res) => {
-  const { proveedor, articulo, cantidad, fecha, estado } = req.body;
+  const { numero, cliente_codigo, fecha_pedido, fecha_entrega, estado, total } = req.body;
   db.run(
-    'UPDATE pedidos SET proveedor = ?, articulo = ?, cantidad = ?, fecha = ?, estado = ? WHERE id = ?',
-    [proveedor, articulo, cantidad, fecha, estado, req.params.id],
+    'UPDATE pedidos SET numero = ?, cliente_codigo = ?, fecha_pedido = ?, fecha_entrega = ?, estado = ?, total = ? WHERE id = ?',
+    [numero, cliente_codigo, fecha_pedido, fecha_entrega, estado, total, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ success: true });
@@ -270,22 +275,17 @@ app.delete('/api/partidas-cocina/:id', (req, res) => {
     res.json({ success: true });
   });
 });
-
-// ============================================================================
-// RUTAS API - SANIDAD (APPCC)
-// ============================================================================
-app.get('/api/control-sanidad', (req, res) => {
-  db.all('SELECT * FROM sanidad_registros ORDER BY fecha DESC', (err, rows) => {
+control_sanidad ORDER BY fecha_produccion DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
 app.post('/api/control-sanidad', (req, res) => {
-  const { tipo_control, responsable, observaciones, resultado } = req.body;
+  const { plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones } = req.body;
   db.run(
-    'INSERT INTO sanidad_registros (tipo_control, responsable, observaciones, resultado) VALUES (?, ?, ?, ?)',
-    [tipo_control, responsable, observaciones, resultado || 'Conforme'],
+    'INSERT INTO control_sanidad (plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ id: this.lastID, success: true });
@@ -294,12 +294,17 @@ app.post('/api/control-sanidad', (req, res) => {
 });
 
 app.delete('/api/control-sanidad/:id', (req, res) => {
-  db.run('DELETE FROM sanidad_registros WHERE id = ?', [req.params.id], (err) => {
+  db.run('DELETE FROM control_sanidad WHERE id = ?', [req.params.id], (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true });
   });
 });
 
+// Alias para compatibilidad con módulos frontend
+app.get('/api/sanidad', (req, res) => {
+  db.all('SELECT * FROM control_sanidad ORDER BY fecha_produccion DESC', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows || []
 // Alias para compatibilidad con módulos frontend
 app.get('/api/sanidad', (req, res) => {
   db.all('SELECT * FROM sanidad_registros ORDER BY fecha DESC', (err, rows) => {
