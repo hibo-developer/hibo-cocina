@@ -7,6 +7,7 @@ const pedidosController = require('../controllers/pedidosController');
 const { validate } = require('../middleware/validator');
 const { pedidosSchemas } = require('../middleware/validationSchemas');
 
+router.get('/estadisticas', pedidosController.obtenerEstadisticas);
 router.get('/', pedidosController.obtenerTodos);
 router.get('/:id', pedidosController.obtenerPorId);
 router.post('/', validate(pedidosSchemas.crear), pedidosController.crear);

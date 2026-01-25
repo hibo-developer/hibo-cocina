@@ -157,10 +157,47 @@ async function eliminar(req, res, next) {
   }
 }
 
+/**
+ * GET /api/platos/estadisticas
+ * Obtiene estadísticas de platos
+ */
+async function obtenerEstadisticas(req, res, next) {
+  try {
+    const db = getDatabase();
+    
+    // Usar una query de estadísticas
+    db.get(`
+      SELECT 
+        COUNT(*) as total,
+        AVG(pvp) as pvp_promedio,
+        MIN(pvp) as pvp_minimo,
+        MAX(pvp) as pvp_maximo
+      FROM platos
+    `, (err, stats) => {
+      if (err) {
+        console.error('Error al obtener estadísticas:', err);
+        return res.status(500).json(
+          createResponse(false, null, err.message, 500)
+        );
+      }
+      
+      res.json(createResponse(true, stats || {
+        total: 0,
+        pvp_promedio: 0,
+        pvp_minimo: 0,
+        pvp_maximo: 0
+      }, null, 200));
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   obtenerTodos,
   obtenerPorId,
   crear,
   actualizar,
-  eliminar
+  eliminar,
+  obtenerEstadisticas
 };

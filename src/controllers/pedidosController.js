@@ -112,10 +112,48 @@ async function eliminar(req, res, next) {
   }
 }
 
+/**
+ * GET /api/pedidos/estadisticas
+ * Obtiene estadísticas de pedidos
+ */
+async function obtenerEstadisticas(req, res, next) {
+  try {
+    const db = getDatabase();
+    
+    db.get(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN estado = 'completado' THEN 1 END) as completados,
+        COUNT(CASE WHEN estado = 'pendiente' THEN 1 END) as pendientes,
+        COUNT(CASE WHEN estado = 'cancelado' THEN 1 END) as cancelados,
+        AVG(total) as total_promedio,
+        SUM(total) as total_vendido
+      FROM pedidos
+    `, (err, stats) => {
+      if (err) {
+        console.error('Error al obtener estadísticas:', err);
+        return res.status(500).json(createResponse(false, null, err.message, 500));
+      }
+      
+      res.json(createResponse(true, stats || {
+        total: 0,
+        completados: 0,
+        pendientes: 0,
+        cancelados: 0,
+        total_promedio: 0,
+        total_vendido: 0
+      }, null, 200));
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   obtenerTodos,
   obtenerPorId,
   crear,
   actualizar,
-  eliminar
+  eliminar,
+  obtenerEstadisticas
 };
