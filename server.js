@@ -17,6 +17,8 @@ const path = require('path');
 // Importar módulos del proyecto
 const { initializeDatabase, closeDatabase } = require('./src/utils/database');
 const { errorHandler, notFoundHandler, createResponse } = require('./src/middleware/errorHandler');
+const log = require('./src/utils/logger');
+const { loggerMiddleware } = require('./src/middleware/loggerMiddleware');
 
 // Importar rutas
 const authRoutes = require('./src/routes/auth');
@@ -51,10 +53,13 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 // Servir archivos estáticos
 app.use(express.static('public'));
 
+// Logging de requests
+app.use(loggerMiddleware);
+
 // Logging de requests (desarrollo)
 if (NODE_ENV === 'development') {
   app.use((req, res, next) => {
-    console.log(`📨 ${req.method} ${req.path}`);
+    log.debug(`Procesando: ${req.method} ${req.path}`);
     next();
   });
 }
@@ -108,12 +113,17 @@ app.use(errorHandler);
 // ============================================================================
 
 async function startServer() {
+    log.info('Base de datos inicializada correctamente');
   try {
     // Inicializar base de datos
     await initializeDatabase();
 
     // Iniciar servidor HTTP
-    const server = app.listen(PORT, () => {
+    colog.info(`Servidor HIBO COCINA iniciado`, {
+        port: PORT,
+        environment: NODE_ENV,
+        version: '2.0.0'
+      });app.listen(PORT, () => {
       console.log(`
 ╔════════════════════════════════════════╗
 ║   HIBO COCINA - Gestor de Producción   ║
@@ -138,20 +148,16 @@ async function startServer() {
 ⏹️  Presiona CTRL+C para detener
 
 `);
-    });
-
-    // Graceful shutdown
-    const gracefulShutdown = async (signal) => {
-      console.log(`\n📛 Recibida señal ${signal}, cerrando gracefully...`);
+    })log.info(`Recibida señal ${signal}, iniciando cierre graceful...`);
       
       server.close(async () => {
-        console.log('❌ Servidor HTTP cerrado');
+        log.info('Servidor HTTP cerrado');
         
         try {
           await closeDatabase();
-          console.log('❌ Base de datos cerrada');
+          log.info('Base de datos cerrada');
         } catch (err) {
-          console.error('Error al cerrar base de datos:', err);
+          log.error('Error al cerrar base de datos', err);
         }
         
         process.exit(0);
@@ -159,12 +165,16 @@ async function startServer() {
 
       // Forzar cierre después de 10 segundos
       setTimeout(() => {
-        console.error('❌ Forzando cierre del servidor');
+        log.error('Forzando cierre del servidor después de timeout');
         process.exit(1);
       }, 10000);
     };
 
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  } catch (error) {
+    log.error('Error al iniciar el servidorSIGTERM'));
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
   } catch (error) {
