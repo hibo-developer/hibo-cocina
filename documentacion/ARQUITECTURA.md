@@ -54,8 +54,6 @@ hibo-cocina/
 │   │   └── ...                       # Otros módulos
 │   │
 │   ├── components/                   # Componentes HTML reutilizables
-│   ├── api-client.js                 # Cliente API para Flask (Fase 3)
-│   ├── integracion-flask.js          # Integración con backend Flask
 │   ├── app.js                        # Aplicación original (legacy)
 │   ├── login.html                    # Página de login
 │   └── index.html                    # Página principal
@@ -504,13 +502,14 @@ pm2 restart hibo-cocina
 - CORS configurado
 - Headers de seguridad básicos
 
-### Pendiente (Fase 3 - Flask)
+### Pendiente
 
 - Autenticación JWT
 - Roles y permisos
 - Rate limiting
 - Logging de auditoría
 - Encriptación de datos sensibles
+- HTTPS en producción
 
 ## 📊 Métricas del Proyecto
 
@@ -545,19 +544,27 @@ Lines        : 65%
 
 - [MANUAL_TECNICO.md](MANUAL_TECNICO.md) - Documentación técnica detallada
 - [GUIA_USO.txt](../GUIA_USO.txt) - Guía de usuario
-- [GUIA_FASE3.md](../GUIA_FASE3.md) - Integración con Flask
 - [COMPLETADO_EXITOSAMENTE.md](../COMPLETADO_EXITOSAMENTE.md) - Resumen de logros
 - [INDICE_DOCUMENTACION.md](../INDICE_DOCUMENTACION.md) - Índice completo
 
 ## 🎯 Próximos Pasos
 
-### Fase 3 - Integración Flask
+### Mejoras Planificadas
 
-1. Backend Flask con autenticación
-2. API REST con JWT
-3. Base de datos PostgreSQL
-4. Deploy en servidor de producción
-5. Documentación Swagger/OpenAPI
+1. **Autenticación y Seguridad**
+   - Implementar JWT
+   - Sistema de roles y permisos
+   - Logging de auditoría
+
+2. **Optimizaciones**
+   - Caché de datos frecuentes
+   - Compresión de respuestas
+   - Índices adicionales en BD
+
+3. **Funcionalidades Nuevas**
+   - Exportación a Excel/PDF
+   - Gráficos y dashboards avanzados
+   - Notificaciones en tiempo real
 
 ### Mejoras Futuras
 
