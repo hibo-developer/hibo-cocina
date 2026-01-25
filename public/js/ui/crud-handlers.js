@@ -310,13 +310,69 @@ async function editarPartida(id) {
   try {
     console.log(`✏️ Editando partida ${id}...`);
     
-    const partida = produccionModule.obtener(id);
+    // Cargar datos de la partida desde la API
+    const response = await fetch(`${window.API_BASE}/partidas-cocina/${id}`);
+    if (!response.ok) throw new Error('Error al cargar partida');
+    const result = await response.json();
+    const partida = result.data || result;
     
-    if (!partida) {
-      throw new Error('Partida no encontrada');
+    if (!partida || !partida.id) {
+      throw new Error('No se pudieron cargar los datos de la partida');
     }
     
-    notify.info('Edición de partidas en desarrollo');
+    console.log('✅ Partida cargada:', partida);
+    
+    // Definir campos del formulario
+    const campos = [
+      { id: 'nombre', nombre: 'nombre', label: 'Nombre', tipo: 'texto', requerido: true },
+      { id: 'responsable', nombre: 'responsable', label: 'Responsable', tipo: 'texto', requerido: false },
+      { id: 'descripcion', nombre: 'descripcion', label: 'Descripción', tipo: 'textarea', requerido: false },
+      { id: 'activo', nombre: 'activo', label: 'Activa', tipo: 'checkbox', requerido: false }
+    ];
+    
+    // Abrir modal con datos
+    modalManager.open(`Editar Partida: ${partida.nombre}`, campos);
+    
+    // Cargar valores en el formulario
+    setTimeout(() => {
+      document.getElementById('nombre').value = partida.nombre || '';
+      document.getElementById('responsable').value = partida.responsable || '';
+      document.getElementById('descripcion').value = partida.descripcion || '';
+      document.getElementById('activo').checked = partida.activo || false;
+    }, 100);
+    
+    // Configurar callback de guardado
+    modalManager.setCallback(async (formData) => {
+      try {
+        console.log('💾 Guardando cambios de partida...', formData);
+        
+        const datos = {
+          nombre: formData.nombre,
+          responsable: formData.responsable || '',
+          descripcion: formData.descripcion || '',
+          activo: formData.activo ? 1 : 0
+        };
+        
+        const resp = await fetch(`${window.API_BASE}/partidas-cocina/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        
+        if (!resp.ok) throw new Error('Error al actualizar partida');
+        
+        notify.success('Partida actualizada correctamente');
+        
+        // Recargar lista
+        if (typeof window.cargarPartidas === 'function') {
+          await window.cargarPartidas();
+        }
+      } catch (error) {
+        console.error('Error al actualizar partida:', error);
+        notify.error('Error al actualizar partida');
+        throw error;
+      }
+    });
     
   } catch (error) {
     console.error('Error al editar partida:', error);
@@ -328,12 +384,25 @@ async function editarPartida(id) {
  * Eliminar partida
  */
 async function eliminarPartida(id) {
-  if (!confirm('¿Está seguro de que desea eliminar esta partida?')) {
+  if (!confirm('¿Está seguro de que desea eliminar esta partida de cocina?')) {
     return;
   }
   
   try {
-    notify.info('Eliminación de partidas en desarrollo');
+    console.log(`🗑️ Eliminando partida ${id}...`);
+    
+    const response = await fetch(`${window.API_BASE}/partidas-cocina/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar partida');
+    
+    notify.success('Partida eliminada correctamente');
+    
+    // Recargar lista
+    if (typeof window.cargarPartidas === 'function') {
+      await window.cargarPartidas();
+    }
   } catch (error) {
     console.error('Error al eliminar partida:', error);
     notify.error('Error al eliminar partida');
@@ -350,7 +419,75 @@ async function eliminarPartida(id) {
 async function editarControlSanidad(id) {
   try {
     console.log(`✏️ Editando control de sanidad ${id}...`);
-    notify.info('Edición de controles APPCC en desarrollo');
+    
+    // Cargar datos del control
+    const response = await fetch(`${window.API_BASE}/control-sanidad/${id}`);
+    if (!response.ok) throw new Error('Error al cargar control');
+    const control = await response.json();
+    
+    if (!control || !control.id) {
+      throw new Error('No se pudieron cargar los datos del control');
+    }
+    
+    console.log('✅ Control sanidad cargado:', control);
+    
+    // Definir campos del formulario
+    const campos = [
+      { id: 'platos', nombre: 'platos', label: 'Código Plato', tipo: 'texto', requerido: true },
+      { id: 'ingredientes', nombre: 'ingredientes', label: 'Código Ingrediente', tipo: 'texto', requerido: false },
+      { id: 'lote_produccion', nombre: 'lote_produccion', label: 'Lote Producción', tipo: 'texto', requerido: false },
+      { id: 'fecha_produccion', nombre: 'fecha_produccion', label: 'Fecha Producción', tipo: 'fecha', requerido: false },
+      { id: 'punto_critico', nombre: 'punto_critico', label: 'Punto Crítico', tipo: 'texto', requerido: false },
+      { id: 'punto_corrector', nombre: 'punto_corrector', label: 'Punto Corrector', tipo: 'textarea', requerido: false },
+      { id: 'resultado', nombre: 'resultado', label: 'Resultado', tipo: 'texto', requerido: false },
+      { id: 'responsable', nombre: 'responsable', label: 'Responsable', tipo: 'texto', requerido: false },
+      { id: 'observaciones', nombre: 'observaciones', label: 'Observaciones', tipo: 'textarea', requerido: false }
+    ];
+    
+    // Abrir modal
+    modalManager.open('Editar Control APPCC', campos);
+    
+    // Cargar valores
+    setTimeout(() => {
+      document.getElementById('platos').value = control.platos || '';
+      document.getElementById('ingredientes').value = control.ingredientes || '';
+      document.getElementById('lote_produccion').value = control.lote_produccion || '';
+      if (control.fecha_produccion) {
+        document.getElementById('fecha_produccion').value = control.fecha_produccion.split('T')[0];
+      }
+      document.getElementById('punto_critico').value = control.punto_critico || '';
+      document.getElementById('punto_corrector').value = control.punto_corrector || '';
+      document.getElementById('resultado').value = control.resultado || '';
+      document.getElementById('responsable').value = control.responsable || '';
+      document.getElementById('observaciones').value = control.observaciones || '';
+    }, 100);
+    
+    // Configurar callback
+    modalManager.setCallback(async (formData) => {
+      try {
+        console.log('💾 Guardando cambios de control sanidad...', formData);
+        
+        const resp = await fetch(`${window.API_BASE}/control-sanidad/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        if (!resp.ok) throw new Error('Error al actualizar control');
+        
+        notify.success('Control APPCC actualizado correctamente');
+        
+        // Recargar lista
+        if (typeof window.cargarSanidad === 'function') {
+          await window.cargarSanidad();
+        }
+      } catch (error) {
+        console.error('Error al actualizar control:', error);
+        notify.error('Error al actualizar control');
+        throw error;
+      }
+    });
+    
   } catch (error) {
     console.error('Error al editar control:', error);
     notify.error('Error al cargar datos del control');
@@ -361,12 +498,25 @@ async function editarControlSanidad(id) {
  * Eliminar control de sanidad
  */
 async function eliminarControlSanidad(id) {
-  if (!confirm('¿Está seguro de que desea eliminar este control?')) {
+  if (!confirm('¿Está seguro de que desea eliminar este control APPCC?')) {
     return;
   }
   
   try {
-    notify.info('Eliminación de controles APPCC en desarrollo');
+    console.log(`🗑️ Eliminando control sanidad ${id}...`);
+    
+    const response = await fetch(`${window.API_BASE}/control-sanidad/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar control');
+    
+    notify.success('Control APPCC eliminado correctamente');
+    
+    // Recargar lista
+    if (typeof window.cargarSanidad === 'function') {
+      await window.cargarSanidad();
+    }
   } catch (error) {
     console.error('Error al eliminar control:', error);
     notify.error('Error al eliminar control');
@@ -383,7 +533,89 @@ async function eliminarControlSanidad(id) {
 async function editarInventario(id) {
   try {
     console.log(`✏️ Editando inventario ${id}...`);
-    notify.info('Edición de inventario en desarrollo');
+    
+    // Cargar datos del inventario
+    const response = await fetch(`${window.API_BASE}/inventario/${id}`);
+    if (!response.ok) throw new Error('Error al cargar inventario');
+    const result = await response.json();
+    const inv = result.data || result;
+    
+    if (!inv || !inv.id) {
+      throw new Error('No se pudieron cargar los datos del inventario');
+    }
+    
+    console.log('✅ Inventario cargado:', inv);
+    
+    // Cargar lista de artículos para el select
+    let articulos = [];
+    try {
+      const articulosResp = await fetch(`${window.API_BASE}/ingredientes`);
+      if (articulosResp.ok) {
+        articulos = await articulosResp.json();
+      }
+    } catch (error) {
+      console.error('Error al cargar artículos:', error);
+    }
+    
+    // Crear opciones para el select de artículos
+    const opcionesArticulos = articulos.map(a => ({
+      valor: a.id,
+      label: `${a.codigo || ''} - ${a.nombre || ''}`
+    }));
+    
+    // Definir campos del formulario
+    const campos = [
+      { id: 'articulo_id', nombre: 'articulo_id', label: 'Artículo', tipo: 'select', requerido: true,
+        opciones: opcionesArticulos
+      },
+      { id: 'cantidad', nombre: 'cantidad', label: 'Cantidad', tipo: 'numero', requerido: true },
+      { id: 'fecha_registro', nombre: 'fecha_registro', label: 'Fecha Registro', tipo: 'fecha', requerido: false }
+    ];
+    
+    // Abrir modal
+    modalManager.open('Editar Inventario', campos);
+    
+    // Cargar valores
+    setTimeout(() => {
+      document.getElementById('articulo_id').value = inv.articulo_id || '';
+      document.getElementById('cantidad').value = inv.cantidad || 0;
+      if (inv.fecha_registro) {
+        document.getElementById('fecha_registro').value = inv.fecha_registro.split('T')[0];
+      }
+    }, 100);
+    
+    // Configurar callback
+    modalManager.setCallback(async (formData) => {
+      try {
+        console.log('💾 Guardando cambios de inventario...', formData);
+        
+        const datos = {
+          articulo_id: parseInt(formData.articulo_id),
+          cantidad: parseFloat(formData.cantidad),
+          fecha_registro: formData.fecha_registro || new Date().toISOString().split('T')[0]
+        };
+        
+        const resp = await fetch(`${window.API_BASE}/inventario/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        
+        if (!resp.ok) throw new Error('Error al actualizar inventario');
+        
+        notify.success('Inventario actualizado correctamente');
+        
+        // Recargar lista
+        if (typeof window.cargarInventario === 'function') {
+          await window.cargarInventario();
+        }
+      } catch (error) {
+        console.error('Error al actualizar inventario:', error);
+        notify.error('Error al actualizar inventario');
+        throw error;
+      }
+    });
+    
   } catch (error) {
     console.error('Error al editar inventario:', error);
     notify.error('Error al cargar datos del inventario');
@@ -394,12 +626,25 @@ async function editarInventario(id) {
  * Eliminar item de inventario
  */
 async function eliminarInventario(id) {
-  if (!confirm('¿Está seguro de que desea eliminar este item?')) {
+  if (!confirm('¿Está seguro de que desea eliminar este registro de inventario?')) {
     return;
   }
   
   try {
-    notify.info('Eliminación de inventario en desarrollo');
+    console.log(`🗑️ Eliminando inventario ${id}...`);
+    
+    const response = await fetch(`${window.API_BASE}/inventario/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Error al eliminar inventario');
+    
+    notify.success('Inventario eliminado correctamente');
+    
+    // Recargar lista
+    if (typeof window.cargarInventario === 'function') {
+      await window.cargarInventario();
+    }
   } catch (error) {
     console.error('Error al eliminar inventario:', error);
     notify.error('Error al eliminar inventario');
