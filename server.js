@@ -30,7 +30,7 @@ app.use(express.static('public'));
 app.get('/api/platos', (req, res) => {
   db.all('SELECT * FROM platos ORDER BY codigo', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
@@ -78,7 +78,7 @@ app.delete('/api/platos/:id', (req, res) => {
 app.get('/api/ingredientes', (req, res) => {
   db.all('SELECT * FROM ingredientes ORDER BY nombre', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
@@ -125,7 +125,7 @@ app.get('/api/escandallos', (req, res) => {
     ORDER BY e.plato_id, e.ingrediente_id
   `, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
@@ -239,9 +239,9 @@ app.delete('/api/pedidos/:id', (req, res) => {
 // RUTAS API - PARTIDAS DE COCINA (PRODUCCIÓN)
 // ============================================================================
 app.get('/api/partidas-cocina', (req, res) => {
-  db.all('SELECT * FROM partidas_cocina ORDER BY fecha_creacion DESC', (err, rows) => {
+  db.all('SELECT * FROM partidas_cocina ORDER BY created_at DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
 
@@ -275,7 +275,12 @@ app.delete('/api/partidas-cocina/:id', (req, res) => {
     res.json({ success: true });
   });
 });
-control_sanidad ORDER BY fecha_produccion DESC', (err, rows) => {
+
+// ============================================================================
+// RUTAS API - SANIDAD (APPCC)
+// ============================================================================
+app.get('/api/control-sanidad', (req, res) => {
+  db.all('SELECT * FROM control_sanidad ORDER BY fecha_produccion DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows || []);
   });
@@ -304,14 +309,13 @@ app.delete('/api/control-sanidad/:id', (req, res) => {
 app.get('/api/sanidad', (req, res) => {
   db.all('SELECT * FROM control_sanidad ORDER BY fecha_produccion DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows || []
-// Alias para compatibilidad con módulos frontend
-app.get('/api/sanidad', (req, res) => {
-  db.all('SELECT * FROM sanidad_registros ORDER BY fecha DESC', (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(rows || []);
   });
 });
+
+// ============================================================================
+// RUTAS RAÍZ
+// ============================================================================
 
 // Ruta raíz
 app.get('/', (req, res) => {
