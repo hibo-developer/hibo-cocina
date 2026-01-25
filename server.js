@@ -17,7 +17,7 @@ const path = require('path');
 // Importar módulos del proyecto
 const { initializeDatabase, closeDatabase } = require('./src/utils/database');
 const { errorHandler, notFoundHandler, createResponse } = require('./src/middleware/errorHandler');
-const log = require('./src/utils/logger');
+const { getLogger } = require('./src/utils/logger');
 const { loggerMiddleware } = require('./src/middleware/loggerMiddleware');
 
 // Importar rutas
@@ -31,6 +31,7 @@ const partidasRoutes = require('./src/routes/partidas');
 const sanidadRoutes = require('./src/routes/sanidad');
 
 const app = express();
+const log = getLogger();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -113,17 +114,19 @@ app.use(errorHandler);
 // ============================================================================
 
 async function startServer() {
-    log.info('Base de datos inicializada correctamente');
   try {
     // Inicializar base de datos
     await initializeDatabase();
+    log.info('Base de datos inicializada correctamente');
 
     // Iniciar servidor HTTP
-    colog.info(`Servidor HIBO COCINA iniciado`, {
+    const server = app.listen(PORT, () => {
+      log.info(`Servidor HIBO COCINA iniciado`, {
         port: PORT,
         environment: NODE_ENV,
         version: '2.0.0'
-      });app.listen(PORT, () => {
+      });
+
       console.log(`
 ╔════════════════════════════════════════╗
 ║   HIBO COCINA - Gestor de Producción   ║
@@ -146,9 +149,12 @@ async function startServer() {
   • /api/health
 
 ⏹️  Presiona CTRL+C para detener
-
 `);
-    })log.info(`Recibida señal ${signal}, iniciando cierre graceful...`);
+    });
+
+    // Graceful shutdown
+    const gracefulShutdown = (signal) => {
+      log.info(`Recibida señal ${signal}, iniciando cierre graceful...`);
       
       server.close(async () => {
         log.info('Servidor HTTP cerrado');
@@ -174,11 +180,7 @@ async function startServer() {
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
   } catch (error) {
-    log.error('Error al iniciar el servidorSIGTERM'));
-    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-  } catch (error) {
-    console.error('❌ Error al iniciar el servidor:', error);
+    log.error('Error al iniciar el servidor:', error);
     process.exit(1);
   }
 }
