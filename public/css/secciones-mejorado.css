@@ -1,0 +1,445 @@
+/* ============================================================================
+   ESTILOS COMPARTIDOS PARA: Ingredientes, Escandallos, Inventario, Pedidos
+   ============================================================================ */
+
+/* Aplicar a todas estas secciones */
+#ingredientes, #escandallos, #inventario, #pedidos {
+  padding: 20px;
+  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+}
+
+#ingredientes h2, #escandallos h2, #inventario h2, #pedidos h2 {
+  font-size: 2.2em;
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ============================================================================
+   TOOLBAR (búsqueda y filtros)
+   ============================================================================ */
+
+#ingredientes .toolbar, #escandallos .toolbar, #inventario .toolbar, #pedidos .toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#ingredientes .toolbar input[type="text"], 
+#ingredientes .toolbar select,
+#escandallos .toolbar input[type="text"], 
+#escandallos .toolbar select,
+#inventario .toolbar input[type="text"], 
+#inventario .toolbar select,
+#pedidos .toolbar input[type="text"], 
+#pedidos .toolbar select {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+#ingredientes .toolbar input[type="text"]:focus, 
+#ingredientes .toolbar select:focus,
+#escandallos .toolbar input[type="text"]:focus, 
+#escandallos .toolbar select:focus,
+#inventario .toolbar input[type="text"]:focus, 
+#inventario .toolbar select:focus,
+#pedidos .toolbar input[type="text"]:focus, 
+#pedidos .toolbar select:focus {
+  border-color: #e74c3c;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.2);
+  outline: none;
+}
+
+#ingredientes .toolbar .btn, 
+#escandallos .toolbar .btn, 
+#inventario .toolbar .btn, 
+#pedidos .toolbar .btn {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#ingredientes .toolbar .btn-primary, 
+#escandallos .toolbar .btn-primary, 
+#inventario .toolbar .btn-primary, 
+#pedidos .toolbar .btn-primary {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+#ingredientes .toolbar .btn-primary:hover, 
+#escandallos .toolbar .btn-primary:hover, 
+#inventario .toolbar .btn-primary:hover, 
+#pedidos .toolbar .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* ============================================================================
+   TABLAS
+   ============================================================================ */
+
+#ingredientes .table-container, 
+#escandallos .table-container, 
+#inventario .table-container, 
+#pedidos .table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 25px;
+}
+
+#ingredientes table, 
+#escandallos table, 
+#inventario table, 
+#pedidos table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+#ingredientes thead, 
+#escandallos thead, 
+#inventario thead, 
+#pedidos thead {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+  font-weight: 700;
+}
+
+#ingredientes thead th, 
+#escandallos thead th, 
+#inventario thead th, 
+#pedidos thead th {
+  padding: 18px 15px;
+  text-align: left;
+  border: none;
+  font-size: 0.9em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #ecf0f1;
+}
+
+#ingredientes tbody tr, 
+#escandallos tbody tr, 
+#inventario tbody tr, 
+#pedidos tbody tr {
+  border-bottom: 1px solid #ecf0f1;
+  transition: all 0.2s ease;
+}
+
+#ingredientes tbody tr:hover, 
+#escandallos tbody tr:hover, 
+#inventario tbody tr:hover, 
+#pedidos tbody tr:hover {
+  background-color: #f8f9fa;
+  box-shadow: inset 4px 0 0 #e74c3c;
+}
+
+#ingredientes tbody td, 
+#escandallos tbody td, 
+#inventario tbody td, 
+#pedidos tbody td {
+  padding: 16px 15px;
+  vertical-align: middle;
+  color: #2c3e50;
+}
+
+#ingredientes tbody td strong, 
+#escandallos tbody td strong, 
+#inventario tbody td strong, 
+#pedidos tbody td strong {
+  font-weight: 700;
+  color: #1a252f;
+}
+
+/* ============================================================================
+   BOTONES DE ACCIÓN
+   ============================================================================ */
+
+#ingredientes .btn-icon, 
+#escandallos .btn-icon, 
+#inventario .btn-icon, 
+#pedidos .btn-icon {
+  padding: 8px 10px;
+  margin: 0 4px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ingredientes .btn-icon:hover, 
+#escandallos .btn-icon:hover, 
+#inventario .btn-icon:hover, 
+#pedidos .btn-icon:hover {
+  background: #f0f0f0;
+  transform: scale(1.15);
+}
+
+/* ============================================================================
+   BADGES Y ETIQUETAS
+   ============================================================================ */
+
+#ingredientes .badge, 
+#escandallos .badge, 
+#inventario .badge, 
+#pedidos .badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#ingredientes .badge.disponible, 
+#escandallos .badge.disponible, 
+#inventario .badge.disponible, 
+#pedidos .badge.disponible,
+#ingredientes .badge.activo, 
+#escandallos .badge.activo, 
+#inventario .badge.activo, 
+#pedidos .badge.activo {
+  background: #d4edda;
+  color: #155724;
+}
+
+#ingredientes .badge.agotado, 
+#escandallos .badge.agotado, 
+#inventario .badge.agotado, 
+#pedidos .badge.agotado,
+#ingredientes .badge.inactivo, 
+#escandallos .badge.inactivo, 
+#inventario .badge.inactivo, 
+#pedidos .badge.inactivo {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+#pedidos .badge.pendiente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+#pedidos .badge.produccion {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+#pedidos .badge.completado {
+  background: #d4edda;
+  color: #155724;
+}
+
+#pedidos .badge.cancelado {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ============================================================================
+   CARDS PARA INVENTARIO
+   ============================================================================ */
+
+#inventario .stock-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+#inventario .stock-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-top: 4px solid #e74c3c;
+  transition: all 0.3s ease;
+}
+
+#inventario .stock-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(231, 76, 60, 0.15);
+}
+
+#inventario .stock-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+#inventario .stock-card .stock-cantidad {
+  font-size: 2.5em;
+  font-weight: 700;
+  color: #e74c3c;
+  margin: 10px 0;
+}
+
+#inventario .stock-card .stock-info {
+  font-size: 0.85em;
+  color: #7f8c8d;
+}
+
+#inventario .stock-card.bajo-stock {
+  border-top-color: #ffc107;
+}
+
+#inventario .stock-card.bajo-stock .stock-cantidad {
+  color: #ffc107;
+}
+
+#inventario .stock-card.sin-stock {
+  border-top-color: #dc3545;
+}
+
+#inventario .stock-card.sin-stock .stock-cantidad {
+  color: #dc3545;
+}
+
+/* ============================================================================
+   PAGINACIÓN
+   ============================================================================ */
+
+#ingredientes .pagination-container, 
+#escandallos .pagination-container, 
+#inventario .pagination-container, 
+#pedidos .pagination-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+#ingredientes .pagination-container button,
+#ingredientes .pagination-container a,
+#escandallos .pagination-container button,
+#escandallos .pagination-container a,
+#inventario .pagination-container button,
+#inventario .pagination-container a,
+#pedidos .pagination-container button,
+#pedidos .pagination-container a {
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+#ingredientes .pagination-container button:hover,
+#ingredientes .pagination-container a:hover,
+#escandallos .pagination-container button:hover,
+#escandallos .pagination-container a:hover,
+#inventario .pagination-container button:hover,
+#inventario .pagination-container a:hover,
+#pedidos .pagination-container button:hover,
+#pedidos .pagination-container a:hover {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+#ingredientes .pagination-container button.active,
+#escandallos .pagination-container button.active,
+#inventario .pagination-container button.active,
+#pedidos .pagination-container button.active {
+  background: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
+}
+
+/* ============================================================================
+   CHECKBOXES
+   ============================================================================ */
+
+#ingredientes input[type="checkbox"],
+#escandallos input[type="checkbox"],
+#inventario input[type="checkbox"],
+#pedidos input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #e74c3c;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  #ingredientes, #escandallos, #inventario, #pedidos {
+    padding: 15px;
+  }
+  
+  #ingredientes h2, #escandallos h2, #inventario h2, #pedidos h2 {
+    font-size: 1.6em;
+  }
+  
+  #ingredientes .toolbar, 
+  #escandallos .toolbar, 
+  #inventario .toolbar, 
+  #pedidos .toolbar {
+    flex-direction: column;
+  }
+  
+  #ingredientes .toolbar input[type="text"],
+  #ingredientes .toolbar select,
+  #escandallos .toolbar input[type="text"],
+  #escandallos .toolbar select,
+  #inventario .toolbar input[type="text"],
+  #inventario .toolbar select,
+  #pedidos .toolbar input[type="text"],
+  #pedidos .toolbar select {
+    min-width: 100%;
+  }
+  
+  #inventario .stock-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  #ingredientes .table-container,
+  #escandallos .table-container,
+  #inventario .table-container,
+  #pedidos .table-container {
+    font-size: 0.85em;
+    overflow-x: auto;
+  }
+  
+  #ingredientes thead th,
+  #ingredientes tbody td,
+  #escandallos thead th,
+  #escandallos tbody td,
+  #inventario thead th,
+  #inventario tbody td,
+  #pedidos thead th,
+  #pedidos tbody td {
+    padding: 12px 10px;
+  }
+}
