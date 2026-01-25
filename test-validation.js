@@ -51,12 +51,13 @@ function makeRequest(testCase) {
   return new Promise((resolve) => {
     const options = {
       hostname: 'localhost',
-      port: 3000,
+      port: 3001,
       path: testCase.path,
       method: testCase.method,
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      timeout: 5000
     };
 
     const req = http.request(options, (res) => {
@@ -78,7 +79,8 @@ function makeRequest(testCase) {
 
     req.on('error', (err) => {
       failed++;
-      console.log(`❌ ${testCase.name} - Error: ${err.message}`);
+      console.log(`❌ ${testCase.name} - Error de conexión: ${err.message}`);
+      console.log(`   Detalles: ${JSON.stringify(err)}`);
       resolve();
     });
 
@@ -86,6 +88,12 @@ function makeRequest(testCase) {
       req.write(JSON.stringify(testCase.data));
     }
     req.end();
+    
+    // Timeout de 5 segundos
+    setTimeout(() => {
+      req.destroy();
+      resolve();
+    }, 5000);
   });
 }
 
