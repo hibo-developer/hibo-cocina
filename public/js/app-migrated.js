@@ -44,7 +44,8 @@ async function cargarPlatos() {
   try {
     console.log('📥 [REFACTORED] Cargando platos...');
     await platosModule.cargar();
-    mostrarPlatos();
+    const platos = getState('platos') || [];
+    mostrarPlatos(platos);
   } catch (error) {
     console.error('Error cargando platos:', error);
     mostrarNotificacion('Error al cargar platos', 'error');
@@ -73,7 +74,8 @@ async function cargarIngredientes() {
   try {
     console.log('📥 [REFACTORED] Cargando ingredientes...');
     await ingredientesModule.cargar();
-    mostrarIngredientes();
+    const ingredientes = getState('ingredientes') || [];
+    mostrarIngredientes(ingredientes);
   } catch (error) {
     console.error('Error cargando ingredientes:', error);
     mostrarNotificacion('Error al cargar ingredientes', 'error');
@@ -87,7 +89,8 @@ async function cargarEscandallos() {
   try {
     console.log('📥 [REFACTORED] Cargando escandallos...');
     await escandallosModule.cargar();
-    mostrarEscandallos();
+    const escandallos = getState('escandallos') || [];
+    mostrarEscandallos(escandallos);
   } catch (error) {
     console.error('Error cargando escandallos:', error);
     mostrarNotificacion('Error al cargar escandallos', 'error');
