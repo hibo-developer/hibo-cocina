@@ -1272,35 +1272,52 @@ function confirmarAccion(mensaje, callback) {
 
 async function cargarProduccion() {
   try {
+    console.log('🔼 Iniciando carga de Producción...');
+    
     // Cargar partidas primero
     await cargarPartidas();
     
     // Inicializar tabs
-    document.querySelectorAll('.tab-button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.textContent.toLowerCase().includes('partidas') ? 'partidas' :
-                    btn.textContent.toLowerCase().includes('trazabilidad') ? 'trazabilidad' : 'resumen';
-        cambiarTab(tab);
+    const tabButtons = document.querySelectorAll('.tab-button');
+    console.log(`✅ Encontrados ${tabButtons.length} botones de tab`);
+    
+    if (tabButtons.length > 0) {
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.textContent.toLowerCase().includes('partidas') ? 'partidas' :
+                      btn.textContent.toLowerCase().includes('trazabilidad') ? 'trazabilidad' : 'resumen';
+          cambiarTab(tab);
+        });
       });
-    });
+      
+      // Activar el primer tab por defecto
+      cambiarTab('partidas');
+      console.log('✅ Tabs inicializados correctamente');
+    } else {
+      console.warn('⚠️ No se encontraron botones de tab');
+    }
 
-    // Activar el primer tab por defecto
-    cambiarTab('partidas');
+    // Botones - validar existencia
+    const btnNuevaTrazabilidad = document.getElementById('btnNuevaTrazabilidad');
+    const btnNuevaPartida = document.getElementById('btnNuevaPartida');
+    if (btnNuevaTrazabilidad) btnNuevaTrazabilidad.addEventListener('click', abrirModalTrazabilidad);
+    if (btnNuevaPartida) btnNuevaPartida.addEventListener('click', abrirModalPartida);
 
-    // Botones
-    document.getElementById('btnNuevaTrazabilidad')?.addEventListener('click', abrirModalTrazabilidad);
-    document.getElementById('btnNuevaPartida')?.addEventListener('click', abrirModalPartida);
-
-    // Filtros
-    document.getElementById('searchTrazabilidad')?.addEventListener('input', filtrarTrazabilidad);
-    document.getElementById('filterFechaTraz')?.addEventListener('change', filtrarTrazabilidad);
+    // Filtros - validar existencia
+    const searchTrazabilidad = document.getElementById('searchTrazabilidad');
+    const filterFechaTraz = document.getElementById('filterFechaTraz');
+    if (searchTrazabilidad) searchTrazabilidad.addEventListener('input', filtrarTrazabilidad);
+    if (filterFechaTraz) filterFechaTraz.addEventListener('change', filtrarTrazabilidad);
 
     // Cargar datos de trazabilidad
+    console.log('🔼 Cargando trazabilidad y resumen...');
     await cargarTrazabilidad();
     await cargarResumenProduccion();
+    
+    console.log('✅ Producción cargada exitosamente');
   } catch (error) {
-    console.error('Error cargando producción:', error);
-    mostrarError('Error al cargar producción');
+    console.error('❌ Error cargando producción:', error);
+    mostrarError('Error al cargar producción: ' + error.message);
   }
 }
 
@@ -1371,16 +1388,30 @@ async function cargarTrazabilidad() {
 
 async function cargarPartidas() {
   try {
+    console.log('🔼 Cargando partidas de cocina...');
     const response = await fetch(`${API_BASE}/partidas-cocina`);
     const data = await response.json();
+    console.log(`✅ Partidas recibidas: ${data.length} registros`);
 
     const tbody = document.getElementById('partidasTableBody');
     const paginacionDiv = document.getElementById('partidas-paginacion');
+    
+    // VALIDACIÓN CRÍTICA: verificar que tbody existe
+    if (!tbody) {
+      console.error('❌ ERROR CRÍTICO: Elemento "partidasTableBody" no encontrado en el DOM');
+      console.log('Elementos disponibles en el DOM:');
+      console.log('  - Body:', document.body ? '✓' : '✗');
+      console.log('  - sections-container:', document.getElementById('sections-container') ? '✓' : '✗');
+      console.log('  - produccion:', document.getElementById('produccion') ? '✓' : '✗');
+      return;
+    }
+    
     tbody.innerHTML = '';
 
     if (data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No hay partidas registradas</td></tr>';
       if (paginacionDiv) paginacionDiv.innerHTML = '';
+      console.log('⚠️ Sin partidas para mostrar');
       return;
     }
 
