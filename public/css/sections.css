@@ -1,0 +1,199 @@
+/* ============================================================================
+ * SECTIONS.CSS - Estilos de secciones y contenido principal
+ * ============================================================================ */
+
+/* Main content */
+.main-content {
+  padding: 30px 20px 80px;
+  margin-top: 180px;
+  flex: 1;
+}
+
+/* Secciones */
+.section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-size: 1.4em;
+}
+
+.section h3 {
+  color: var(--dark-gray);
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--light-gray);
+  background: white;
+}
+
+.tab-button {
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: var(--font-weight-medium);
+  border-bottom: 3px solid transparent;
+  transition: var(--transition);
+  position: relative;
+}
+
+.tab-button:hover {
+  color: var(--primary-color);
+  background: rgba(26, 58, 82, 0.05);
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: rgba(26, 58, 82, 0.08);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Production Tabs (backwards compatibility) */
+.production-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--light-gray);
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--dark-gray);
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: var(--font-weight-medium);
+  border-bottom: 3px solid transparent;
+  transition: var(--transition);
+}
+
+.tab-btn:hover {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Production Cards */
+.production-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Acciones */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Loading */
+.spinner {
+  border: 4px solid var(--light-gray);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Texto centrado */
+.text-center {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+  font-style: italic;
+}
+
+/* Estadísticas */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.stat-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--light-gray);
+  font-size: 0.9em;
+}
+
+.stat-item strong {
+  color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 20px 10px 60px;
+    margin-top: 180px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 8px;
+    font-size: 0.75em;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons > button,
+  .action-buttons > a {
+    width: 100%;
+  }
+}

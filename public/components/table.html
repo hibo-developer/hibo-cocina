@@ -1,0 +1,88 @@
+<!-- ============================================================================
+ * TABLE.HTML - Componente tabla reutilizable
+ * ============================================================================ -->
+
+<!-- 
+  Uso básico:
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-platos">
+        <tr>
+          <td>PL-001</td>
+          <td>Paella</td>
+          <td>
+            <button class="btn-icon" onclick="editar(1)">✏️</button>
+            <button class="btn-icon" onclick="eliminar(1)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  Con paginación:
+  <div id="tabla-paginacion"></div>
+  
+  Con status badges:
+  <td><span class="status-completado">Completado</span></td>
+-->
+
+<style>
+  .table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  thead {
+    background: #2c3e50;
+    color: white;
+  }
+
+  th {
+    padding: 10px;
+    text-align: left;
+    font-weight: 400;
+    font-size: 0.9em;
+  }
+
+  td {
+    padding: 4px 5px;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: 0.85em;
+  }
+
+  tr:hover {
+    background: #ecf0f1;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+
+  .status-completado {
+    background: #d1e7dd;
+    color: #0f5132;
+  }
+
+  .status-pendiente {
+    background: #fff3cd;
+    color: #856404;
+  }
+</style>

@@ -1,0 +1,201 @@
+/* ============================================================================
+ * FORMS.CSS - Estilos de formularios
+ * ============================================================================ */
+
+/* Grupos de formulario */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  color: var(--dark-gray);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group .required {
+  color: var(--danger-color);
+  margin-left: 3px;
+}
+
+/* Inputs */
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group select,
+.form-group textarea {
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  font-size: 0.85em;
+  font-family: inherit;
+  transition: var(--transition);
+  background-color: #fafafa;
+  color: var(--dark-gray);
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: #d0d0d0;
+  background-color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(26, 58, 82, 0.12), inset 0 1px 2px rgba(0,0,0,0.05);
+  background-color: white;
+}
+
+.form-group input::placeholder {
+  color: #b3b3b3;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-group input[readonly] {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+/* Checkboxes y radios */
+.form-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+  margin-right: 4px;
+}
+
+/* Multi-select */
+.multi-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.multi-select label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  margin: 0;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.multi-select label:hover {
+  background: #f0f0f0;
+}
+
+.multi-select input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+  width: auto;
+}
+
+/* Toggle switch */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 40px;
+  height: 24px;
+  margin-right: 10px;
+  cursor: pointer;
+  appearance: none;
+  background: #ddd;
+  border-radius: var(--radius-sm);
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.toggle-label input[type="checkbox"]:checked {
+  background: var(--primary-color);
+}
+
+/* Validación */
+.form-group.has-error input,
+.form-group.has-error select {
+  border-color: var(--danger-color);
+  background: #fff5f5;
+}
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 0.75em;
+  margin-top: 4px;
+  display: block;
+}
+
+.success-message {
+  color: #4caf50;
+  font-size: 0.75em;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Search group */
+.search-group {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-group input,
+.search-group select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.85em;
+}
+
+.search-group input {
+  flex: 1;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .multi-select {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-group {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,54 @@
+<section id="sanidad" class="section" style="display:none;">
+  <div class="section-header">
+    <h2>🏥 Sanidad y Control APPCC</h2>
+    <div class="actions">
+      <button class="btn" onclick="mostrarModalNuevoControlAPPCC()">+ Nuevo Control</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="searchControlAPPCC" placeholder="🔍 Buscar por código, punto crítico..." onkeyup="filtrarControlesAPPCC()">
+    <button class="btn btn-secondary" onclick="limpiarFiltrosControlAPPCC()">Limpiar</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><input type="checkbox" onchange="toggleSeleccionTodos('sanidad', this)"></th>
+          <th>ID</th>
+          <th>Código Plato</th>
+          <th>Ingrediente</th>
+          <th>Punto Crítico</th>
+          <th>Fecha Control</th>
+          <th>Resultado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="sanidadTableBody">
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 20px;">
+            Cargando datos...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="sanidad-paginacion" class="pagination"></div>
+
+  <div class="stats-cards">
+    <div class="stat-card">
+      <h3>Total Controles</h3>
+      <p class="stat-value" id="totalControles">-</p>
+    </div>
+    <div class="stat-card">
+      <h3>Controles Hoy</h3>
+      <p class="stat-value" id="controlesHoy">-</p>
+    </div>
+    <div class="stat-card">
+      <h3>Alergenos Identificados</h3>
+      <p class="stat-value" id="totalAlergenos">-</p>
+    </div>
+  </div>
+</section>

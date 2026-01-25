@@ -34,8 +34,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'unidad',
         etiqueta: 'Unidad Escandallo',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Kg', 'Lt', 'Ud', 'Gramo', 'Litro'],
         default: 'Kg'
       },
@@ -51,8 +52,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'grupo_conservacion',
         etiqueta: 'Grupo Conservación',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar grupo de conservación...',
         options: ['Congelado', 'Fresco', 'Neutro', 'Refrigerado'],
         default: 'Fresco'
       },
@@ -92,8 +94,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'dia_semana',
         etiqueta: 'Día de la Semana',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar día...',
         options: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
         onChange: 'calcularTrazabilidad'
       },
@@ -221,8 +224,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'formato_envase',
         etiqueta: 'Formato Envase',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar formato...',
         options: ['Cubetas', 'Barqueta GN 100', 'Barqueta GN 60', 'Barqueta GN 30', 'Mono']
       },
       {
@@ -237,8 +241,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'dia_servicio',
         etiqueta: 'Día Servicio',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar día de servicio...',
         options: [
           'Lunes 1 Alm.', 'Lunes 1 Cen.',
           'Martes 2 Alm.', 'Martes 2 Cen.',
@@ -261,8 +266,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'estado',
         etiqueta: 'Estado',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar estado...',
         options: ['PEDIDO', 'EN PROCESO', 'SERVIDO'],
         default: 'PEDIDO'
       },
@@ -304,8 +310,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'familia',
         etiqueta: 'Familia',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar familia...',
         options: [
           'Aceites y Grasas', 'Bebidas', 'Carnes', 'Conservas',
           'Frutas', 'Hortalizas', 'Lácteos', 'Mariscos', 'Pescados'
@@ -314,35 +321,41 @@ const MODAL_CONFIGS = {
       {
         nombre: 'grupo_conservacion',
         etiqueta: 'Grupo Conservación',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar grupo de conservación...',
         options: ['Congelado', 'Fresco', 'Neutro', 'Seco']
       },
       {
         nombre: 'partidas_almacen',
         etiqueta: 'Partidas y Almacén',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar partida o almacén...',
         options: ['Economato', 'Cocina', 'Almacén', 'Bodega']
       },
       {
         nombre: 'unidad_economato',
         etiqueta: 'Unidad Economato',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Lt', 'Kg', 'Ud', 'Gramo', 'Litro', 'Caja']
       },
       {
         nombre: 'unidad_escandallo',
         etiqueta: 'Unidad Escandallo',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Lt', 'Kg', 'Ud', 'Gramo', 'Litro']
       },
       {
         nombre: 'formato_envases',
         etiqueta: 'Formato Envases',
-        tipo: 'select',
+        tipo: 'autocomplete',
+        required: false,
+        placeholder: 'Escribe para buscar formato...',
         options: ['Garrafa', 'Bote', 'Caja', 'Bolsa', 'Bandeja', 'Tarrina'],
         default: 'Caja'
       },
@@ -439,8 +452,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'grupo_menu',
         etiqueta: 'Grupo Menú',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar grupo...',
         options: [
           'Aperitivos', 'Arroces', 'Carnes', 'Ensaladas',
           'Pescados', 'Postres', 'Sopas', 'Verduras'
@@ -449,8 +463,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'unidad_escandallo',
         etiqueta: 'Unidad Escandallo',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Kg', 'Lt', 'Ud', 'Gramo', 'Litro'],
         default: 'Kg'
       },
@@ -479,8 +494,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'preparacion',
         etiqueta: 'Preparación (Cocina)',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar tipo de preparación...',
         options: ['Fria', 'Caliente'],
         onChange: 'cargarPuntosControlSanidad'
       },
@@ -535,7 +551,8 @@ const MODAL_CONFIGS = {
       {
         nombre: 'plantilla_produccion',
         etiqueta: 'Plantillas PROD',
-        tipo: 'select',
+        tipo: 'autocomplete',
+        placeholder: 'Escribe para buscar plantilla...',
         options: ['Preparacion', 'Cocina', 'Terminados', 'No Aplica'],
         default: 'Preparacion'
       }
@@ -648,8 +665,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'punto_critico',
         etiqueta: 'Punto Crítico',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar punto crítico...',
         options: ['Temperatura', 'Tiempo de Cocción', 'pH', 'Humedad', 'Contaminación Cruzada', 'Higiene Personal'],
         onChange: 'mostrarRangosExpectados'
       },
@@ -678,8 +696,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'resultado',
         etiqueta: 'Resultado',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar resultado...',
         options: ['✓ OK', '✗ FUERA RANGO'],
         onChange: 'mostrarAccionCorrectora'
       },
@@ -778,8 +797,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'modo_conservacion',
         etiqueta: 'Modo de Conservación',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar modo de conservación...',
         options: ['Temperatura Ambiente', 'Refrigeración (0-4°C)', 'Congelación (-18°C)', 'Fresco']
       },
       {
@@ -831,8 +851,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'tipo',
         etiqueta: 'Tipo de Evento',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar tipo de evento...',
         options: ['Boda', 'Corporativo', 'Cumpleaños', 'Comunión', 'Bautizo', 'Otro']
       },
       {
@@ -853,7 +874,8 @@ const MODAL_CONFIGS = {
       {
         nombre: 'estado',
         etiqueta: 'Estado',
-        tipo: 'select',
+        tipo: 'autocomplete',
+        placeholder: 'Escribe para buscar estado...',
         options: ['Pendiente', 'Confirmado', 'En curso', 'Completado'],
         default: 'Pendiente'
       }
@@ -906,22 +928,25 @@ const MODAL_CONFIGS = {
       {
         nombre: 'grupo_conservacion',
         etiqueta: 'Grupo Conservación *',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: true,
+        placeholder: 'Escribe para buscar grupo de conservación...',
         options: ['Fresco', 'Congelado', 'Neutro', 'Refrigerado']
       },
       {
         nombre: 'unidad_economato',
         etiqueta: 'Unidad Economato',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Ud', 'Kg', 'Lt']
       },
       {
         nombre: 'unidad_escandallo',
         etiqueta: 'Unidad Escandallo',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Ud', 'Kg', 'Lt']
       },
       {
@@ -950,7 +975,7 @@ const MODAL_CONFIGS = {
       },
       {
         nombre: 'alergenosMulti',
-        etiqueta: '⚠️ Alérgenos (14 oficiales)',
+        etiqueta: '⚠️ Alérgenos (Oficiales + Personalizados)',
         tipo: 'multiCheckbox',
         required: false,
         opciones: [
@@ -973,7 +998,8 @@ const MODAL_CONFIGS = {
           { nombre: 'ajo', etiqueta: 'Ajo' }
         ],
         columnas: 3,
-        autoDetect: true
+        autoDetect: true,
+        cargarPersonalizados: true
       },
       {
         nombre: 'proveedor',
@@ -1017,8 +1043,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'planning',
         etiqueta: 'Tipo Preparación',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar tipo de preparación...',
         options: ['Medir', 'Pesar', 'Contar', 'Troceado', 'Cocido', 'Otro']
       },
       {
@@ -1097,8 +1124,9 @@ const MODAL_CONFIGS = {
           },
           unidad: {
             etiqueta: 'Unidad',
-            tipo: 'select',
+            tipo: 'autocomplete',
             required: true,
+            placeholder: 'Escribe unidad...',
             options: ['Kg', 'g', 'L', 'ml', 'Ud', 'Pieza', 'Lt'],
             default: 'Kg',
             width: '15%'
@@ -1185,8 +1213,9 @@ const MODAL_CONFIGS = {
       {
         nombre: 'ubicacion',
         etiqueta: 'Ubicación (Partida/Almacén)',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar ubicación...',
         options: ['Economato', 'Bodega', 'Carnicería', 'Pescaderías', 'Verduras', 'Frutas', 
                   'Cuarto frio', 'Panaderia', 'Pastelería', 'Caliente', 'Guarniciones', 
                   'Salsas', 'Aperitivos', 'Desayuno', 'OFFICE', 'Precocinado', 
@@ -1196,16 +1225,18 @@ const MODAL_CONFIGS = {
       {
         nombre: 'unidad_economato',
         etiqueta: 'Unidad Economato',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Ud', 'Kg', 'Lt'],
         dependsOn: 'ingrediente_id'
       },
       {
         nombre: 'unidad_escandallo',
         etiqueta: 'Unidad Escandallo',
-        tipo: 'select',
+        tipo: 'autocomplete',
         required: false,
+        placeholder: 'Escribe para buscar unidad...',
         options: ['Ud', 'Kg', 'Lt'],
         dependsOn: 'ingrediente_id'
       },
@@ -1740,11 +1771,22 @@ class ModalDinamico {
     container.id = `alergenos-container`;
     container.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107;';
 
-    // Título
+    // Título con contador
+    const headerDiv = document.createElement('div');
+    headerDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;';
+    
     const titulo = document.createElement('h4');
     titulo.textContent = campo.etiqueta;
-    titulo.style.cssText = 'margin: 0 0 10px 0; color: #333; font-size: 1em; display: flex; align-items: center; gap: 8px;';
-    container.appendChild(titulo);
+    titulo.style.cssText = 'margin: 0; color: #333; font-size: 1em; display: flex; align-items: center; gap: 8px;';
+    
+    const contador = document.createElement('span');
+    contador.id = 'alergenos-contador';
+    contador.style.cssText = 'background: #4caf50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 600;';
+    contador.textContent = '0 seleccionados';
+    
+    headerDiv.appendChild(titulo);
+    headerDiv.appendChild(contador);
+    container.appendChild(headerDiv);
 
     // Help text
     if (campo.help) {
@@ -1759,6 +1801,14 @@ class ModalDinamico {
     grid.className = 'multi-checkbox-grid';
     const columnas = campo.columnas || 3;
     grid.style.cssText = `display: grid; grid-template-columns: repeat(${columnas}, 1fr); gap: 12px;`;
+
+    // Función para actualizar el contador
+    const actualizarContador = () => {
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+      const seleccionados = Array.from(checkboxes).filter(cb => cb.checked).length;
+      contador.textContent = `${seleccionados} seleccionado${seleccionados !== 1 ? 's' : ''}`;
+      contador.style.background = seleccionados > 0 ? '#4caf50' : '#9e9e9e';
+    };
 
     // Función para crear un checkbox
     const crearCheckbox = (opcion, icono = '') => {
@@ -1791,6 +1841,7 @@ class ModalDinamico {
           label.style.borderColor = '#e0e0e0';
           label.style.background = 'white';
         }
+        actualizarContador();
       });
 
       const texto = document.createElement('span');
@@ -1844,7 +1895,6 @@ class ModalDinamico {
         .catch(err => console.error('Error cargando alérgenos personalizados:', err));
     }
 
-    return container;
     return container;
   }
 

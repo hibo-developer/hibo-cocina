@@ -37,7 +37,8 @@ const ModuleLoader = {
       'escandallos',
       'inventario',
       'pedidos',
-      'produccion'
+      'produccion',
+      'sanidad'
     ];
     
     const container = document.getElementById('sections-container');

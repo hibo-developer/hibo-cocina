@@ -18,13 +18,15 @@ let estadoApp = {
   escandallosData: [],
   ingredientesData: [],
   inventarioData: [],
+  controlesAPPCC: [],
   paginacion: {
     platos: { pagina: 1, porPagina: 12, seleccionados: [] },
     ingredientes: { pagina: 1, porPagina: 12, seleccionados: [] },
     escandallos: { pagina: 1, porPagina: 12, seleccionados: [] },
     inventario: { pagina: 1, porPagina: 12, seleccionados: [] },
     pedidos: { pagina: 1, porPagina: 12, seleccionados: [] },
-    partidas: { pagina: 1, porPagina: 12, seleccionados: [] }
+    partidas: { pagina: 1, porPagina: 12, seleccionados: [] },
+    controlesAPPCC: { pagina: 1, porPagina: 12, seleccionados: [] }
   }
 };
 
@@ -169,6 +171,9 @@ function cambiarSeccion(seccion) {
       break;
     case 'produccion':
       cargarProduccion();
+      break;
+    case 'sanidad':
+      cargarSanidad();
       break;
   }
 }
@@ -723,6 +728,369 @@ async function cargarEstadisticas() {
 
   } catch (error) {
     console.error('Error cargando estadísticas:', error);
+  }
+}
+
+// ==================== MÓDULO SANIDAD (ALÉRGENOS) ====================
+
+async function cargarSanidad() {
+  try {
+    console.log('🔵 Iniciando carga de Sanidad...');
+    
+    // Cargar alérgenos oficiales
+    let alergenos = [];
+    try {
+      console.log('📡 Cargando alérgenos oficiales...');
+      const resp = await fetch(`${API_BASE}/alergenos-oficiales`);
+      if (!resp.ok) throw new Error(`Error ${resp.status}`);
+      alergenos = await resp.json();
+      console.log('✅ Alérgenos oficiales:', alergenos.length);
+    } catch (error) {
+      console.error('❌ Error cargando alérgenos oficiales:', error);
+      mostrarMensaje('Error al cargar alérgenos oficiales', 'error');
+    }
+    
+    // Cargar alérgenos personalizados
+    let personalizados = [];
+    try {
+      console.log('📡 Cargando alérgenos personalizados...');
+      await cargarAlergenosPersonalizados();
+      personalizados = alergenosPersonalizadosCache || [];
+      console.log('✅ Alérgenos personalizados:', personalizados.length);
+    } catch (error) {
+      console.error('❌ Error cargando alérgenos personalizados:', error);
+      mostrarMensaje('Error al cargar alérgenos personalizados', 'error');
+    }
+    
+    // Cargar controles APPCC
+    let controles = [];
+    try {
+      console.log('📡 Cargando controles APPCC...');
+      const resp = await fetch(`${API_BASE}/control-sanidad`);
+      if (!resp.ok) throw new Error(`Error ${resp.status}`);
+      controles = await resp.json();
+      console.log('✅ Controles APPCC:', controles.length);
+    } catch (error) {
+      console.error('❌ Error cargando controles APPCC:', error);
+      mostrarMensaje('Error al cargar controles APPCC', 'error');
+    }
+    
+    // Agrupar controles por plato
+    const controlesPorPlato = {};
+    controles.forEach(c => {
+      if (!controlesPorPlato[c.plato_codigo]) {
+        controlesPorPlato[c.plato_codigo] = [];
+      }
+      controlesPorPlato[c.plato_codigo].push(c);
+    });
+    
+    const html = `
+      <div class="card">
+        <div style="margin-bottom: 30px;">
+          <h2 style="margin: 0 0 5px 0;">⚕️ Gestión Integral de Sanidad</h2>
+          <p style="margin: 0; color: #666;">Sistema completo de gestión sanitaria: Alérgenos + Control APPCC</p>
+        </div>
+        
+        <!-- TABS DE NAVEGACIÓN -->
+        <div style="border-bottom: 2px solid #e0e0e0; margin-bottom: 25px;">
+          <button class="tab-btn active" onclick="mostrarTabSanidad('alergenos-oficiales')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid #4a90e2; font-weight: 600;">
+            🇪🇺 Alérgenos Oficiales
+          </button>
+          <button class="tab-btn" onclick="mostrarTabSanidad('alergenos-personalizados')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent;">
+            🏷️ Alérgenos Personalizados
+          </button>
+          <button class="tab-btn" onclick="mostrarTabSanidad('control-appcc')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent;">
+            📋 Control APPCC
+          </button>
+        </div>
+        
+        <!-- TAB 1: ALÉRGENOS OFICIALES -->
+        <div id="tab-alergenos-oficiales" class="tab-content" style="display: block;">
+          <div style="margin-bottom: 20px;">
+            <h3 style="margin: 0 0 10px 0; color: var(--dark-gray);">14 Alérgenos Oficiales de la Unión Europea</h3>
+            <p style="color: #666; font-size: 0.95em;">Alérgenos de declaración obligatoria según el Reglamento (UE) 1169/2011</p>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th width="50">#</th>
+                  <th width="70">Icono</th>
+                  <th width="180">Nombre</th>
+                  <th>Descripción</th>
+                  <th>Palabras Clave (Detección)</th>
+                  <th width="90">Estado</th>
+                  <th width="100">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${alergenos.map((a, i) => `
+                  <tr>
+                    <td style="text-align: center;">${i + 1}</td>
+                    <td style="text-align: center; font-size: 1.5em;">${a.icono || '❔'}</td>
+                    <td><strong>${a.nombre}</strong></td>
+                    <td style="font-size: 0.9em; color: #666;">${a.descripcion || '-'}</td>
+                    <td style="font-size: 0.85em; color: #555;">
+                      ${a.palabras_clave ? a.palabras_clave.split(',').slice(0, 5).join(', ') + '...' : '<span style="color: #999;">Sin configurar</span>'}
+                    </td>
+                    <td style="text-align: center;">
+                      <span class="badge ${a.activo ? 'badge-success' : 'badge-secondary'}">
+                        ${a.activo ? '✓ Activo' : '✗ Inactivo'}
+                      </span>
+                    </td>
+                    <td style="text-align: center;">
+                      <button class="btn btn-secondary btn-sm" onclick="editarAlergenoOficial(${a.id})" title="Editar">
+                        ✏️
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- TAB 2: ALÉRGENOS PERSONALIZADOS -->
+        <div id="tab-alergenos-personalizados" class="tab-content" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="margin: 0 0 5px 0; color: var(--dark-gray);">Alérgenos Personalizados</h3>
+              <p style="margin: 0; color: #666; font-size: 0.95em;">Para restricciones específicas de clientes (ajo, cebolla, picante, etc.)</p>
+            </div>
+            <button class="btn btn-primary" onclick="mostrarModalNuevoAlergenoPersonalizado()">
+              ➕ Nuevo Alérgeno
+            </button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th width="70">Icono</th>
+                  <th width="200">Nombre</th>
+                  <th>Descripción</th>
+                  <th>Palabras Clave (Detección)</th>
+                  <th width="90">Estado</th>
+                  <th width="140">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${personalizados.length === 0 ? 
+                  '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">No hay alérgenos personalizados. Créalos para adaptarte a necesidades específicas de clientes.</td></tr>' :
+                  personalizados.map(a => `
+                    <tr>
+                      <td style="text-align: center; font-size: 1.5em;">${a.icono || '❔'}</td>
+                      <td><strong>${a.nombre}</strong></td>
+                      <td style="font-size: 0.9em; color: #666;">${a.descripcion || '-'}</td>
+                      <td style="font-size: 0.85em; color: #555;">
+                        ${a.palabras_clave ? a.palabras_clave.split(',').slice(0, 5).join(', ') : '<span style="color: #999;">Sin configurar</span>'}
+                      </td>
+                      <td style="text-align: center;">
+                        <span class="badge ${a.activo ? 'badge-success' : 'badge-secondary'}">
+                          ${a.activo ? '✓ Activo' : '✗ Inactivo'}
+                        </span>
+                      </td>
+                      <td style="text-align: center;">
+                        <button class="btn btn-secondary btn-sm" onclick="editarAlergenoPersonalizado(${a.id})" title="Editar">
+                          ✏️
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarAlergenoPersonalizado(${a.id})" title="Eliminar">
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- TAB 3: CONTROL APPCC -->
+        <div id="tab-control-appcc" class="tab-content" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="margin: 0 0 5px 0; color: var(--dark-gray);">Control de Puntos Críticos (APPCC)</h3>
+              <p style="margin: 0; color: #666; font-size: 0.95em;">Análisis de Peligros y Puntos Críticos de Control - ${controles.length} registros</p>
+            </div>
+            <button class="btn btn-primary" onclick="mostrarModalNuevoControlAPPCC()">
+              ➕ Nuevo Control
+            </button>
+          </div>
+          
+          <div class="toolbar">
+            <div class="search-group">
+              <input type="text" id="searchControlAPPCC" placeholder="🔍 Buscar por plato, ingrediente..." onkeyup="filtrarControlesAPPCC()">
+            </div>
+            <button class="btn btn-secondary" onclick="limpiarFiltrosControlAPPCC()">🔄 Limpiar</button>
+            <button class="btn btn-secondary" onclick="seleccionarTodosLosRegistros('controlesAPPCC')">☑️ Seleccionar Todos</button>
+            <button class="btn btn-danger" id="btn-eliminar-controlesAPPCC" onclick="eliminarSeleccionados('controlesAPPCC', 'control-sanidad')" disabled>
+              🗑️ Eliminar (0)
+            </button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px;">
+            <div class="card" style="text-align: center; padding: 20px;">
+              <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">Total Controles</div>
+              <div style="font-size: 2.5em; font-weight: 700; color: var(--primary-color);">${controles.length}</div>
+            </div>
+            <div class="card" style="text-align: center; padding: 20px;">
+              <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">Platos Monitoreados</div>
+              <div style="font-size: 2.5em; font-weight: 700; color: var(--secondary-color);">${Object.keys(controlesPorPlato).length}</div>
+            </div>
+            <div class="card" style="text-align: center; padding: 20px;">
+              <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">Con Punto Crítico</div>
+              <div style="font-size: 2.5em; font-weight: 700; color: #e74c3c;">${controles.filter(c => c.punto_critico).length}</div>
+            </div>
+            <div class="card" style="text-align: center; padding: 20px;">
+              <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">Con Corrector</div>
+              <div style="font-size: 2.5em; font-weight: 700; color: #27ae60;">${controles.filter(c => c.corrector).length}</div>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th width="40">
+                    <input type="checkbox" id="selectAllControlesAPPCC" onchange="toggleSeleccionTodos('controlesAPPCC')">
+                  </th>
+                  <th>Plato</th>
+                  <th>Ingrediente</th>
+                  <th>Fecha Producción</th>
+                  <th>Punto Crítico</th>
+                  <th>Punto Corrector</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="controlesAPPCCTableBody">
+              </tbody>
+            </table>
+          </div>
+          <div id="control-appcc-paginacion" class="paginacion"></div>
+        </div>
+        
+        <!-- INFORMACIÓN IMPORTANTE -->
+        <div style="margin-top: 30px; padding: 20px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+          <strong style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            💡 Información Importante del Sistema de Sanidad
+          </strong>
+          <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li><strong>Alérgenos Oficiales:</strong> Los 14 alérgenos de la UE se detectan automáticamente al crear ingredientes/platos según las palabras clave configuradas</li>
+            <li><strong>Alérgenos Personalizados:</strong> Permite adaptarse a restricciones específicas de clientes (ajo, cebolla, picante, etc.)</li>
+            <li><strong>Control APPCC:</strong> Sistema de Análisis de Peligros y Puntos Críticos de Control para seguridad alimentaria</li>
+            <li><strong>Detección Automática:</strong> Configura palabras clave en varios idiomas para mejorar la detección</li>
+            <li><strong>Trazabilidad:</strong> Todos los controles APPCC se registran para auditorías y certificaciones</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('sanidad').innerHTML = html;
+    
+    // Guardar controles en estado global para paginación
+    estadoApp.controlesAPPCC = controles;
+    console.log('📊 Controles guardados en estadoApp:', controles.length);
+    
+    console.log('🔄 Llamando a mostrarControlesAPPCC...');
+    mostrarControlesAPPCC(controles);
+    console.log('✅ mostrarControlesAPPCC ejecutado');
+    
+  } catch (error) {
+    console.error('Error cargando sanidad:', error);
+    document.getElementById('sanidad').innerHTML = `
+      <div class="card">
+        <h2>⚕️ Gestión de Sanidad</h2>
+        <p class="error">Error al cargar el módulo: ${error.message}</p>
+      </div>
+    `;
+  }
+}
+
+// Función para cambiar entre tabs
+function mostrarTabSanidad(tabId) {
+  // Ocultar todos los tabs
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.style.display = 'none';
+  });
+  
+  // Remover clase active de todos los botones
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.style.borderBottom = '3px solid transparent';
+    btn.style.fontWeight = 'normal';
+  });
+  
+  // Mostrar tab seleccionado
+  const selectedTab = document.getElementById(`tab-${tabId}`);
+  if (selectedTab) {
+    selectedTab.style.display = 'block';
+  }
+  
+  // Activar botón seleccionado
+  event.target.style.borderBottom = '3px solid #4a90e2';
+  event.target.style.fontWeight = '600';
+}
+
+async function editarAlergenoOficial(id) {
+  try {
+    const response = await fetch(`${API_BASE}/alergenos-oficiales/${id}`);
+    if (!response.ok) throw new Error('Error al cargar alérgeno');
+    const alergeno = await response.json();
+    
+    const campos = `
+      <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        <div>
+          <label>Nombre (No editable)</label>
+          <input type="text" value="${alergeno.nombre}" disabled style="background-color: #f5f5f5;">
+        </div>
+        <div>
+          <label>Código (No editable)</label>
+          <input type="text" value="${alergeno.codigo}" disabled style="background-color: #f5f5f5;">
+        </div>
+        <div>
+          <label>Descripción</label>
+          <textarea name="descripcion" rows="3">${alergeno.descripcion || ''}</textarea>
+        </div>
+        <div>
+          <label>Icono (emoji)</label>
+          <input type="text" name="icono" value="${alergeno.icono || ''}" maxlength="4">
+        </div>
+        <div>
+          <label>Palabras Clave (para detección automática) *</label>
+          <textarea name="palabras_clave" rows="4" required placeholder="Separadas por comas. Ej: gluten,trigo,wheat,cereal">${alergeno.palabras_clave || ''}</textarea>
+          <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">
+            Estas palabras se usarán para detectar automáticamente este alérgeno cuando se creen ingredientes o platos.
+            Incluye el nombre en varios idiomas y sinónimos comunes.
+          </small>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" name="activo" id="activo-oficial-${id}" ${alergeno.activo ? 'checked' : ''}>
+          <label for="activo-oficial-${id}" style="margin: 0; text-transform: none;">Activo</label>
+        </div>
+      </div>
+    `;
+    
+    abrirModal(`Editar Alérgeno Oficial: ${alergeno.nombre}`, campos, async (formData) => {
+      try {
+        const datos = Object.fromEntries(formData);
+        datos.activo = formData.has('activo') ? 1 : 0;
+        
+        const resp = await fetch(`${API_BASE}/alergenos-oficiales/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        
+        if (!resp.ok) throw new Error('Error al actualizar');
+        
+        mostrarExito('Alérgeno oficial actualizado');
+        cerrarModal();
+        await cargarSanidad();
+      } catch (error) {
+        mostrarError('Error al actualizar: ' + error.message);
+      }
+    });
+  } catch (error) {
+    mostrarError('Error al cargar formulario: ' + error.message);
   }
 }
 
@@ -1571,7 +1939,7 @@ function detectarAlergenos(nombre) {
   return alergenos;
 }
 
-function detectarAlergenosAutomatico(nombre, modalInstance) {
+async function detectarAlergenosAutomatico(nombre, modalInstance) {
   if (!nombre || !modalInstance) return;
   
   const alergenosDetectados = detectarAlergenos(nombre);
@@ -1579,9 +1947,9 @@ function detectarAlergenosAutomatico(nombre, modalInstance) {
   
   if (!form) return;
   
-  // Marcar automáticamente los checkboxes de alérgenos detectados
+  // Marcar automáticamente los checkboxes de alérgenos oficiales detectados
   Object.keys(alergenosDetectados).forEach(alergeno => {
-    const checkbox = form.querySelector(`input[name="${alergeno}"]`);
+    const checkbox = form.querySelector(`input[name="alergenos_${alergeno}"]`);
     if (checkbox && alergenosDetectados[alergeno]) {
       checkbox.checked = true;
       // Agregar efecto visual suave
@@ -1592,9 +1960,54 @@ function detectarAlergenosAutomatico(nombre, modalInstance) {
           checkbox.parentElement.style.backgroundColor = '';
         }, 1500);
       }
-      console.log(`✅ Alérgeno ${alergeno} detectado automáticamente en "${nombre}"`);
+      console.log(`✅ Alérgeno oficial ${alergeno} detectado automáticamente en "${nombre}"`);
     }
   });
+  
+  // Detectar alérgenos personalizados
+  try {
+    const response = await fetch('/api/alergenos-personalizados');
+    if (response.ok) {
+      const datos = await response.json();
+      const personalizados = datos.data || datos;
+      const activos = personalizados.filter(a => a.activo === 1);
+      
+      const nombreNormalizado = normalizarTexto(nombre);
+      
+      activos.forEach(alergeno => {
+        // Buscar palabras clave del alérgeno personalizado
+        const palabrasClave = alergeno.palabras_clave ? alergeno.palabras_clave.split(',').map(p => p.trim().toLowerCase()) : [alergeno.nombre.toLowerCase()];
+        
+        const detectado = palabrasClave.some(palabra => {
+          const palabraNormalizada = normalizarTexto(palabra);
+          return nombreNormalizado.includes(palabraNormalizada);
+        });
+        
+        if (detectado) {
+          // Convertir nombre a formato de ID
+          const nombreId = alergeno.nombre.toLowerCase()
+            .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
+            .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
+            .replace(/[úùüû]/g, 'u').replace(/ñ/g, 'n')
+            .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+          
+          const checkbox = form.querySelector(`input[name="alergenos_${nombreId}"]`);
+          if (checkbox) {
+            checkbox.checked = true;
+            if (checkbox.parentElement) {
+              checkbox.parentElement.style.backgroundColor = '#e8f5e9';
+              setTimeout(() => {
+                checkbox.parentElement.style.backgroundColor = '';
+              }, 1500);
+            }
+            console.log(`✅ Alérgeno personalizado "${alergeno.nombre}" detectado automáticamente en "${nombre}"`);
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error al detectar alérgenos personalizados:', error);
+  }
 }
 
 async function buscarDuplicadosIngrediente(nombre, modalInstance) {
@@ -1786,6 +2199,12 @@ async function editarIngrediente(id) {
     const todosIngredientes = await fetch(`${API_BASE}/ingredientes`).then(r => r.json());
     const familias = [...new Set(todosIngredientes.filter(i => i.familia).map(i => i.familia))].sort();
     const partidas = [...new Set(todosIngredientes.filter(i => i.partidas_almacen).map(i => i.partidas_almacen))].sort();
+    const gruposConservacion = ['Congelado', 'Fresco', 'Neutro', 'Refrigerado', 'Seco'];
+    const unidadesEconomato = ['Ud', 'Kg', 'Lt', 'Gramo', 'Litro', 'Caja'];
+    const unidadesEscandallo = ['Ud', 'Kg', 'Lt', 'Gramo', 'Litro'];
+    
+    // Cargar sección de alérgenos personalizados primero
+    const seccionAlergenosPersonalizados = await agregarSeccionAlergenosPersonalizados(id, 'ingrediente');
     
     const fields = `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px;">
@@ -1813,31 +2232,24 @@ async function editarIngrediente(id) {
         </div>
         <div>
           <label>Grupo Conservación</label>
-          <select name="grupo_conservacion">
-            <option value="">-- Seleccionar --</option>
-            <option value="Congelado" ${ing.grupo_conservacion === 'Congelado' ? 'selected' : ''}>Congelado</option>
-            <option value="Fresco" ${ing.grupo_conservacion === 'Fresco' ? 'selected' : ''}>Fresco</option>
-            <option value="Neutro" ${ing.grupo_conservacion === 'Neutro' ? 'selected' : ''}>Neutro</option>
-            <option value="Refrigerado" ${ing.grupo_conservacion === 'Refrigerado' ? 'selected' : ''}>Refrigerado</option>
-          </select>
+          <input type="text" name="grupo_conservacion" value="${ing.grupo_conservacion || ''}" list="grupos-conservacion-list" autocomplete="off">
+          <datalist id="grupos-conservacion-list">
+            ${gruposConservacion.map(g => `<option value="${g}">`).join('')}
+          </datalist>
         </div>
         <div>
           <label>Unidad Economato</label>
-          <select name="unidad_economato">
-            <option value="">-- Seleccionar --</option>
-            <option value="Ud" ${ing.unidad_economato === 'Ud' ? 'selected' : ''}>Ud</option>
-            <option value="Kg" ${ing.unidad_economato === 'Kg' ? 'selected' : ''}>Kg</option>
-            <option value="Lt" ${ing.unidad_economato === 'Lt' ? 'selected' : ''}>Lt</option>
-          </select>
+          <input type="text" name="unidad_economato" value="${ing.unidad_economato || ''}" list="unidades-economato-list" autocomplete="off">
+          <datalist id="unidades-economato-list">
+            ${unidadesEconomato.map(u => `<option value="${u}">`).join('')}
+          </datalist>
         </div>
         <div>
           <label>Unidad Escandallo</label>
-          <select name="unidad_escandallo">
-            <option value="">-- Seleccionar --</option>
-            <option value="Ud" ${ing.unidad_escandallo === 'Ud' ? 'selected' : ''}>Ud</option>
-            <option value="Kg" ${ing.unidad_escandallo === 'Kg' ? 'selected' : ''}>Kg</option>
-            <option value="Lt" ${ing.unidad_escandallo === 'Lt' ? 'selected' : ''}>Lt</option>
-          </select>
+          <input type="text" name="unidad_escandallo" value="${ing.unidad_escandallo || ''}" list="unidades-escandallo-list" autocomplete="off">
+          <datalist id="unidades-escandallo-list">
+            ${unidadesEscandallo.map(u => `<option value="${u}">`).join('')}
+          </datalist>
         </div>
         <div>
           <label>Coste Unidad (€)</label>
@@ -1862,9 +2274,6 @@ async function editarIngrediente(id) {
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
           <label style="display: flex; align-items: center; gap: 8px; text-transform: none; font-weight: 500;">
             <input type="checkbox" name="gluten" ${ing.gluten ? 'checked' : ''}> Gluten
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px; text-transform: none; font-weight: 500;">
-            <input type="checkbox" name="cereales" ${ing.cereales ? 'checked' : ''}> Cereales
           </label>
           <label style="display: flex; align-items: center; gap: 8px; text-transform: none; font-weight: 500;">
             <input type="checkbox" name="crustaceos" ${ing.crustaceos ? 'checked' : ''}> Crustáceos
@@ -1905,19 +2314,16 @@ async function editarIngrediente(id) {
           <label style="display: flex; align-items: center; gap: 8px; text-transform: none; font-weight: 500;">
             <input type="checkbox" name="altramuces" ${ing.altramuces ? 'checked' : ''}> Altramuces
           </label>
-          <label style="display: flex; align-items: center; gap: 8px; text-transform: none; font-weight: 500;">
-            <input type="checkbox" name="mariscos" ${ing.mariscos ? 'checked' : ''}> Mariscos
-          </label>
         </div>
       </div>
-      ${await agregarSeccionAlergenosPersonalizados(id, 'ingrediente')}
+      ${seccionAlergenosPersonalizados}
     `;
     
     abrirModal('Editar Ingrediente', fields, async (formData) => {
       const datos = Object.fromEntries(formData);
       
-      // Convertir checkboxes de alérgenos
-      const alergenos = ['gluten', 'cereales', 'crustaceos', 'moluscos', 'pescado', 'cacahuetes', 'frutos_secos', 'soja', 'lacteos', 'ovoproductos', 'apio', 'mostaza', 'sesamo', 'sulfitos', 'altramuces', 'mariscos'];
+      // Convertir checkboxes de alérgenos (solo los que existen en la BD)
+      const alergenos = ['gluten', 'crustaceos', 'moluscos', 'pescado', 'cacahuetes', 'frutos_secos', 'soja', 'lacteos', 'ovoproductos', 'apio', 'mostaza', 'sesamo', 'sulfitos', 'altramuces'];
       alergenos.forEach(alergeno => {
         datos[alergeno] = formData.has(alergeno) ? 1 : 0;
       });
@@ -2356,19 +2762,19 @@ async function editarInventario(id) {
         </div>
         <div>
           <label>Unidad Economato</label>
-          <select name="unidad_economato" id="edit_unidad_economato">
-            <option value="">-- Seleccionar --</option>
-            ${unidades.map(u => `<option value="${u}" ${inv.unidad === u ? 'selected' : ''}>${u}</option>`).join('')}
-          </select>
+          <input type="text" name="unidad_economato" id="edit_unidad_economato" value="${inv.unidad || ''}" list="unidades-economato-inv-list" autocomplete="off">
+          <datalist id="unidades-economato-inv-list">
+            ${unidades.map(u => `<option value="${u}">`).join('')}
+          </datalist>
         </div>
       </div>
       
       <div>
         <label>Unidad Escandallo</label>
-        <select name="unidad_escandallo" id="edit_unidad_escandallo">
-          <option value="">-- Seleccionar --</option>
-          ${unidades.map(u => `<option value="${u}">${u}</option>`).join('')}
-        </select>
+        <input type="text" name="unidad_escandallo" id="edit_unidad_escandallo" list="unidades-escandallo-inv-list" autocomplete="off">
+        <datalist id="unidades-escandallo-inv-list">
+          ${unidades.map(u => `<option value="${u}">`).join('')}
+        </datalist>
       </div>
       
       <div>
@@ -2389,10 +2795,10 @@ async function editarInventario(id) {
       
       <div>
         <label>Ubicación (Partida/Almacén)</label>
-        <select name="ubicacion" id="edit_ubicacion">
-          <option value="">-- Seleccionar --</option>
-          ${ubicaciones.map(loc => `<option value="${loc}" ${inv.ubicacion === loc ? 'selected' : ''}>${loc}</option>`).join('')}
-        </select>
+        <input type="text" name="ubicacion" id="edit_ubicacion" value="${inv.ubicacion || ''}" list="ubicaciones-inv-list" autocomplete="off">
+        <datalist id="ubicaciones-inv-list">
+          ${ubicaciones.map(loc => `<option value="${loc}">`).join('')}
+        </datalist>
       </div>
     `;
     
@@ -2897,26 +3303,34 @@ function toggleSeleccion(tabla, id) {
 }
 
 function toggleSeleccionTodos(tabla, ids) {
-  const seleccionados = estadoApp.paginacion[tabla].seleccionados;
+  const config = estadoApp.paginacion[tabla];
+  if (!config) return;
+  
+  const seleccionados = config.seleccionados;
   const checkbox = event.target;
   
-  // Si no se pasan IDs, obtenerlos automáticamente de los checkboxes visibles
+  // Si no se pasan IDs, obtenerlos automáticamente
   if (!ids || ids.length === 0) {
     ids = [];
-    const checkboxes = document.querySelectorAll(`input[id^="check-${tabla}-"]:not(#check-all-${tabla})`);
+    const checkboxes = document.querySelectorAll(`input[id^="check-${tabla}-"]:not(#selectAll${tabla.charAt(0).toUpperCase() + tabla.slice(1)}):not(#check-all-${tabla})`);
     checkboxes.forEach(cb => {
-      const id = parseInt(cb.id.replace(`check-${tabla}-`, ''));
-      if (!isNaN(id)) ids.push(id);
+      const match = cb.id.match(/check-.+-(\d+)/);
+      if (match) {
+        const id = parseInt(match[1]);
+        if (!isNaN(id)) ids.push(id);
+      }
     });
   }
   
   if (checkbox.checked) {
+    // Agregar los IDs visibles a la selección
     ids.forEach(id => {
       if (!seleccionados.includes(id)) {
         seleccionados.push(id);
       }
     });
   } else {
+    // Remover los IDs visibles de la selección
     ids.forEach(id => {
       const index = seleccionados.indexOf(id);
       if (index > -1) {
@@ -2925,13 +3339,61 @@ function toggleSeleccionTodos(tabla, ids) {
     });
   }
   
-  // Actualizar checkboxes individuales
+  // Actualizar checkboxes individuales en la página actual
   ids.forEach(id => {
     const cb = document.getElementById(`check-${tabla}-${id}`);
     if (cb) cb.checked = checkbox.checked;
   });
   
   actualizarBotonEliminarMasivo(tabla);
+}
+
+// Nueva función para seleccionar TODOS los registros de la tabla (todas las páginas)
+function seleccionarTodosLosRegistros(tabla) {
+  const config = estadoApp.paginacion[tabla];
+  if (!config) return;
+  
+  let todosLosIds = [];
+  
+  // Obtener todos los IDs según la tabla
+  switch(tabla) {
+    case 'platos':
+      todosLosIds = estadoApp.platosData.map(p => p.id);
+      break;
+    case 'ingredientes':
+      todosLosIds = estadoApp.ingredientesData.map(i => i.id);
+      break;
+    case 'escandallos':
+      todosLosIds = estadoApp.escandallosData.map(e => e.id);
+      break;
+    case 'inventario':
+      todosLosIds = estadoApp.inventarioData.map(i => i.id);
+      break;
+    case 'pedidos':
+      todosLosIds = estadoApp.pedidosData.map(p => p.id);
+      break;
+    case 'controlesAPPCC':
+      todosLosIds = estadoApp.controlesAPPCC.map(c => c.id);
+      break;
+  }
+  
+  confirmarAccion(`¿Seleccionar todos los ${todosLosIds.length} registros de la tabla?`, () => {
+    config.seleccionados = [...todosLosIds];
+    
+    // Actualizar checkbox visual
+    const checkboxAll = document.getElementById(`selectAll${tabla.charAt(0).toUpperCase() + tabla.slice(1)}`) || 
+                        document.getElementById(`check-all-${tabla}`);
+    if (checkboxAll) checkboxAll.checked = true;
+    
+    // Actualizar checkboxes visibles
+    todosLosIds.forEach(id => {
+      const cb = document.getElementById(`check-${tabla}-${id}`);
+      if (cb) cb.checked = true;
+    });
+    
+    actualizarBotonEliminarMasivo(tabla);
+    mostrarExito(`Seleccionados ${todosLosIds.length} registros`);
+  });
 }
 
 function actualizarBotonEliminarMasivo(tabla) {
@@ -2960,45 +3422,56 @@ async function eliminarSeleccionados(tabla, endpoint) {
   
   async function realizarEliminacionMasiva() {
     let exitosos = 0;
-  let errores = 0;
-  
-  for (const id of seleccionados) {
-    try {
-      const response = await fetch(`${API_BASE}/${endpoint}/${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        exitosos++;
-      } else {
+    let errores = 0;
+    
+    for (const id of seleccionados) {
+      try {
+        const response = await fetch(`${API_BASE}/${endpoint}/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          exitosos++;
+        } else {
+          errores++;
+        }
+      } catch (error) {
         errores++;
       }
-    } catch (error) {
-      errores++;
     }
-  }
-  
-  estadoApp.paginacion[tabla].seleccionados = [];
-  
-  // Desmarcar el checkbox de "seleccionar todos"
-  const checkAllBox = document.getElementById(`check-all-${tabla}`);
-  if (checkAllBox) {
-    checkAllBox.checked = false;
-  }
-  
-  if (exitosos > 0) {
-    mostrarExito(`${exitosos} registro(s) eliminado(s)`);
-  }
-  if (errores > 0) {
-    mostrarError(`${errores} error(es) al eliminar`);
-  }
-  
-  // Recargar la tabla correspondiente
-  switch(tabla) {
-    case 'platos': cargarPlatos(); break;
-    case 'ingredientes': cargarIngredientes(); break;
-    case 'escandallos': cargarEscandallos(); break;
-    case 'inventario': cargarInventario(); break;
-    case 'pedidos': cargarPedidos(); break;
-    case 'partidas': cargarPartidas(); break;
-  }
+    
+    // Limpiar selección
+    estadoApp.paginacion[tabla].seleccionados = [];
+    
+    // Desmarcar todos los checkboxes
+    const checkAllBox = document.getElementById(`check-all-${tabla}`) || 
+                        document.getElementById(`selectAll${tabla.charAt(0).toUpperCase() + tabla.slice(1)}`);
+    if (checkAllBox) {
+      checkAllBox.checked = false;
+    }
+    
+    // Desmarcar checkboxes individuales
+    document.querySelectorAll(`input[id^="check-${tabla}-"]`).forEach(cb => {
+      cb.checked = false;
+    });
+    
+    // Actualizar botón de eliminar
+    actualizarBotonEliminarMasivo(tabla);
+    
+    if (exitosos > 0) {
+      mostrarExito(`${exitosos} registro(s) eliminado(s)`);
+    }
+    if (errores > 0) {
+      mostrarError(`${errores} error(es) al eliminar`);
+    }
+    
+    // Recargar la tabla correspondiente
+    switch(tabla) {
+      case 'platos': cargarPlatos(); break;
+      case 'ingredientes': cargarIngredientes(); break;
+      case 'escandallos': cargarEscandallos(); break;
+      case 'inventario': cargarInventario(); break;
+      case 'pedidos': cargarPedidos(); break;
+      case 'partidas': cargarPartidas(); break;
+      case 'controlesAPPCC': cargarSanidad(); break;
+    }
   }
 }
 
@@ -3218,6 +3691,11 @@ async function mostrarModalNuevoAlergenoPersonalizado() {
         <label>Icono (emoji opcional)</label>
         <input type="text" name="icono" placeholder="🧄 🧅 🌶️" maxlength="4">
       </div>
+      <div>
+        <label>Palabras Clave (para detección automática)</label>
+        <input type="text" name="palabras_clave" placeholder="Ej: ajo, garlic, all">
+        <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">Separadas por comas. Se usarán para detectar automáticamente este alérgeno.</small>
+      </div>
     </div>
   `;
   
@@ -3260,6 +3738,11 @@ async function editarAlergenoPersonalizado(id) {
         <div>
           <label>Icono (emoji opcional)</label>
           <input type="text" name="icono" value="${alergeno.icono || ''}" maxlength="4">
+        </div>
+        <div>
+          <label>Palabras Clave (para detección automática)</label>
+          <input type="text" name="palabras_clave" value="${alergeno.palabras_clave || ''}" placeholder="Ej: ajo, garlic, all">
+          <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">Separadas por comas. Se usarán para detectar automáticamente este alérgeno.</small>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <input type="checkbox" name="activo" id="activo-alergeno-${id}" ${alergeno.activo ? 'checked' : ''}>
@@ -3406,6 +3889,265 @@ window.editarAlergenoPersonalizado = editarAlergenoPersonalizado;
 window.eliminarAlergenoPersonalizado = eliminarAlergenoPersonalizado;
 window.agregarSeccionAlergenosPersonalizados = agregarSeccionAlergenosPersonalizados;
 window.guardarAlergenosPersonalizados = guardarAlergenosPersonalizados;
+
+// Exportar funciones de alérgenos oficiales
+window.editarAlergenoOficial = editarAlergenoOficial;
+window.mostrarTabSanidad = mostrarTabSanidad;
+
+// ==================== CONTROL APPCC ====================
+
+function mostrarControlesAPPCC(controles) {
+  const tbody = document.getElementById('controlesAPPCCTableBody');
+  const paginacionDiv = document.getElementById('control-appcc-paginacion');
+  
+  if (!tbody) {
+    console.error('❌ Tbody de controles APPCC no encontrado');
+    return;
+  }
+  
+  tbody.innerHTML = '';
+
+  if (!controles.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No hay controles APPCC</td></tr>';
+    if (paginacionDiv) paginacionDiv.innerHTML = '';
+    return;
+  }
+
+  const controlesPaginados = paginar(controles, 'controlesAPPCC');
+  const idsVisibles = controlesPaginados.map(c => c.id);
+  const seleccionados = estadoApp.paginacion.controlesAPPCC.seleccionados;
+
+  controlesPaginados.forEach(c => {
+    const checked = seleccionados.includes(c.id) ? 'checked' : '';
+    const row = `
+      <tr>
+        <td><input type="checkbox" id="check-controlesAPPCC-${c.id}" ${checked} onchange="toggleSeleccion('controlesAPPCC', ${c.id})"></td>
+        <td><strong>${c.plato_codigo}</strong></td>
+        <td>${c.ingrediente_codigo || '-'}</td>
+        <td>${c.fecha_produccion || '-'}</td>
+        <td>${c.punto_critico || '-'}</td>
+        <td>${c.corrector || '-'}</td>
+        <td>
+          <button class="btn-icon" onclick="editarControlAPPCC(${c.id})" title="Editar">✏️</button>
+          <button class="btn-icon" onclick="eliminarControlAPPCC(${c.id})" title="Eliminar">🗑️</button>
+        </td>
+      </tr>
+    `;
+    tbody.innerHTML += row;
+  });
+
+  if (paginacionDiv) {
+    paginacionDiv.innerHTML = renderizarPaginacion(controles.length, 'controlesAPPCC', 'filtrarControlesAPPCC');
+  }
+
+  actualizarBotonEliminarMasivo('controlesAPPCC');
+}
+
+function filtrarControlesAPPCC() {
+  const search = normalizarTexto(document.getElementById('searchControlAPPCC').value);
+
+  const filtrados = estadoApp.controlesAPPCC.filter(control => {
+    const matchSearch = !search || 
+      normalizarTexto(control.plato_codigo).includes(search) || 
+      normalizarTexto(control.ingrediente_codigo || '').includes(search) ||
+      normalizarTexto(control.fecha_produccion || '').includes(search) ||
+      normalizarTexto(control.punto_critico || '').includes(search);
+    return matchSearch;
+  });
+
+  mostrarControlesAPPCC(filtrados);
+}
+
+function limpiarFiltrosControlAPPCC() {
+  document.getElementById('searchControlAPPCC').value = '';
+  mostrarControlesAPPCC(estadoApp.controlesAPPCC);
+}
+
+async function mostrarModalNuevoControlAPPCC() {
+  // Cargar platos e ingredientes para autocompletar
+  let platosCodigos = [];
+  let ingredientesCodigos = [];
+  
+  try {
+    const [platosRes, ingredientesRes] = await Promise.all([
+      fetch(`${API_BASE}/platos`).then(r => r.json()),
+      fetch(`${API_BASE}/ingredientes`).then(r => r.json())
+    ]);
+    
+    platosCodigos = [...new Set((platosRes.data || []).map(p => p.codigo).filter(Boolean))];
+    ingredientesCodigos = [...new Set((ingredientesRes.data || []).map(i => i.codigo).filter(Boolean))];
+  } catch (error) {
+    console.error('Error cargando datos para autocompletar:', error);
+  }
+  
+  const campos = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <label>Plato / Código *</label>
+        <input type="text" name="plato_codigo" list="platos-appcc-list" autocomplete="off" required placeholder="Código del plato">
+        <datalist id="platos-appcc-list">
+          ${platosCodigos.map(c => `<option value="${c}">`).join('')}
+        </datalist>
+      </div>
+      <div>
+        <label>Ingrediente</label>
+        <input type="text" name="ingrediente_codigo" list="ingredientes-appcc-list" autocomplete="off" placeholder="Ingrediente relacionado">
+        <datalist id="ingredientes-appcc-list">
+          ${ingredientesCodigos.map(c => `<option value="${c}">`).join('')}
+        </datalist>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Procedimiento / Proceso *</label>
+        <textarea name="fecha_produccion" rows="3" required placeholder="Ej: HERVIR LA LECHE 900 ML + VAINILLA"></textarea>
+      </div>
+      <div>
+        <label>Punto Crítico</label>
+        <input type="text" name="punto_critico" placeholder="Ej: Temperatura 70ºC, Tiempo 10 min">
+      </div>
+      <div>
+        <label>Punto Corrector</label>
+        <input type="text" name="corrector" placeholder="Acción si falla el control">
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Responsable</label>
+        <input type="text" name="responsable" placeholder="Persona responsable del control">
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Observaciones</label>
+        <textarea name="observaciones" rows="2" placeholder="Notas adicionales"></textarea>
+      </div>
+    </div>
+  `;
+  
+  abrirModal('Nuevo Control APPCC', campos, async (formData) => {
+    try {
+      const datos = Object.fromEntries(formData);
+      const response = await fetch(`${API_BASE}/control-sanidad`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+      
+      if (!response.ok) throw new Error('Error al crear control');
+      
+      mostrarExito('Control APPCC creado');
+      cerrarModal();
+      await cargarSanidad();
+    } catch (error) {
+      mostrarError('Error al crear control: ' + error.message);
+    }
+  });
+}
+
+async function editarControlAPPCC(id) {
+  try {
+    const response = await fetch(`${API_BASE}/control-sanidad/${id}`);
+    if (!response.ok) throw new Error('Error al cargar control');
+    const control = await response.json();
+    
+    // Cargar platos e ingredientes para autocompletar
+    let platosCodigos = [];
+    let ingredientesCodigos = [];
+    
+    try {
+      const [platosRes, ingredientesRes] = await Promise.all([
+        fetch(`${API_BASE}/platos`).then(r => r.json()),
+        fetch(`${API_BASE}/ingredientes`).then(r => r.json())
+      ]);
+      
+      platosCodigos = [...new Set((platosRes.data || []).map(p => p.codigo).filter(Boolean))];
+      ingredientesCodigos = [...new Set((ingredientesRes.data || []).map(i => i.codigo).filter(Boolean))];
+    } catch (error) {
+      console.error('Error cargando datos para autocompletar:', error);
+    }
+    
+    const campos = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <label>Plato / Código *</label>
+          <input type="text" name="plato_codigo" value="${control.plato_codigo}" list="platos-appcc-edit-list" autocomplete="off" required>
+          <datalist id="platos-appcc-edit-list">
+            ${platosCodigos.map(c => `<option value="${c}">`).join('')}
+          </datalist>
+        </div>
+        <div>
+          <label>Ingrediente</label>
+          <input type="text" name="ingrediente_codigo" value="${control.ingrediente_codigo || ''}" list="ingredientes-appcc-edit-list" autocomplete="off">
+          <datalist id="ingredientes-appcc-edit-list">
+            ${ingredientesCodigos.map(c => `<option value="${c}">`).join('')}
+          </datalist>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>Procedimiento / Proceso *</label>
+          <textarea name="fecha_produccion" rows="3" required>${control.fecha_produccion || ''}</textarea>
+        </div>
+        <div>
+          <label>Punto Crítico</label>
+          <input type="text" name="punto_critico" value="${control.punto_critico || ''}">
+        </div>
+        <div>
+          <label>Punto Corrector</label>
+          <input type="text" name="corrector" value="${control.corrector || ''}">
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>Responsable</label>
+          <input type="text" name="responsable" value="${control.responsable || ''}">
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>Observaciones</label>
+          <textarea name="observaciones" rows="2">${control.observaciones || ''}</textarea>
+        </div>
+      </div>
+    `;
+    
+    abrirModal('Editar Control APPCC', campos, async (formData) => {
+      try {
+        const datos = Object.fromEntries(formData);
+        
+        const resp = await fetch(`${API_BASE}/control-sanidad/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        
+        if (!resp.ok) throw new Error('Error al actualizar');
+        
+        mostrarExito('Control APPCC actualizado');
+        cerrarModal();
+        await cargarSanidad();
+      } catch (error) {
+        mostrarError('Error al actualizar: ' + error.message);
+      }
+    });
+  } catch (error) {
+    mostrarError('Error al cargar formulario: ' + error.message);
+  }
+}
+
+async function eliminarControlAPPCC(id) {
+  confirmarAccion('¿Eliminar este control APPCC?', async () => {
+    try {
+      const response = await fetch(`${API_BASE}/control-sanidad/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Error al eliminar');
+      
+      mostrarExito('Control APPCC eliminado');
+      await cargarSanidad();
+    } catch (error) {
+      mostrarError('Error al eliminar: ' + error.message);
+    }
+  });
+}
+
+// Exportar funciones de control APPCC
+window.mostrarModalNuevoControlAPPCC = mostrarModalNuevoControlAPPCC;
+window.editarControlAPPCC = editarControlAPPCC;
+window.eliminarControlAPPCC = eliminarControlAPPCC;
+window.mostrarControlesAPPCC = mostrarControlesAPPCC;
+window.filtrarControlesAPPCC = filtrarControlesAPPCC;
+window.limpiarFiltrosControlAPPCC = limpiarFiltrosControlAPPCC;
 
 // ==================== ESCANDALLO MÚLTIPLE ====================
 
@@ -3980,6 +4722,53 @@ async function detectarAlergenosEscandallo(escandallos) {
   return Array.from(alergenosSet);
 }
 
+/**
+ * ============================================================================
+ * MOSTRAR PRODUCCIÓN
+ * ============================================================================
+ */
+function mostrarProduccion(produccion = null) {
+  try {
+    if (!produccion) {
+      produccion = estadoApp.produccion || [];
+    }
+
+    const seccion = document.getElementById('produccion-section');
+    if (seccion) {
+      console.log('📊 Mostrando producción:', produccion.length, 'órdenes');
+      // Aquí iría la lógica de renderizado específica
+      // Por ahora se actualiza desde el módulo frontend
+    }
+  } catch (error) {
+    console.error('Error en mostrarProduccion:', error);
+  }
+}
+
+/**
+ * ============================================================================
+ * MOSTRAR SANIDAD (APPCC)
+ * ============================================================================
+ */
+function mostrarSanidad(sanidad = null) {
+  try {
+    if (!sanidad) {
+      sanidad = estadoApp.sanidad || [];
+    }
+
+    const seccion = document.getElementById('sanidad-section');
+    if (seccion) {
+      console.log('📊 Mostrando sanidad:', sanidad.length ? 'datos cargados' : 'sin datos');
+      // Aquí iría la lógica de renderizado específica
+      // Por ahora se actualiza desde el módulo frontend
+    }
+  } catch (error) {
+    console.error('Error en mostrarSanidad:', error);
+  }
+}
+
 // Exportar funciones
 window.guardarEscandalloMultiple = guardarEscandalloMultiple;
 window.cargarEscandalloExistente = cargarEscandalloExistente;
+window.seleccionarTodosLosRegistros = seleccionarTodosLosRegistros;
+window.mostrarProduccion = mostrarProduccion;
+window.mostrarSanidad = mostrarSanidad;

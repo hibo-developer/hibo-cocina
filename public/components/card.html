@@ -1,0 +1,59 @@
+<!-- ============================================================================
+ * CARD.HTML - Componente tarjeta reutilizable
+ * ============================================================================ -->
+
+<!-- 
+  Uso básico:
+  <div class="card">
+    <h3>Título de la tarjeta</h3>
+    <p>Contenido de la tarjeta</p>
+  </div>
+  
+  Con métrica:
+  <div class="card">
+    <h3>Total de Platos</h3>
+    <div class="metric">245</div>
+    <p>Platos disponibles en el catálogo</p>
+  </div>
+  
+  En grilla:
+  <div class="dashboard-grid">
+    <div class="card">...</div>
+    <div class="card">...</div>
+  </div>
+  
+  De producción:
+  <div class="production-card">
+    <h4>Plato XYZ</h4>
+    <p><span class="label">Coste:</span> <span class="value">12.50€</span></p>
+  </div>
+-->
+
+<style>
+  .card {
+    background: white;
+    border: 1px solid #ecf0f1;
+    border-radius: 2px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  .card h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1em;
+  }
+
+  .metric {
+    font-size: 2em;
+    color: #1a3a52;
+    font-weight: bold;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+</style>

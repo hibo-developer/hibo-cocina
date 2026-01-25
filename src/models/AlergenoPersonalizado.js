@@ -25,10 +25,10 @@ class AlergenoPersonalizado {
 
   // Crear nuevo alérgeno personalizado
   static async crear(alergeno) {
-    const { nombre, descripcion, icono } = alergeno;
-    const sql = `INSERT INTO alergenos_personalizados (nombre, descripcion, icono) VALUES (?, ?, ?)`;
+    const { nombre, descripcion, icono, palabras_clave } = alergeno;
+    const sql = `INSERT INTO alergenos_personalizados (nombre, descripcion, icono, palabras_clave) VALUES (?, ?, ?, ?)`;
     return new Promise((resolve, reject) => {
-      db.run(sql, [nombre, descripcion, icono], function(err) {
+      db.run(sql, [nombre, descripcion, icono, palabras_clave], function(err) {
         if (err) reject(err);
         else resolve({ id: this.lastID, ...alergeno });
       });
@@ -37,10 +37,10 @@ class AlergenoPersonalizado {
 
   // Actualizar alérgeno existente
   static async actualizar(id, alergeno) {
-    const { nombre, descripcion, icono, activo } = alergeno;
-    const sql = `UPDATE alergenos_personalizados SET nombre = ?, descripcion = ?, icono = ?, activo = ? WHERE id = ?`;
+    const { nombre, descripcion, icono, activo, palabras_clave } = alergeno;
+    const sql = `UPDATE alergenos_personalizados SET nombre = ?, descripcion = ?, icono = ?, palabras_clave = ?, activo = ? WHERE id = ?`;
     return new Promise((resolve, reject) => {
-      db.run(sql, [nombre, descripcion, icono, activo !== undefined ? activo : 1, id], function(err) {
+      db.run(sql, [nombre, descripcion, icono, palabras_clave, activo !== undefined ? activo : 1, id], function(err) {
         if (err) reject(err);
         else resolve({ id, ...alergeno });
       });

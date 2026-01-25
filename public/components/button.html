@@ -1,0 +1,39 @@
+<!-- ============================================================================
+ * BUTTON.HTML - Componente botón reutilizable
+ * ============================================================================ -->
+
+<!-- 
+  Uso básico:
+  <button class="btn btn-primary" onclick="handleClick()">Guardar</button>
+  
+  Variantes:
+  - btn-primary (rojo/gradiente, acción principal)
+  - btn-secondary (gris, acciones secundarias)
+  - btn-danger (color peligro, para eliminar)
+  - btn-small (botón pequeño)
+  
+  Ejemplo con icono:
+  <button class="btn btn-primary">
+    <span>💾</span>
+    <span>Guardar</span>
+  </button>
+-->
+
+<style>
+  /* Botón template */
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+</style>

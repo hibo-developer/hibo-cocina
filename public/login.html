@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HIBO Cocina - Iniciar Sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header h1 {
+      font-size: 2.5em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 0.95em;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1em;
+      transition: all 0.3s;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group input::placeholder {
+      color: #999;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .login-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #c33;
+    }
+
+    .success-message {
+      background: #efe;
+      color: #3c3;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #3c3;
+    }
+
+    .test-credentials {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 25px;
+      font-size: 0.85em;
+      color: #666;
+    }
+
+    .test-credentials h4 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .test-credentials-list {
+      list-style: none;
+    }
+
+    .test-credentials-list li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    .test-credentials-list li:last-child {
+      border-bottom: none;
+    }
+
+    .test-credentials-list strong {
+      color: #667eea;
+    }
+
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .info-text {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>🍳</h1>
+      <h1>HIBO COCINA</h1>
+      <p>Sistema de Gestión de Producción</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input 
+          type="email" 
+          id="email" 
+          placeholder="tu@email.com"
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password" 
+          placeholder="••••••••"
+          required 
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button type="submit" class="login-button" id="loginBtn">
+        <div class="button-content">
+          <span class="spinner" id="spinner"></span>
+          <span id="buttonText">Iniciar Sesión</span>
+        </div>
+      </button>
+    </form>
+
+    <div class="test-credentials">
+      <h4>👤 Credenciales de Prueba</h4>
+      <ul class="test-credentials-list">
+        <li><strong>Admin:</strong> admin@hibo.com / admin123</li>
+        <li><strong>Chef:</strong> chef@hibo.com / chef123</li>
+        <li><strong>Operario:</strong> operario@hibo.com / operario123</li>
+      </ul>
+    </div>
+
+    <div class="info-text">
+      <p>🔗 Backend Flask: <span id="serverStatus">Verificando...</span></p>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script>
+    /**
+     * PÁGINA DE LOGIN - Fase 3 Integración Frontend-Backend
+     */
+
+    // Verificar conexión al servidor al cargar
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkServerStatus();
+      
+      // Si ya hay sesión activa, redirigir al dashboard
+      if (authState.isAuthenticated) {
+        window.location.href = '/';
+      }
+    });
+
+    /**
+     * Verificar estado del servidor
+     */
+    async function checkServerStatus() {
+      try {
+        const status = await checkServerConnection();
+        const statusEl = document.getElementById('serverStatus');
+        
+        if (status) {
+          statusEl.textContent = '✅ Conectado';
+          statusEl.style.color = '#3c3';
+        } else {
+          statusEl.textContent = '❌ No conectado';
+          statusEl.style.color = '#c33';
+        }
+      } catch (error) {
+        document.getElementById('serverStatus').textContent = '⚠️ Error';
+        document.getElementById('serverStatus').style.color = '#cc9';
+      }
+    }
+
+    /**
+     * Manejar envío del formulario de login
+     */
+    async function handleLogin(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showError('Por favor, completa todos los campos');
+        return;
+      }
+
+      // Mostrar spinner
+      const spinner = document.getElementById('spinner');
+      const buttonText = document.getElementById('buttonText');
+      const loginBtn = document.getElementById('loginBtn');
+
+      spinner.style.display = 'inline-block';
+      buttonText.textContent = 'Iniciando sesión...';
+      loginBtn.disabled = true;
+
+      try {
+        console.log('🔐 Intentando login con:', email);
+
+        const response = await authLogin(email, password);
+
+        if (!response.success) {
+          throw new Error(response.message || 'Error en autenticación');
+        }
+
+        console.log('✅ Login exitoso:', response.data.usuario);
+        showSuccess(`¡Bienvenido, ${response.data.usuario.nombre || 'usuario'}!`);
+
+        // Redirigir al dashboard después de 1 segundo
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+
+      } catch (error) {
+        console.error('❌ Error en login:', error);
+        showError(error.message || 'Error al iniciar sesión. Verifica tus credenciales.');
+      } finally {
+        spinner.style.display = 'none';
+        buttonText.textContent = 'Iniciar Sesión';
+        loginBtn.disabled = false;
+      }
+    }
+
+    /**
+     * Mostrar mensaje de error
+     */
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      // Auto-ocultar después de 5 segundos
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    /**
+     * Mostrar mensaje de éxito
+     */
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

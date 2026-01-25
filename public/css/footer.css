@@ -1,0 +1,29 @@
+/* ============================================================================
+ * FOOTER.CSS - Estilos de pie de página
+ * ============================================================================ */
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-fixed) - 1;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 0.75em;
+}
+
+@media (max-width: 768px) {
+  .footer-content p {
+    font-size: 0.65em;
+  }
+}

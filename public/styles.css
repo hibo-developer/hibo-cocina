@@ -1,20 +1,44 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ============================================================================
+ * STYLES.CSS - Archivo principal que importa todos los estilos modulares
+ * ============================================================================ */
 
-:root {
-  --primary-color: #1a3a52;
-  --secondary-color: #2c5f8d;
-  --success-color: #3d7ea6;
-  --warning-color: #5a92b8;
-  --danger-color: #4a6f8a;
-  --light-gray: #ecf0f1;
-  --dark-gray: #2c3e50;
-  --border-color: #b0bec5;
-  --shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+/* Orden importante: variables primero, luego base, luego componentes */
+@import url('css/variables.css');
+@import url('css/base.css');
+@import url('css/navbar.css');
+@import url('css/buttons.css');
+@import url('css/forms.css');
+@import url('css/tables.css');
+@import url('css/cards.css');
+@import url('css/modals.css');
+@import url('css/sections.css');
+@import url('css/footer.css');
+
+/* 
+  MIGRACIÓN DE CSS COMPLETADA
+  
+  Antes: 1 archivo de 1483 líneas (styles.css)
+  Ahora: 10 archivos pequeños y organizados
+  
+  Estructura:
+  ├── variables.css (colores, tamaños, transiciones)
+  ├── base.css (reset y estilos globales)
+  ├── navbar.css (header y navegación)
+  ├── buttons.css (todos los tipos de botones)
+  ├── forms.css (inputs, selects, validación)
+  ├── tables.css (tablas, paginación, badges)
+  ├── cards.css (tarjetas, grillas, secciones)
+  ├── modals.css (modales y overlays)
+  ├── sections.css (contenido principal, tabs)
+  └── footer.css (pie de página)
+  
+  BENEFICIOS:
+  ✅ Cada archivo <250 líneas, fácil de entender
+  ✅ Cambios localizados sin afectar otras áreas
+  ✅ Reutilizable y escalable
+  ✅ Mejor performance (carga progresiva)
+  ✅ Fácil de mantener y debuggear
+*/
 
 body {
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;

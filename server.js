@@ -19,6 +19,7 @@ const proveedoresRoutes = require('./src/routes/proveedores');
 const pedidosProveedorRoutes = require('./src/routes/pedidosProveedor');
 const stockRoutes = require('./src/routes/stock');
 const alergenosPersonalizadosRoutes = require('./src/routes/alergenosPersonalizados');
+const alergenosOficialesRoutes = require('./src/routes/alergenosOficiales');
 const { crearTablas } = require('./src/db/schema');
 
 const app = express();
@@ -60,6 +61,11 @@ app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/pedidos-proveedor', pedidosProveedorRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/alergenos-personalizados', alergenosPersonalizadosRoutes);
+app.use('/api/alergenos-oficiales', alergenosOficialesRoutes);
+
+// Alias para compatibilidad con módulos frontend
+app.use('/api/sanidad', controlSanidadRoutes); // Alias de control-sanidad
+app.use('/api/produccion', partidasCocinaRoutes); // Alias de partidas-cocina
 
 // Ruta raíz
 app.get('/', (req, res) => {

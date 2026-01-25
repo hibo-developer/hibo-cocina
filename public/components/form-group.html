@@ -1,0 +1,61 @@
+<!-- ============================================================================
+ * FORM-GROUP.HTML - Componente grupo de formulario
+ * ============================================================================ -->
+
+<!-- 
+  Uso:
+  <div class="form-group">
+    <label>Nombre <span class="required">*</span></label>
+    <input type="text" id="nombre" placeholder="Ingrese el nombre" required>
+  </div>
+  
+  Con validación:
+  <div class="form-group has-error">
+    <label>Email</label>
+    <input type="email" class="error" value="">
+    <span class="error-message">Email no válido</span>
+  </div>
+  
+  Con checkboxes:
+  <div class="form-group">
+    <label>
+      <input type="checkbox" id="activo">
+      Activo
+    </label>
+  </div>
+-->
+
+<style>
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.8em;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 2px;
+    font-size: 1em;
+  }
+
+  .form-group.has-error input {
+    border-color: #e74c3c;
+    background: #fff5f5;
+  }
+
+  .error-message {
+    color: #e74c3c;
+    font-size: 0.75em;
+  }
+</style>

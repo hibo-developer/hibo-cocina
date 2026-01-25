@@ -1,0 +1,97 @@
+/* ============================================================================
+ * NAVBAR.CSS - Estilos de navegación
+ * ============================================================================ */
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-fixed);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header h1 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 0.95em;
+  opacity: 0.9;
+}
+
+/* Navigation Bar */
+.navbar {
+  display: flex;
+  background: white;
+  border-bottom: 2px solid var(--light-gray);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 5px 20px;
+  position: fixed;
+  top: calc(var(--header-height) - 33px);
+  left: 0;
+  right: 0;
+  z-index: calc(var(--z-fixed) - 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  align-items: stretch;
+}
+
+.navbar::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.85em;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: var(--transition);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.nav-btn:hover {
+  background: var(--light-gray);
+  color: var(--primary-color);
+}
+
+.nav-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.4em;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    flex: 0 1 auto;
+    padding: 10px 12px;
+    font-size: 0.75em;
+  }
+}

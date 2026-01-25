@@ -26,6 +26,7 @@
       <button class="nav-btn" data-section="inventario">Inventario</button>
       <button class="nav-btn" data-section="pedidos">Pedidos</button>
       <button class="nav-btn" data-section="produccion">Producción</button>
+      <button class="nav-btn" data-section="sanidad">Sanidad</button>
       <button class="nav-btn" data-section="estadisticas">Estadísticas</button>
     </nav>
 
@@ -81,8 +82,47 @@
   <!-- Modal dinámico global -->
   <div id="modal-container"></div>
 
+  <!-- FASE 3 (REFACTORIZADO): Scripts en el nuevo orden -->
+  
+  <!-- 1. Servicios centralizados (deben cargar primero) -->
+  <script src="js/services/api.js"></script>
+  <script src="js/services/state.js"></script>
+  <script src="js/services/utils.js"></script>
+
+  <!-- 2. Componentes UI reutilizables -->
+  <script src="js/ui/modals.js"></script>
+  <script src="js/ui/notifications.js"></script>
+  <script src="js/ui/forms.js"></script>
+
+  <!-- 3. Capa de compatibilidad (puente entre viejo y nuevo) -->
+  <script src="js/compatibility-layer.js"></script>
+
+  <!-- 4. Módulos de negocio -->
+  <script src="js/modules/platos.js"></script>
+  <script src="js/modules/ingredientes.js"></script>
+  <script src="js/modules/escandallos.js"></script>
+  <script src="js/modules/pedidos.js"></script>
+  <script src="js/modules/inventario.js"></script>
+  <script src="js/modules/sanidad.js"></script>
+  <script src="js/modules/produccion.js"></script>
+  <script src="js/modules/navigation.js"></script>
+
+  <!-- 5. Scripts originales (mantenidos para compatibilidad) -->
   <script src="module-loader.js"></script>
   <script src="modales-dinamicos.js"></script>
   <script src="app.js"></script>
+  
+  <!-- 5.5. Versiones migradas que sobrescriben app.js -->
+  <script src="js/app-migrated.js"></script>
+
+  <!-- 6. App refactorizada (nueva inicialización) -->
+  <script src="js/app-refactored.js"></script>
+  
+  <!-- 7. Test de integración (desarrollo) -->
+  <script src="js/test-integracion.js"></script>
+  
+  <!-- 8. Integración con Backend Flask -->
+  <script src="api-client.js"></script>
+  <script src="integracion-flask.js"></script>
 </body>
 </html>
