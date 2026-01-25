@@ -19,6 +19,7 @@ const { initializeDatabase, closeDatabase } = require('./src/utils/database');
 const { errorHandler, notFoundHandler, createResponse } = require('./src/middleware/errorHandler');
 
 // Importar rutas
+const authRoutes = require('./src/routes/auth');
 const platosRoutes = require('./src/routes/platos');
 const ingredientesRoutes = require('./src/routes/ingredientes');
 const escandallosRoutes = require('./src/routes/escandallos');
@@ -61,6 +62,9 @@ if (NODE_ENV === 'development') {
 // ============================================================================
 // RUTAS API
 // ============================================================================
+
+// Rutas de autenticación (públicas)
+app.use('/api/auth', authRoutes);
 
 // Rutas de negocio
 app.use('/api/platos', platosRoutes);
