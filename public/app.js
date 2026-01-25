@@ -3,6 +3,17 @@
 
 const API_BASE = '/api';
 
+/**
+ * Extrae datos de una respuesta API
+ * Soporta tanto formato { success, data, ... } como arrays/objetos directos
+ */
+function extractAPIData(response) {
+  if (response && typeof response === 'object' && 'data' in response) {
+    return response.data;
+  }
+  return response;
+}
+
 // Función helper para formatear números con coma decimal (formato español)
 function formatDecimal(num, decimales = 3) {
   if (num === null || num === undefined || num === '') return '';
@@ -183,45 +194,49 @@ async function cargarDashboard() {
   try {
     // Cargar datos en paralelo
     const [statsPlatos, statsPedidos] = await Promise.all([
-      fetch(`${API_BASE}/platos/estadisticas`).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch(`${API_BASE}/pedidos/estadisticas`).then(r => r.json()).catch(() => ({ data: [] }))
+      fetch(`${API_BASE}/platos/estadisticas`).then(r => r.json()).then(d => d.data || d || {}).catch(() => ({})),
+      fetch(`${API_BASE}/pedidos/estadisticas`).then(r => r.json()).then(d => d.data || d || {}).catch(() => ({}))
     ]);
 
     // Actualizar métricas con verificación de elementos
     const totalPlatosEl = document.getElementById('totalPlatos');
     if (totalPlatosEl) {
-      totalPlatosEl.textContent = (statsPlatos.data || []).reduce((s, g) => s + g.cantidad, 0) || 0;
+      // statsPlatos es ahora directamente el objeto {total, activos, ...}
+      totalPlatosEl.textContent = statsPlatos.total || 0;
     }
 
-    const pedidosPendientes = (statsPedidos.data || []).find(p => p.estado === 'pendiente');
     const totalPendientesEl = document.getElementById('totalPedidosPendientes');
     if (totalPendientesEl) {
-      totalPendientesEl.textContent = pedidosPendientes?.cantidad || 0;
+      totalPendientesEl.textContent = statsPedidos.pendientes || 0;
     }
 
-    const pedidosProduccion = (statsPedidos.data || []).find(p => p.estado === 'produccion');
     const totalProduccionEl = document.getElementById('totalPedidosProduccion');
     if (totalProduccionEl) {
-      totalProduccionEl.textContent = pedidosProduccion?.cantidad || 0;
+      totalProduccionEl.textContent = statsPedidos.cancelados || 0;
     }
 
-    const total = (statsPedidos.data || []).reduce((s, p) => s + (p.total_acumulado || 0), 0);
+    const total = statsPedidos.total_vendido || 0;
     const valorTotalEl = document.getElementById('valorTotalPedidos');
     if (valorTotalEl) {
       valorTotalEl.textContent = formatDecimal(total) + '€';
     }
 
-    // Grupos populares
-    const topGrupos = (statsPlatos.data || []).slice(0, 5);
-    const topGruposHtml = topGrupos.map(g => `
+    // Mostrar información de estadísticas
+    const infoHtml = `
       <div class="stat-item">
-        <strong>${g.grupo_menu}:</strong> ${g.cantidad} platos (Promedio: ${formatDecimal(g.coste_promedio)}€)
+        <strong>Platos totales:</strong> ${statsPlatos.total || 0}
       </div>
-    `).join('');
+      <div class="stat-item">
+        <strong>Precio promedio:</strong> ${formatDecimal(statsPlatos.precio_venta_promedio || 0)}€
+      </div>
+      <div class="stat-item">
+        <strong>Pedidos completados:</strong> ${statsPedidos.completados || 0}
+      </div>
+    `;
     
     const topGruposEl = document.getElementById('topGrupos');
     if (topGruposEl) {
-      topGruposEl.innerHTML = topGruposHtml || '<p>Sin datos</p>';
+      topGruposEl.innerHTML = infoHtml || '<p>Sin datos</p>';
     }
 
   } catch (error) {
@@ -234,7 +249,7 @@ async function cargarPlatos() {
   try {
     const response = await fetch(`${API_BASE}/platos`);
     const result = await response.json();
-    estadoApp.platosData = result.data || [];
+    estadoApp.platosData = extractAPIData(result) || [];
 
     mostrarPlatos(estadoApp.platosData);
   } catch (error) {
@@ -508,7 +523,7 @@ async function cargarPedidos() {
   try {
     const response = await fetch(`${API_BASE}/pedidos`);
     const result = await response.json();
-    estadoApp.pedidosData = result.data || [];
+    estadoApp.pedidosData = extractAPIData(result) || [];
 
     mostrarPedidos(estadoApp.pedidosData);
   } catch (error) {
@@ -1809,7 +1824,9 @@ async function cargarIngredientes() {
     const response = await fetch(`${API_BASE}/ingredientes`);
     if (!response.ok) throw new Error('Error al cargar ingredientes');
     
-    const ingredientes = await response.json();
+    const json = await response.json();
+    // Extraer datos del formato { success, data, error, statusCode }
+    const ingredientes = extractAPIData(json) || [];
     estadoApp.ingredientesData = ingredientes; // Guardar en cache
     
     // Poblar filtros dinámicamente
@@ -2249,7 +2266,7 @@ async function editarIngrediente(id) {
     }
     
     // Obtener valores únicos para autocompletar
-    const todosIngredientes = await fetch(`${API_BASE}/ingredientes`).then(r => r.json());
+    const todosIngredientes = await fetch(`${API_BASE}/ingredientes`).then(r => r.json()).then(d => extractAPIData(d) || []);
     const familias = [...new Set(todosIngredientes.filter(i => i.familia).map(i => i.familia))].sort();
     const partidas = [...new Set(todosIngredientes.filter(i => i.partidas_almacen).map(i => i.partidas_almacen))].sort();
     const gruposConservacion = ['Congelado', 'Fresco', 'Neutro', 'Refrigerado', 'Seco'];
@@ -2449,7 +2466,7 @@ async function cargarEscandallos() {
     const response = await fetch(`${API_BASE}/escandallos`);
     if (!response.ok) throw new Error('Error al cargar escandallos');
     
-    const escandallosTodos = await response.json();
+    const escandallosTodos = extractAPIData(await response.json()) || [];
     
     // Filtrar solo escandallos con nombres amigables y entendibles
     const escandallos = (escandallosTodos || []).filter(esc => {
@@ -2598,7 +2615,7 @@ async function editarEscandallo(id) {
       console.error('⚠️ No se pudieron cargar los escandallos del plato');
     }
     const escandallosResult = escandallosResponse.ok ? await escandallosResponse.json() : { data: [] };
-    const escandallos = Array.isArray(escandallosResult) ? escandallosResult : (escandallosResult.data || []);
+    const escandallos = extractAPIData(escandallosResult) || [];
     
     console.log(`✅ Escandallos del plato ${plato.codigo} (${plato.nombre}):`, escandallos.length, 'ingredientes');
     
@@ -2637,7 +2654,7 @@ async function cargarInventario() {
     const response = await fetch(`${API_BASE}/inventario`);
     if (!response.ok) throw new Error('Error al cargar inventario');
     
-    const inventario = await response.json();
+    const inventario = extractAPIData(await response.json()) || [];
     estadoApp.inventarioData = inventario; // Guardar en cache
     
     // Poblar filtros dinámicamente
@@ -4376,7 +4393,7 @@ async function cargarEscandalloExistente(platoId, opciones = {}) {
       const escResponse = await fetch(`${API_BASE}/escandallos/plato/${plato.codigo}`);
       if (escResponse.ok) {
         const escResult = await escResponse.json();
-        escandallos = Array.isArray(escResult) ? escResult : (escResult.data || []);
+        escandallos = extractAPIData(escResult) || [];
         console.log(`✅ Escandallos cargados desde API: ${escandallos.length}`);
       } else {
         console.warn(`⚠️ No se pudieron cargar escandallos del plato ${plato.codigo}`);
