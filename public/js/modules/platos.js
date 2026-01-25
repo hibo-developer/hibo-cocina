@@ -19,8 +19,7 @@ class PlatosModule {
    */
   async cargar() {
     try {
-      const response = await this.api.get('/platos');
-      const platos = response.data || [];
+      const platos = await this.api.get('/platos');
       this.state.set('platos', platos);
       return platos;
     } catch (error) {
