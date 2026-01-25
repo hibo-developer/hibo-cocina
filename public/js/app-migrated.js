@@ -188,37 +188,43 @@ function mostrarPlatos(platosFiltrados = null) {
  */
 function mostrarProduccion(produccion = null) {
   const datos = produccion || getState('produccion') || [];
-  const tbody = document.getElementById('partidasTableBody'); // Usar partidasTableBody en lugar de produccionTableBody
+  console.log('📊 mostrarProduccion() - Total datos:', datos.length);
+  
+  const tbody = document.getElementById('partidasTableBody');
   
   if (!tbody) {
-    console.warn('⚠️ Elemento partidasTableBody no encontrado');
+    console.error('❌ ERROR: Elemento partidasTableBody no encontrado en mostrarProduccion()');
     return;
   }
-
+  
+  console.log('✅ Elemento partidasTableBody encontrado');
   tbody.innerHTML = '';
 
   if (!datos.length) {
+    console.warn('⚠️ Sin datos para mostrar en Producción');
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No hay órdenes de producción</td></tr>';
     return;
   }
 
-  datos.slice(0, 20).forEach(orden => {
-    const row = `
-      <tr>
-        <td><input type="checkbox" data-id="${orden.id}"></td>
-        <td><strong>${orden.id || '-'}</strong></td>
-        <td>${orden.nombre || orden.plato_nombre || '-'}</td>
-        <td>${orden.responsable || '-'}</td>
-        <td>${orden.descripcion || '-'}</td>
-        <td>${orden.estado || 'Activo'}</td>
-        <td>
-          <button class="btn-icon" onclick="editarPartida(${orden.id})" title="Editar">✏️</button>
-          <button class="btn-icon" onclick="eliminarPartida(${orden.id})" title="Eliminar">🗑️</button>
-        </td>
-      </tr>
-    `;
-    tbody.innerHTML += row;
-  });
+  console.log(`📝 Insertando ${Math.min(datos.length, 20)} filas en la tabla...`);
+  
+  const rows = datos.slice(0, 20).map(orden => `
+    <tr>
+      <td><input type="checkbox" data-id="${orden.id}"></td>
+      <td><strong>${orden.id || '-'}</strong></td>
+      <td>${orden.nombre || orden.plato_nombre || '-'}</td>
+      <td>${orden.responsable || '-'}</td>
+      <td>${orden.descripcion || '-'}</td>
+      <td><span class="badge ${orden.activo ? 'activo' : 'inactivo'}">${orden.activo ? 'ACTIVA' : 'INACTIVA'}</span></td>
+      <td>
+        <button class="btn-icon" onclick="editarPartida(${orden.id})" title="Editar">✏️</button>
+        <button class="btn-icon" onclick="eliminarPartida(${orden.id})" title="Eliminar">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+  
+  tbody.innerHTML = rows;
+  console.log('✅ Filas insertadas correctamente en la tabla');
 }
 
 /**

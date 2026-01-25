@@ -1,213 +1,138 @@
-# HIBO COCINA - Sistema de Gestión Integral de Cocina y Catering
+# 🍳 HIBO Cocina
 
-Una aplicación completa con **Node.js + Express + SQLite + JavaScript** para gestionar la producción de comidas en cocinas profesionales.
+Sistema de Gestión Integral de Producción y Pedidos para Restaurantes
 
-## 📋 Características
+## 📋 Descripción
 
-### Módulos Principales
+HIBO Cocina es una aplicación web completa para la gestión de restaurantes que incluye:
 
-1. **Gestión de Platos** (1639+ artículos)
-   - Catálogo completo de platos con costes
-   - Clasificación por grupos menú
-   - Control de stock activo
-   - Información nutricional y de preparación
+- **Platos**: Gestión del menú y carta del restaurante
+- **Ingredientes**: Control de materias primas y productos
+- **Escandallos**: Cálculo automático de costes de producción
+- **Inventario**: Control de stock y almacén
+- **Pedidos**: Gestión de pedidos a proveedores
+- **Producción**: Partidas de cocina y trazabilidad
+- **Sanidad (APPCC)**: Control de sanidad alimentaria
+- **Estadísticas**: Dashboard con métricas y gráficos
 
-2. **Gestión de Pedidos**
-   - Creación y seguimiento de pedidos
-   - Estados: Pendiente, En Producción, Completado, Cancelado
-   - Cálculo automático de costes
-   - Historial completo
+## 🚀 Inicio Rápido
 
-3. **Escandallos** (Recetas)
-   - Detalles de ingredientes por plato
-   - Cálculo de costes por ración
-   - Control de porciones
+### Requisitos Previos
 
-4. **Producción**
-   - Planificación por partidas de cocina
-   - Asignación de envases
-   - Trazabilidad de producción
+- Node.js 16+ 
+- npm
 
-5. **Envases** (5 tipos)
-   - Cubetas
-   - Barqueta GN 100, 60, 30
-   - Mono
-   - Gestión de costes y capacidades
+### Instalación
 
-6. **Etiquetas y Trazabilidad**
-   - 2130+ registros de ingredientes
-   - Control de pérdidas
-   - Generación de etiquetas
-
-7. **Estadísticas y Reportes**
-   - Análisis por grupo de menú
-   - Costes promedio
-   - Seguimiento de pedidos
-   - Métricas de producción
-
-## 🚀 Instalación y Uso
-
-### 1. Instalar dependencias
 ```bash
+# Clonar el repositorio
+git clone https://github.com/hibo-developer/hibo-cocina.git
+cd hibo-cocina
+
+# Instalar dependencias
 npm install
-```
 
-### 2. Inicializar base de datos con datos de ejemplo
-```bash
-npm run build
-```
-
-### 3. Iniciar servidor
-```bash
+# Iniciar el servidor
 npm start
 ```
 
-O para desarrollo con reinicio automático:
-```bash
-npm run dev
-```
-
-### 4. Acceder a la aplicación
-- **Interfaz web:** http://localhost:3000
-- **API:** http://localhost:3000/api
-
-## 📚 API Endpoints
-
-### Platos
-```
-GET    /api/platos                 # Obtener todos los platos
-GET    /api/platos/:codigo         # Obtener plato por código
-GET    /api/platos/estadisticas    # Estadísticas por grupo
-POST   /api/platos                 # Crear nuevo plato
-PUT    /api/platos/:id             # Actualizar plato
-DELETE /api/platos/:id             # Eliminar plato
-```
-
-### Pedidos
-```
-GET    /api/pedidos                # Obtener todos los pedidos
-GET    /api/pedidos/:id            # Obtener pedido con detalles
-GET    /api/pedidos/estadisticas   # Estadísticas de pedidos
-POST   /api/pedidos                # Crear nuevo pedido
-PUT    /api/pedidos/:id            # Actualizar pedido
-DELETE /api/pedidos/:id            # Eliminar pedido
-```
-
-### Sistema
-```
-GET    /api/health                 # Verificar estado del servidor
-```
-
-## 📊 Estructura de Base de Datos
-
-### Tablas Principales
-- `platos` - Catálogo de platos
-- `ingredientes` - Base de ingredientes
-- `escandallos` - Relación plato-ingrediente
-- `pedidos` - Gestión de pedidos
-- `lineas_pedido` - Detalles de pedidos
-- `produccion` - Seguimiento de producción
-- `envases` - Tipos de empaque
-- `etiquetas` - Trazabilidad
-- `partidas_cocina` - Secciones de cocina
-- `salida_mercancias` - Control de salidas
-
-## 🎨 Interfaz de Usuario
-
-### Secciones
-1. **Dashboard** - Métricas principales y KPIs
-2. **Platos** - Catálogo completo con búsqueda y filtros
-3. **Pedidos** - Gestión de pedidos con estados
-4. **Producción** - Planificación y seguimiento
-5. **Estadísticas** - Reportes y análisis
-
-### Características UI
-- Diseño responsive (mobile-friendly)
-- Búsqueda en tiempo real
-- Filtros avanzados
-- Modal para crear/editar
-- Notificaciones de éxito/error
-- Estados visuales con badges
+La aplicación estará disponible en `http://localhost:3000`
 
 ## 📁 Estructura del Proyecto
 
 ```
 hibo-cocina/
-├── src/
-│   ├── db/
-│   │   ├── database.js          # Conexión SQLite
-│   │   └── schema.js            # Creación de tablas
-│   ├── models/
-│   │   ├── Plato.js            # Modelo de platos
-│   │   └── Pedido.js           # Modelo de pedidos
-│   ├── controllers/
-│   │   ├── platosController.js
-│   │   └── pedidosController.js
-│   ├── routes/
-│   │   ├── platos.js
-│   │   └── pedidos.js
-│   └── utils/
-│       └── importarDatos.js    # Importación desde Excel
-├── public/
-│   ├── index.html              # Interfaz principal
-│   ├── app.js                  # Lógica de cliente
-│   └── styles.css              # Estilos
-├── scripts/
-│   └── inicializar.js          # Script de inicialización
-├── data/                        # Base de datos SQLite
-├── server.js                    # Servidor principal
-├── package.json
-└── README.md
+├── server.js                 # Servidor Express
+├── hibo-cocina.db           # Base de datos SQLite
+├── public/                   # Frontend
+│   ├── index.html           # HTML principal
+│   ├── css/                 # Estilos
+│   ├── js/
+│   │   ├── services/        # ApiService, StateManager, etc.
+│   │   ├── modules/         # Módulos de negocio
+│   │   └── app-migrated.js  # Lógica principal refactorizada
+│   └── modules/             # Componentes HTML
+├── migrations/              # Migraciones de base de datos
+└── __tests__/              # Tests unitarios
 ```
 
-## 🔧 Tecnologías Utilizadas
+## 🏗️ Arquitectura
 
-- **Backend:** Node.js, Express.js
-- **Base de Datos:** SQLite3
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Procesamiento:** XLSX (lectura de Excel)
-- **Utilerías:** Moment.js (fechas), CORS
+### Backend
+- **Express.js**: Servidor HTTP
+- **SQLite**: Base de datos
+- **API RESTful**: Endpoints bajo `/api/*`
 
-## 📈 Casos de Uso
+### Frontend
+- **Vanilla JavaScript**: Sin frameworks
+- **Arquitectura Modular**: Separación de responsabilidades
+- **SPA**: Single Page Application con navegación dinámica
+- **State Management**: Sistema centralizado de estado
 
-### Para Gestores
-- Ver KPIs principales en el dashboard
-- Acceder a estadísticas por grupo
-- Monitorear costes promedio
+### Módulos Principales
 
-### Para Cocina
-- Ver platos a producir
-- Conocer ingredientes por plato
-- Seguimiento de partidas
+1. **ApiService**: Gestión de llamadas HTTP
+2. **StateManager**: Estado global de la aplicación
+3. **ModalManager**: Gestión de modales dinámicos
+4. **NotificationManager**: Sistema de notificaciones
+5. **NavigationModule**: Navegación entre secciones
+6. **Módulos de Negocio**: platos, ingredientes, escandallos, etc.
 
-### Para Administración
-- Crear y gestionar pedidos
-- Asignar envases
-- Generar etiquetas
-- Exportar reportes
+## 🔧 Desarrollo
 
-## 🔐 Características de Seguridad
+### Scripts Disponibles
 
-- Validación de entrada en API
-- Manejo de errores robusto
-- Confirmación en operaciones críticas
-- Logs de operaciones
+```bash
+npm start          # Iniciar servidor en modo producción
+npm run dev        # Iniciar con nodemon (auto-reload)
+npm test           # Ejecutar tests
+```
 
-## 📝 Próximas Mejoras
+### API Endpoints
 
-- [ ] Autenticación y roles de usuario
-- [ ] Exportación a PDF/Excel
-- [ ] Cálculo automático de costes
-- [ ] Integración de proveedores
-- [ ] Notificaciones en tiempo real
-- [ ] Gráficos estadísticos avanzados
-- [ ] API de mobile
-- [ ] Backup automático
+- `GET /api/platos` - Obtener todos los platos
+- `POST /api/platos` - Crear nuevo plato
+- `PUT /api/platos/:id` - Actualizar plato
+- `DELETE /api/platos/:id` - Eliminar plato
 
-## 📞 Soporte
+(Similar para ingredientes, escandallos, inventario, pedidos, etc.)
 
-Para reportar problemas o sugerencias, contactar al equipo de desarrollo.
+## 🎨 Características
 
----
+- ✅ Interfaz moderna y responsive
+- ✅ Modales dinámicos para CRUD
+- ✅ Búsqueda y filtrado en tiempo real
+- ✅ Cálculo automático de costes
+- ✅ Sistema de notificaciones
+- ✅ Validación de formularios
+- ✅ Gestión de alérgenos
+- ✅ Control de trazabilidad
+- ✅ Dashboard con estadísticas
 
-**HIBO COCINA v1.0.0** - 2026 | Sistema de gestión profesional para cocinas
+## 📊 Base de Datos
+
+SQLite con las siguientes tablas principales:
+
+- `platos` - Platos del menú
+- `ingredientes` - Ingredientes y materias primas
+- `escandallos` - Relación ingredientes-platos con cantidades
+- `inventario` - Stock de productos
+- `pedidos` - Pedidos a proveedores
+- `partidas_cocina` - Órdenes de producción
+- `sanidad_registros` - Registros de control APPCC
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Añadir nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Propietario - © 2026 HIBO Cocina
+
+## 👨‍💻 Autor
+
+Desarrollado por el equipo de HIBO

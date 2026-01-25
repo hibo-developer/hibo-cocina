@@ -11,18 +11,19 @@ class ProduccionModule {
   constructor() {
     this.apiService = window.apiService;
     this.stateManager = window.stateManager;
-    this.endpoint = '/produccion';
+    this.endpoint = '/partidas-cocina';
   }
 
   async cargar() {
     try {
-      console.log('📥 Cargando órdenes de producción...');
+      console.log('📥 Cargando órdenes de producción desde:', this.endpoint);
       const produccion = await this.apiService.get(this.endpoint);
+      console.log('📦 Datos recibidos:', produccion);
       this.stateManager.set('produccion', produccion);
       console.log(`✅ ${produccion.length} órdenes cargadas`);
       return produccion;
     } catch (error) {
-      console.error('Error al cargar producción:', error);
+      console.error('❌ Error al cargar producción:', error);
       throw error;
     }
   }
