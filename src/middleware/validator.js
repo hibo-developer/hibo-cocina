@@ -1,9 +1,11 @@
 /**
- * Middleware de validación
- * Valida requests contra esquemas Joi
+ * Middleware de validación mejorado
+ * Valida requests contra esquemas Joi con manejo granular de errores
  */
 
-const { createResponse } = require('./errorHandler');
+const { ValidationError } = require('./errors');
+const { getLogger } = require('../utils/logger');
+const log = getLogger();
 
 /**
  * Crea un middleware validador para un esquema dado
@@ -19,27 +21,31 @@ function validate(schema) {
     });
 
     if (error) {
-      // Construir mensaje de error detallado
+      // Construir mensaje de error detallado con información clara
       const details = error.details.map(detail => ({
         field: detail.path.join('.'),
-        message: detail.message
+        message: detail.message,
+        type: detail.type,
+        context: detail.context
       }));
 
-      console.warn('❌ Validación fallida:', {
+      // Log de validación fallida
+      log.warn('Validation failed:', {
         path: req.path,
         method: req.method,
-        errors: details
+        errorCount: details.length,
+        fields: details.map(d => d.field)
       });
 
-      return res.status(400).json(
-        createResponse(false, null, {
-          message: 'Errores de validación',
-          details
-        }, 400)
+      // Lanzar ValidationError que será capturado por el middleware de error
+      const validationError = new ValidationError(
+        'Errores de validación en la solicitud',
+        details
       );
+      return next(validationError);
     }
 
-    // Reemplazar body con datos validados
+    // Reemplazar body con datos validados y tipo-convertidos
     req.body = value;
     next();
   };
