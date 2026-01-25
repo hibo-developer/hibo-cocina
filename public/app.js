@@ -713,33 +713,48 @@ async function eliminarPedido(pedidoId) {
 async function cargarEstadisticas() {
   try {
     const [statsPlatos, statsPedidos] = await Promise.all([
-      fetch(`${API_BASE}/platos/estadisticas`).then(r => r.json()).catch(() => ({ data: [] })),
-      fetch(`${API_BASE}/pedidos/estadisticas`).then(r => r.json()).catch(() => ({ data: [] }))
+      fetch(`${API_BASE}/platos/estadisticas`).then(r => r.json()).then(d => extractAPIData(d) || {}).catch(() => ({})),
+      fetch(`${API_BASE}/pedidos/estadisticas`).then(r => r.json()).then(d => extractAPIData(d) || {}).catch(() => ({}))
     ]);
 
-    // Estadísticas de platos
-    const statsPlatos_html = (statsPlatos.data || []).map(g => `
+    // Estadísticas de platos (ahora es un objeto con total, promedio, etc.)
+    const statsPlatos_html = `
       <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
-        <strong>${g.grupo_menu}:</strong> ${g.cantidad} platos | Promedio: ${formatDecimal(g.coste_promedio)}€
+        <strong>Total platos:</strong> ${statsPlatos.total || 0}
       </div>
-    `).join('');
-    document.getElementById('statsPlatos').innerHTML = statsPlatos_html || '<p>Sin datos</p>';
-
-    // Estadísticas de pedidos
-    const statsPedidos_html = (statsPedidos.data || []).map(p => `
       <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
-        <strong>${p.estado}:</strong> ${p.cantidad} pedidos | Promedio: ${formatDecimal(p.promedio_total)}€ | Total: ${formatDecimal(p.total_acumulado)}€
+        <strong>Platos activos:</strong> ${statsPlatos.activos || 0}
       </div>
-    `).join('');
-    document.getElementById('statsPedidos').innerHTML = statsPedidos_html || '<p>Sin datos</p>';
+      <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+        <strong>Precio promedio:</strong> ${formatDecimal(statsPlatos.precio_venta_promedio || 0)}€
+      </div>
+    `;
+    const statsPlatos_el = document.getElementById('statsPlatos');
+    if (statsPlatos_el) statsPlatos_el.innerHTML = statsPlatos_html || '<p>Sin datos</p>';
 
-    // Costos por grupo
-    const costosHtml = (statsPlatos.data || []).map(g => `
+    // Estadísticas de pedidos (ahora es un objeto con total, completados, etc.)
+    const statsPedidos_html = `
+      <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+        <strong>Total pedidos:</strong> ${statsPedidos.total || 0}
+      </div>
+      <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+        <strong>Completados:</strong> ${statsPedidos.completados || 0}
+      </div>
+      <div class="stat-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+        <strong>Pendientes:</strong> ${statsPedidos.pendientes || 0}
+      </div>
+    `;
+    const statsPedidos_el = document.getElementById('statsPedidos');
+    if (statsPedidos_el) statsPedidos_el.innerHTML = statsPedidos_html || '<p>Sin datos</p>';
+
+    // Costos promedio
+    const costosHtml = `
       <div class="stat-item" style="padding: 8px 0;">
-        ${g.grupo_menu}: ${formatDecimal(g.coste_promedio)}€
+        <strong>Coste promedio:</strong> ${formatDecimal(statsPlatos.coste_promedio || 0)}€
       </div>
-    `).join('');
-    document.getElementById('statsCostos').innerHTML = costosHtml || '<p>Sin datos</p>';
+    `;
+    const costos_el = document.getElementById('statsCostos');
+    if (costos_el) costos_el.innerHTML = costosHtml || '<p>Sin datos</p>';
 
   } catch (error) {
     console.error('Error cargando estadísticas:', error);
