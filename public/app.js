@@ -737,6 +737,10 @@ async function cargarSanidad() {
   try {
     console.log('🔵 Iniciando carga de Sanidad...');
     
+    // ⏳ ESPERAR A QUE EL MÓDULO ESTÉ CARGADO EN EL DOM
+    await esperarElemento('sanidadTableBody', 5000);
+    console.log('✅ Módulo de Sanidad detectado en DOM');
+    
     // Cargar alérgenos oficiales
     let alergenos = [];
     try {
@@ -1274,11 +1278,16 @@ async function cargarProduccion() {
   try {
     console.log('🔼 Iniciando carga de Producción...');
     
+    // ⏳ ESPERAR A QUE EL MÓDULO ESTÉ CARGADO EN EL DOM
+    // El módulo podría no estar cargado si el usuario hace click muy rápido
+    await esperarElemento('partidasTableBody', 5000);
+    console.log('✅ Módulo de Producción detectado en DOM');
+    
     // Cargar partidas primero
     await cargarPartidas();
     
     // Inicializar tabs
-    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabButtons = document.querySelectorAll('#produccion .tab-button');
     console.log(`✅ Encontrados ${tabButtons.length} botones de tab`);
     
     if (tabButtons.length > 0) {
@@ -1318,6 +1327,19 @@ async function cargarProduccion() {
   } catch (error) {
     console.error('❌ Error cargando producción:', error);
     mostrarError('Error al cargar producción: ' + error.message);
+  }
+}
+
+// ⏳ Función auxiliar para esperar a que un elemento exista en el DOM
+async function esperarElemento(elementId, timeoutMs = 5000) {
+  const startTime = Date.now();
+  
+  while (!document.getElementById(elementId)) {
+    if (Date.now() - startTime > timeoutMs) {
+      throw new Error(`Timeout esperando elemento #${elementId} (${timeoutMs}ms)`);
+    }
+    // Esperar 100ms antes de revisar nuevamente
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 }
 
