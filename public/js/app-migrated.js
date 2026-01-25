@@ -15,6 +15,25 @@
  */
 
 // ============================================================================
+// UTILIDADES
+// ============================================================================
+
+/**
+ * Esperar a que un elemento exista en el DOM
+ */
+async function esperarElemento(elementId, timeoutMs = 5000) {
+  const startTime = Date.now();
+  
+  while (!document.getElementById(elementId)) {
+    if (Date.now() - startTime > timeoutMs) {
+      throw new Error(`Timeout esperando elemento #${elementId} (${timeoutMs}ms)`);
+    }
+    // Esperar 100ms antes de revisar nuevamente
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+}
+
+// ============================================================================
 // FUNCIONES DE CARGA REFACTORIZADAS
 // ============================================================================
 
@@ -96,6 +115,11 @@ async function cargarInventario() {
 async function cargarProduccion() {
   try {
     console.log('📥 [REFACTORED] Cargando producción...');
+    
+    // ⏳ ESPERAR A QUE EL MÓDULO ESTÉ CARGADO EN EL DOM
+    await esperarElemento('partidasTableBody', 5000);
+    console.log('✅ Módulo de Producción detectado en DOM');
+    
     await produccionModule.cargar();
     const produccion = getState('produccion') || [];
     mostrarProduccion(produccion);
@@ -111,6 +135,11 @@ async function cargarProduccion() {
 async function cargarSanidad() {
   try {
     console.log('📥 [REFACTORED] Cargando sanidad...');
+    
+    // ⏳ ESPERAR A QUE EL MÓDULO ESTÉ CARGADO EN EL DOM
+    await esperarElemento('sanidadTableBody', 5000);
+    console.log('✅ Módulo de Sanidad detectado en DOM');
+    
     await sanidadModule.cargar();
     const sanidad = getState('sanidad') || [];
     mostrarSanidad(sanidad);
