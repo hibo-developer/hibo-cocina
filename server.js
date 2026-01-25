@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Conexión a la base de datos
-const db = new sqlite3.Database('./hibo-cocina.db', (err) => {
+const db = new sqlite3.Database('./data/hibo-cocina.db', (err) => {
   if (err) {
     console.error('Error conectando a la base de datos:', err);
   } else {
@@ -340,7 +340,7 @@ app.listen(PORT, () => {
   
   🚀 Servidor: http://localhost:${PORT}
   📡 API: http://localhost:${PORT}/api
-  💾 Base de datos: hibo-cocina.db
+  💾 Base de datos: data/hibo-cocina.db
   
   Endpoints disponibles:
   - /api/platos
