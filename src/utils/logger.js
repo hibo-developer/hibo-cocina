@@ -191,4 +191,12 @@ const log = {
   }
 };
 
+/**
+ * Función getLogger para testing
+ */
+function getLogger() {
+  return log;
+}
+
 module.exports = log;
+module.exports.getLogger = getLogger;
