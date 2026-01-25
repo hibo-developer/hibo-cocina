@@ -169,10 +169,15 @@ async function obtenerEstadisticas(req, res, next) {
     db.get(`
       SELECT 
         COUNT(*) as total,
-        AVG(pvp) as pvp_promedio,
-        MIN(pvp) as pvp_minimo,
-        MAX(pvp) as pvp_maximo
+        COUNT(CASE WHEN activo = 1 THEN 1 END) as activos,
+        COUNT(CASE WHEN plato_venta = 1 THEN 1 END) as platos_venta,
+        AVG(precio_venta) as precio_venta_promedio,
+        MIN(precio_venta) as precio_venta_minimo,
+        MAX(precio_venta) as precio_venta_maximo,
+        AVG(coste_escandallo) as coste_promedio,
+        SUM(CASE WHEN escandallado = 1 THEN 1 ELSE 0 END) as escandallados
       FROM platos
+      WHERE activo = 1
     `, (err, stats) => {
       if (err) {
         console.error('Error al obtener estadísticas:', err);
@@ -183,9 +188,13 @@ async function obtenerEstadisticas(req, res, next) {
       
       res.json(createResponse(true, stats || {
         total: 0,
-        pvp_promedio: 0,
-        pvp_minimo: 0,
-        pvp_maximo: 0
+        activos: 0,
+        platos_venta: 0,
+        precio_venta_promedio: 0,
+        precio_venta_minimo: 0,
+        precio_venta_maximo: 0,
+        coste_promedio: 0,
+        escandallados: 0
       }, null, 200));
     });
   } catch (error) {
