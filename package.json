@@ -23,18 +23,29 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.4",
     "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
     "express": "^4.22.1",
+    "express-rate-limit": "^8.2.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
     "moment": "^2.30.1",
     "node-fetch": "^2.7.0",
     "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "eslint": "^9.39.2",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "prettier": "^3.8.1",
+    "standard-version": "^9.5.0",
     "supertest": "^7.2.2"
   }
 }
