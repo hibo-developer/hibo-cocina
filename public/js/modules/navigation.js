@@ -24,10 +24,22 @@ class NavigationModule {
    * Configurar event listeners
    */
   setupListeners() {
-    document.querySelectorAll('.nav-btn').forEach(btn => {
+    document.querySelectorAll('.nav-btn:not(.dropdown-toggle)').forEach(btn => {
       btn.addEventListener('click', () => {
         const section = btn.dataset.section;
-        this.navigate(section);
+        if (section) {
+          this.navigate(section);
+        }
+      });
+    });
+    
+    // Listeners para dropdown items
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const section = item.dataset.section;
+        if (section) {
+          this.navigate(section);
+        }
       });
     });
   }
