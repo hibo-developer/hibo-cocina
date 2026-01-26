@@ -22,7 +22,7 @@
     <table>
       <thead>
         <tr>
-          <th><input type="checkbox" id="check-all-platos" onchange="toggleSeleccionTodos('platos', Array.from(document.querySelectorAll('#platosTableBody input[type=checkbox]')).map(cb => parseInt(cb.id.split('-')[2])))"></th>
+          <th><input type="checkbox" id="check-all-platos" onchange="toggleSeleccionTodos('platos', [])"></th>
           <th>Código</th>
           <th>Nombre</th>
           <th>Grupo Menú</th>

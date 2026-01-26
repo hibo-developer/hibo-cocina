@@ -3392,7 +3392,12 @@ function toggleSeleccionTodos(tabla, ids) {
   if (!config) return;
   
   const seleccionados = config.seleccionados;
-  const checkbox = event.target;
+  const checkbox = window.event ? window.event.target : document.getElementById(`check-all-${tabla}`);
+  
+  if (!checkbox) {
+    console.error(`No se encontró checkbox para tabla: ${tabla}`);
+    return;
+  }
   
   // Si no se pasan IDs, obtenerlos automáticamente
   if (!ids || ids.length === 0) {
