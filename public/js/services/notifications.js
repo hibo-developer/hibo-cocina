@@ -3,6 +3,8 @@
  * Integra WebSocket, almacenamiento local y persistencia
  */
 
+// Solo definir si no existe ya (evitar conflicto con notifications.js anterior)
+if (typeof NotificationManager === 'undefined') {
 class NotificationManager {
   constructor(wsClient) {
     this.wsClient = wsClient;
@@ -373,6 +375,7 @@ class NotificationManager {
     }
   }
 }
+} // Cerrar el if typeof NotificationManager === 'undefined'
 
 // Exportar para uso global
 if (typeof window !== 'undefined') {

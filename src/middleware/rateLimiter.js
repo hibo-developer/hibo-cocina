@@ -13,11 +13,13 @@ const { createResponse } = require('./errorHandler');
  */
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100,
+  max: process.env.NODE_ENV === 'test' ? 10000 : 100, // Desactivar en tests
   message: 'Ha excedido el límite de solicitudes permitidas',
   standardHeaders: true, // Retorna rate limit info en `RateLimit-*` headers
   legacyHeaders: false, // Deshabilita los headers `X-RateLimit-*`
   skip: (req, res) => {
+    // No limitar en tests
+    if (process.env.NODE_ENV === 'test') return true;
     // No limitar rutas de health check y documentación
     return req.path === '/api/health' || req.path.startsWith('/api-docs');
   },

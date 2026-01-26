@@ -4,7 +4,7 @@ const { defineConfig, devices } = require('@playwright/test');
  * See https://playwright.dev/docs/test-configuration.
  */
 module.exports = defineConfig({
-  testDir: './e2e',
+  testDir: './__tests__/e2e',  // Usar solo nuestros tests de Sprint 2.10
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code */
@@ -63,7 +63,7 @@ module.exports = defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm start',
+    command: 'cross-env NODE_ENV=test npm start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
   },
