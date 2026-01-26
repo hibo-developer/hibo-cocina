@@ -99,6 +99,9 @@
   <script src="js/ui/notifications.js"></script>
   <script src="js/ui/forms.js"></script>
 
+  <!-- Logger para debugging condicional -->
+  <script src="js/services/logger.js"></script>
+
   <!-- 3. Capa de compatibilidad (puente entre viejo y nuevo) -->
   <script src="js/compatibility-layer.js"></script>
 
@@ -112,18 +115,25 @@
   <script src="js/modules/produccion.js"></script>
   <script src="js/modules/navigation.js"></script>
 
-  <!-- 5. Scripts originales (mantenidos para compatibilidad) -->
+  <!-- 5. Scripts principales (legado + migrado) -->
   <script src="module-loader.js"></script>
   <script src="modales-dinamicos.js"></script>
   <script src="app.js"></script>
-  
-  <!-- 5.5. Versiones migradas que sobrescriben app.js -->
   <script src="js/app-migrated.js"></script>
 
-  <!-- 6. App refactorizada (nueva inicialización) -->
+  <!-- 6. Inicialización refactorizada -->
   <script src="js/app-refactored.js"></script>
-  
-  <!-- 7. Test de integración (desarrollo) -->
-  <script src="js/test-integracion.js"></script>
+
+  <!-- Footer con links a documentación -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="/api-docs" target="_blank" title="Documentación API (Swagger)">📚 API Docs</a>
+        <a href="https://github.com/hibo-developer/hibo-cocina" target="_blank" title="Repositorio">🔗 GitHub</a>
+        <a href="#" onclick="logger.setDebug(true)" title="Habilitar modo debug">🔧 Debug</a>
+      </div>
+      <p>&copy; 2026 HIBO COCINA v2.0.0 | Sistema de Gestión de Producción</p>
+    </div>
+  </footer>
 </body>
 </html>
