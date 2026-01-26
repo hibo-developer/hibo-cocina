@@ -48,6 +48,7 @@ const inventarioRoutes = require('./src/routes/inventario');
 const pedidosRoutes = require('./src/routes/pedidos');
 const partidasRoutes = require('./src/routes/partidas');
 const sanidadRoutes = require('./src/routes/sanidad');
+const notificacionesRoutes = require('./src/routes/notificaciones');
 
 const app = express();
 const log = getLogger();
@@ -151,6 +152,9 @@ app.use('/api/inventario', inventarioRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/partidas-cocina', partidasRoutes);
 app.use('/api/control-sanidad', sanidadRoutes);
+
+// Rutas de notificaciones
+app.use('/api/notificaciones', notificacionesRoutes);
 
 // Alias de compatibilidad
 app.use('/api/sanidad', sanidadRoutes);
