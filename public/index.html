@@ -99,6 +99,9 @@
   <script src="js/ui/notifications.js"></script>
   <script src="js/ui/forms.js"></script>
 
+  <!-- Logger para debugging condicional -->
+  <script src="js/services/logger.js"></script>
+
   <!-- 3. Capa de compatibilidad (puente entre viejo y nuevo) -->
   <script src="js/compatibility-layer.js"></script>
 
@@ -112,18 +115,103 @@
   <script src="js/modules/produccion.js"></script>
   <script src="js/modules/navigation.js"></script>
 
-  <!-- 5. Scripts originales (mantenidos para compatibilidad) -->
+  <!-- 5. Scripts principales (legado + migrado) -->
   <script src="module-loader.js"></script>
   <script src="modales-dinamicos.js"></script>
   <script src="app.js"></script>
-  
-  <!-- 5.5. Versiones migradas que sobrescriben app.js -->
   <script src="js/app-migrated.js"></script>
 
-  <!-- 6. App refactorizada (nueva inicialización) -->
+  <!-- 6. Inicialización refactorizada -->
   <script src="js/app-refactored.js"></script>
-  
-  <!-- 7. Test de integración (desarrollo) -->
-  <script src="js/test-integracion.js"></script>
+
+  <!-- 7. WebSocket en tiempo real -->
+  <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
+  <script src="js/services/websocket.js"></script>
+
+  <!-- 8. Sistema de notificaciones en tiempo real -->
+  <script src="js/services/notifications.js"></script>
+  <script src="js/ui/notification-panel.js"></script>
+
+  <!-- 9. Inicialización de WebSocket y notificaciones -->
+  <script>
+    // Inicializar WebSocket y NotificationManager cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('authToken') || 'guest';
+      
+      console.log('🔧 DOMContentLoaded - Inicializando WebSocket y NotificationManager');
+      console.log('  - window.NotificationManager:', typeof window.NotificationManager);
+      console.log('  - window.WebSocketClient:', typeof window.WebSocketClient);
+      
+      try {
+        // Crear cliente WebSocket
+        window.wsClient = new WebSocketClient(token);
+        console.log('✅ WebSocket cliente creado');
+      } catch (err) {
+        console.error('❌ Error creando WebSocket:', err);
+      }
+      
+      try {
+        // Crear gestor de notificaciones
+        if (typeof window.NotificationManager === 'undefined') {
+          console.warn('⚠️ NotificationManager no está definido, usando SimpleNotificationManager');
+          window.notificationManager = window.simpleNotificationManager;
+        } else {
+          window.notificationManager = new NotificationManager(window.wsClient);
+          console.log('✅ NotificationManager instancia creada');
+        }
+      } catch (err) {
+        console.error('❌ Error creando NotificationManager:', err);
+        window.notificationManager = window.simpleNotificationManager;
+      }
+      
+      try {
+        // Crear panel de notificaciones
+        if (typeof window.NotificationPanel === 'undefined') {
+          console.warn('⚠️ NotificationPanel no está definido');
+        } else {
+          window.notificationPanel = new NotificationPanel(window.notificationManager);
+          console.log('✅ NotificationPanel creado');
+        }
+      } catch (err) {
+        console.error('❌ Error creando NotificationPanel:', err);
+      }
+      
+      // Conectar módulos a WebSocket para actualizaciones en tiempo real
+      setTimeout(() => {
+        // Esperar a que los módulos estén cargados
+        if (window.ingredientesModule) {
+          window.ingredientesModule.connectWebSocket(window.wsClient);
+        }
+        if (window.inventarioModule) {
+          window.inventarioModule.connectWebSocket(window.wsClient);
+        }
+        if (window.pedidosModule) {
+          window.pedidosModule.connectWebSocket(window.wsClient);
+        }
+        if (window.platosModule) {
+          window.platosModule.connectWebSocket(window.wsClient);
+        }
+        
+        console.log('✅ Módulos conectados a WebSocket');
+      }, 500);
+      
+      console.log('✅ Sistema de notificaciones inicializado');
+      console.log('WebSocketClient disponible en: window.wsClient');
+      console.log('NotificationManager disponible en: window.notificationManager');
+      console.log('NotificationPanel disponible en: window.notificationPanel');
+    });
+  </script>
+
+  <!-- Footer con links a documentación -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="/api-docs" target="_blank" title="Documentación API (Swagger)">📚 API Docs</a>
+        <a href="https://github.com/hibo-developer/hibo-cocina" target="_blank" title="Repositorio">🔗 GitHub</a>
+        <a href="#" onclick="logger.setDebug(true)" title="Habilitar modo debug">🔧 Debug</a>
+      </div>
+      <p>&copy; 2026 HIBO COCINA v2.0.0 | Sistema de Gestión de Producción</p>
+    </div>
+  </footer>
 </body>
 </html>

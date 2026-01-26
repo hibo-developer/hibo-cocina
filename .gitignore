@@ -28,6 +28,13 @@ dist/
 build/
 
 # Excel files temporales
+
+# Playwright E2E Testing
+playwright-report/
+test-results/
+.auth/
+/e2e/test-results/
+/e2e/playwright-report/
 ~$*.xlsx
 ~$*.xlsb
 

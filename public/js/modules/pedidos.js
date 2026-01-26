@@ -12,6 +12,82 @@ class PedidosModule {
     this.apiService = window.apiService;
     this.stateManager = window.stateManager;
     this.endpoint = '/pedidos';
+    this.wsClient = null;
+    this.wsInitialized = false;
+  }
+
+  /**
+   * Conectar a WebSocket para recibir actualizaciones en tiempo real
+   */
+  connectWebSocket(wsClient) {
+    if (this.wsInitialized) return;
+    
+    this.wsClient = wsClient;
+    
+    // Suscribirse a actualizaciones generales de pedidos
+    this.wsClient.on('pedidos:update', (data) => {
+      console.log('📡 Actualización de pedidos recibida:', data);
+      this.handleWebSocketUpdate(data);
+    });
+    
+    // Suscribirse a notificaciones personales
+    this.wsClient.on('pedidos:personal-update', (data) => {
+      console.log('📬 Notificación personal de pedido:', data);
+      this.handlePersonalUpdate(data);
+    });
+    
+    // Suscribirse al canal
+    if (this.wsClient.isConnected) {
+      this.wsClient.subscribePedidos();
+    } else {
+      this.wsClient.on('connected', () => {
+        this.wsClient.subscribePedidos();
+      });
+    }
+    
+    this.wsInitialized = true;
+    console.log('✅ WebSocket conectado para Pedidos');
+  }
+
+  /**
+   * Manejar actualizaciones desde WebSocket
+   */
+  async handleWebSocketUpdate(data) {
+    const { action, pedido } = data;
+    
+    switch (action) {
+      case 'created':
+        console.log('➕ Pedido creado:', pedido.id);
+        await this.cargar();
+        break;
+        
+      case 'updated':
+        console.log('✏️  Pedido actualizado:', pedido.id);
+        await this.cargar();
+        break;
+        
+      case 'deleted':
+        console.log('🗑️  Pedido eliminado:', pedido.id);
+        await this.cargar();
+        break;
+    }
+  }
+
+  /**
+   * Manejar notificación personal de pedido
+   */
+  handlePersonalUpdate(data) {
+    console.log('📬 Notificación personal:', data);
+    
+    // Si hay gestor de notificaciones, mostrar
+    if (window.notificationManager) {
+      window.notificationManager.addNotification({
+        type: data.type || 'info',
+        title: data.title || 'Actualización de Pedido',
+        message: data.message,
+        data: data.pedido
+      });
+    }
   }
 
   async cargar() {

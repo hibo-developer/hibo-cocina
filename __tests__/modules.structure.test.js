@@ -73,6 +73,6 @@ describe('Module Structure Tests', () => {
     expect(content).toContain('/api/pedidos');
     expect(content).toContain('/api/inventario');
     expect(content).toContain('/api/sanidad');
-    expect(content).toContain('/api/produccion');
+    expect(content).toContain('/api/partidas-cocina');
   });
 });

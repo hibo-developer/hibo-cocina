@@ -20,6 +20,19 @@ class ApiService {
   }
 
   /**
+   * Extrae los datos de una respuesta API
+   * Soporta tanto formato { data: [...] } como arrays directos
+   */
+  extractData(responseData) {
+    // Si la respuesta tiene estructura { success, data, error, statusCode }
+    if (responseData && typeof responseData === 'object' && 'data' in responseData) {
+      return responseData.data;
+    }
+    // Si es un array directo o datos simples
+    return responseData;
+  }
+
+  /**
    * GET - Obtener datos
    */
   async get(endpoint) {
@@ -28,7 +41,8 @@ class ApiService {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      return await response.json();
+      const json = await response.json();
+      return this.extractData(json);
     } catch (error) {
       console.error(`❌ Error GET ${endpoint}:`, error);
       throw error;
@@ -48,7 +62,8 @@ class ApiService {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      return await response.json();
+      const json = await response.json();
+      return this.extractData(json);
     } catch (error) {
       console.error(`❌ Error POST ${endpoint}:`, error);
       throw error;
@@ -68,7 +83,8 @@ class ApiService {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      return await response.json();
+      const json = await response.json();
+      return this.extractData(json);
     } catch (error) {
       console.error(`❌ Error PUT ${endpoint}:`, error);
       throw error;
@@ -86,7 +102,8 @@ class ApiService {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-      return await response.json();
+      const json = await response.json();
+      return this.extractData(json);
     } catch (error) {
       console.error(`❌ Error DELETE ${endpoint}:`, error);
       throw error;

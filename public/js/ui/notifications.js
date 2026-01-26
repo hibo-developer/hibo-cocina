@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * NOTIFICATIONS.JS - Sistema de notificaciones
+ * NOTIFICATIONS.JS - Sistema de notificaciones simple
  * ============================================================================
  * 
  * Uso:
@@ -11,7 +11,7 @@
  * 
  */
 
-class NotificationManager {
+class SimpleNotificationManager {
   constructor() {
     this.container = this.crearContenedor();
   }
@@ -112,7 +112,7 @@ class NotificationManager {
 }
 
 // Instancia global
-const notify = new NotificationManager();
+const notify = new SimpleNotificationManager();
 
 // Agregar estilos CSS
 const styleSheet = document.createElement('style');
@@ -141,10 +141,10 @@ styleSheet.textContent = `
 `;
 document.head.appendChild(styleSheet);
 
-// Instancia global
-const notificationManager = new NotificationManager();
+// Instancia simple para notificaciones rápidas
+const simpleNotificationManager = new SimpleNotificationManager();
 
 // Exponer globalmente
-window.notificationManager = notificationManager;
+window.simpleNotificationManager = simpleNotificationManager;
 
-console.log('✅ NotificationManager cargado y expuesto globalmente');
+console.log('✅ SimpleNotificationManager cargado y expuesto globalmente');

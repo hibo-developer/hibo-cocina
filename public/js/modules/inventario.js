@@ -12,6 +12,81 @@ class InventarioModule {
     this.apiService = window.apiService;
     this.stateManager = window.stateManager;
     this.endpoint = '/inventario';
+    this.wsClient = null;
+    this.wsInitialized = false;
+  }
+
+  /**
+   * Conectar a WebSocket para recibir actualizaciones en tiempo real
+   */
+  connectWebSocket(wsClient) {
+    if (this.wsInitialized) return;
+    
+    this.wsClient = wsClient;
+    
+    // Suscribirse a actualizaciones de inventario
+    this.wsClient.on('inventario:update', (data) => {
+      console.log('📡 Actualización de inventario recibida:', data);
+      this.handleWebSocketUpdate(data);
+    });
+    
+    // Suscribirse a alertas de stock bajo
+    this.wsClient.on('alert:low-stock', (data) => {
+      console.log('⚠️  Alerta de stock bajo:', data);
+      this.handleLowStockAlert(data);
+    });
+    
+    // Suscribirse al canal
+    if (this.wsClient.isConnected) {
+      this.wsClient.subscribeInventario();
+    } else {
+      this.wsClient.on('connected', () => {
+        this.wsClient.subscribeInventario();
+      });
+    }
+    
+    this.wsInitialized = true;
+    console.log('✅ WebSocket conectado para Inventario');
+  }
+
+  /**
+   * Manejar actualizaciones desde WebSocket
+   */
+  async handleWebSocketUpdate(data) {
+    const { action, item } = data;
+    
+    switch (action) {
+      case 'created':
+      case 'updated':
+      case 'deleted':
+        console.log(`📦 Inventario ${action}`);
+        await this.cargar();
+        break;
+      
+      case 'low-stock':
+        await this.handleLowStockAlert(item);
+        break;
+    }
+  }
+
+  /**
+   * Manejar alerta de stock bajo
+   */
+  async handleLowStockAlert(data) {
+    console.warn('⚠️  Stock bajo detectado:', data);
+    
+    // Recargar inventario
+    await this.cargar();
+    
+    // Si hay un gestor de notificaciones, mostrar alerta
+    if (window.notificationManager) {
+      window.notificationManager.addNotification({
+        type: 'warning',
+        title: 'Stock Bajo',
+        message: data.mensaje || `Stock bajo en ${data.nombre || 'producto'}`,
+        data: data
+      });
+    }
   }
 
   async cargar() {
