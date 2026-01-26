@@ -50,6 +50,7 @@ const pedidosRoutes = require('./src/routes/pedidos');
 const partidasRoutes = require('./src/routes/partidas');
 const sanidadRoutes = require('./src/routes/sanidad');
 const notificacionesRoutes = require('./src/routes/notificaciones');
+const exportRoutes = require('./src/routes/export');
 const alergenosRoutes = require('./src/routes/alergenos');
 const ofertasRoutes = require('./src/routes/ofertas');
 
@@ -171,6 +172,9 @@ app.use('/api', ofertasRoutes);
 
 // Alias de compatibilidad
 app.use('/api/sanidad', sanidadRoutes);
+
+// Rutas de exportación (descargas masivas)
+app.use('/api/export', exportRoutes);
 
 // Rutas de utilidad
 app.get('/api/health', (req, res) => {
