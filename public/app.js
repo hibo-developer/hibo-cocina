@@ -123,6 +123,29 @@ function inicializarEventos() {
     }
   });
 
+  // Búsqueda Global
+  const globalSearch = document.getElementById('globalSearch');
+  if (globalSearch) {
+    globalSearch.addEventListener('input', (e) => {
+      const termino = e.target.value.toLowerCase().trim();
+      console.log('Búsqueda global:', termino);
+      
+      if (termino.length === 0) {
+        return;
+      }
+      
+      // Buscar en platos
+      if (estadoApp.platosData && estadoApp.platosData.length > 0) {
+        const platoEncontrado = estadoApp.platosData.find(p => 
+          p.nombre.toLowerCase().includes(termino)
+        );
+        if (platoEncontrado) {
+          console.log('Plato encontrado:', platoEncontrado.nombre);
+        }
+      }
+    });
+  }
+
   // Busqueda y filtros
   const searchPlatos = document.getElementById('searchPlatos');
   if (searchPlatos) searchPlatos.addEventListener('input', filtrarPlatos);
