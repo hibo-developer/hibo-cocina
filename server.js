@@ -13,6 +13,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 
 // Importar módulos del proyecto
 const { initializeDatabase, closeDatabase } = require('./src/utils/database');
@@ -64,6 +66,25 @@ if (NODE_ENV === 'development') {
     next();
   });
 }
+
+// ============================================================================
+// DOCUMENTACIÓN API
+// ============================================================================
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  swaggerOptions: {
+    url: '/api-docs.json'
+  }
+}));
+
+// JSON de especificación de Swagger
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // ============================================================================
 // RUTAS API
