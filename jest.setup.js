@@ -40,3 +40,4 @@ jest.mock('ioredis', () => {
 console.log('[TEST SETUP] Redis disabled for testing');
 console.log(`[TEST SETUP] Using database: ${process.env.DATABASE_PATH}`);
 
+

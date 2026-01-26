@@ -36,10 +36,12 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req, res) => {
-    // Limita por IP + usuario para mayor seguridad
-    // Obtén email del body del login/register
+    // Limita por IP + usuario para mayor seguridad usando helper IPv6
     const email = req.body?.email || req.body?.username || 'unknown';
-    return `${req.ip}:${email}`;
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    // Remover IPv6 prefix si existe
+    const cleanIp = clientIp.includes('::ffff:') ? clientIp.replace('::ffff:', '') : clientIp;
+    return `${cleanIp}:${email}`;
   },
   handler: (req, res) => {
     res.status(429).json(createResponse(false, null, 'Demasiados intentos de inicio de sesión. Intenta más tarde.', 429));

@@ -3,6 +3,7 @@
  */
 const request = require('supertest');
 const path = require('path');
+const { initializeTestDatabase } = require('./helpers/testHelper');
 
 // Mock de Express
 const express = require('express');
@@ -12,7 +13,9 @@ describe('Platos API Routes', () => {
   let app;
   let server;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    await initializeTestDatabase();
+    
     app = express();
     app.use(bodyParser.json());
     

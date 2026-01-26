@@ -3,12 +3,13 @@
  * Validar CRUD de platos
  */
 
-const { request, app, registerAndLogin, makeAuthRequest } = require('../helpers/testHelper');
+const { request, app, registerAndLogin, makeAuthRequest, initializeTestDatabase } = require('../helpers/testHelper');
 
 describe('Platos Controller', () => {
   let token;
 
   beforeAll(async () => {
+    await initializeTestDatabase();
     token = await registerAndLogin('platosuser', 'password123');
   });
 

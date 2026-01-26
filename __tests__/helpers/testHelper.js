@@ -7,6 +7,7 @@ const request = require('supertest');
 const app = require('../../server');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { initializeDatabase } = require('../../src/utils/database');
 
 /**
  * Crear base de datos de prueba
@@ -113,6 +114,19 @@ function insertTestIngrediente(db, codigo = 'ING001', nombre = 'Test Ingrediente
   });
 }
 
+/**
+ * Inicializar la base de datos de prueba
+ */
+async function initializeTestDatabase() {
+  try {
+    await initializeDatabase();
+    console.log('✅ Test database initialized');
+  } catch (err) {
+    console.error('❌ Error initializing test database:', err);
+    throw err;
+  }
+}
+
 module.exports = {
   request,
   app,
@@ -122,5 +136,6 @@ module.exports = {
   registerAndLogin,
   makeAuthRequest,
   insertTestPlato,
-  insertTestIngrediente
+  insertTestIngrediente,
+  initializeTestDatabase
 };

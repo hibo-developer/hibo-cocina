@@ -3,9 +3,13 @@
  * Validar registro, login y autenticación
  */
 
-const { request, app, registerAndLogin, makeAuthRequest } = require('../helpers/testHelper');
+const { request, app, registerAndLogin, makeAuthRequest, initializeTestDatabase } = require('../helpers/testHelper');
 
 describe('Auth Controller', () => {
+  
+  beforeAll(async () => {
+    await initializeTestDatabase();
+  });
   
   describe('POST /api/auth/register', () => {
     
