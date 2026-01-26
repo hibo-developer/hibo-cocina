@@ -48,9 +48,9 @@
   --spacing-2xl: 30px;
   
   /* Border radius */
-  --radius-sm: 2px;
-  --radius-md: 6px;
-  --radius-lg: 12px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
   
   /* Z-index */
   --z-dropdown: 100;
