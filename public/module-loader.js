@@ -38,7 +38,8 @@ const ModuleLoader = {
       'inventario',
       'pedidos',
       'produccion',
-      'sanidad'
+      'sanidad',
+      'alergenos'
     ];
     
     const container = document.getElementById('sections-container');

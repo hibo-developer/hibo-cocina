@@ -172,6 +172,8 @@ function inicializarEventos() {
 
 // ==================== NAVEGACIÓN ====================
 function mostrarSeccion(seccion) {
+  console.log('mostrarSeccion:', seccion);
+  
   // Ocultar todas las secciones
   document.querySelectorAll('.section').forEach(s => {
     s.style.display = 'none';
@@ -179,8 +181,12 @@ function mostrarSeccion(seccion) {
 
   // Mostrar sección seleccionada
   const seccionElement = document.getElementById(seccion);
+  console.log('Elemento de sección encontrado:', seccionElement ? 'Sí' : 'No', seccionElement);
+  
   if (seccionElement) {
     seccionElement.style.display = 'block';
+  } else {
+    console.error(`No se encontró el elemento con id="${seccion}"`);
   }
 
   // Actualizar botones de navegación (nav-btn directos)
@@ -218,6 +224,7 @@ function mostrarSeccion(seccion) {
 }
 
 function cambiarSeccion(seccion) {
+  console.log('Cambiando a sección:', seccion);
   mostrarSeccion(seccion);
 
   // Cargar datos según sección
@@ -246,6 +253,16 @@ function cambiarSeccion(seccion) {
     case 'sanidad':
       cargarSanidad();
       break;
+    case 'alergenos':
+      // El módulo de alérgenos carga sus propios datos
+      console.log('Módulo de alérgenos cargado');
+      break;
+    case 'estadisticas':
+      // Estadísticas es un módulo estático
+      console.log('Módulo de estadísticas cargado');
+      break;
+    default:
+      console.warn('Sección no reconocida:', seccion);
   }
 }
 
