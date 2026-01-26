@@ -34,7 +34,7 @@
 .form-group textarea {
   padding: 10px 12px;
   border: 2px solid #e0e0e0;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 0.85em;
   font-family: inherit;
   transition: var(--transition);
@@ -78,7 +78,7 @@
   width: 100%;
   padding: 10px 12px;
   border: 2px solid #e0e0e0;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: 0.9em;
   font-family: inherit;
   transition: var(--transition);
@@ -130,7 +130,7 @@
   margin: 0;
   cursor: pointer;
   padding: 8px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   transition: var(--transition-fast);
 }
 
@@ -167,7 +167,7 @@
   cursor: pointer;
   appearance: none;
   background: #ddd;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   position: relative;
   transition: var(--transition-fast);
 }
@@ -209,7 +209,7 @@
 .search-group select {
   padding: 8px 12px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 0.85em;
 }
 

@@ -6,7 +6,7 @@
 .card {
   background: white;
   border: 1px solid var(--light-gray);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   padding: 20px;
   box-shadow: var(--shadow);
   margin-bottom: 20px;
@@ -33,7 +33,7 @@
 .production-card {
   background: white;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   padding: 15px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   transition: var(--transition);
@@ -87,7 +87,7 @@
   background: white;
   border-left: 4px solid var(--primary-color);
   padding: 20px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   box-shadow: var(--shadow);
   transition: var(--transition);
 }
@@ -129,7 +129,7 @@
 .metric-card {
   background: rgba(255,255,255,0.15);
   padding: 15px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   text-align: center;
   color: white;
 }
@@ -150,7 +150,7 @@
 .info-section {
   background: linear-gradient(135deg, var(--secondary-color) 0%, var(--success-color) 100%);
   padding: 20px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   margin-bottom: 20px;
   box-shadow: 0 4px 15px rgba(44, 95, 141, 0.3);
 }
@@ -165,7 +165,7 @@
 .info-section-content {
   background: rgba(255,255,255,0.15);
   padding: 15px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   color: white;
 }
 
@@ -173,7 +173,7 @@
   background: #fff3cd;
   border-left: 4px solid #ffc107;
   padding: 15px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   margin-bottom: 20px;
 }
 
@@ -190,7 +190,7 @@
   background: rgba(255,193,7,0.3);
   color: #856404;
   padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 0.9em;
   font-weight: var(--font-weight-semibold);
 }
@@ -199,7 +199,7 @@
   background: #d4edda;
   color: #155724;
   padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   font-size: 0.8em;
   display: inline-block;
   margin-top: 8px;

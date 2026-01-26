@@ -61,7 +61,7 @@ body.modal-open {
 .modal-content {
   background-color: white;
   padding: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   width: 90%;
   max-width: 700px;
   max-height: 90vh;
@@ -104,7 +104,7 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   z-index: 10;
 }
 
@@ -225,7 +225,7 @@ body.modal-open {
 #modalFields textarea {
   padding: 10px 12px;
   border: 2px solid #e0e0e0;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: 0.85em;
   font-family: inherit;
   transition: var(--transition);
@@ -260,7 +260,7 @@ body.modal-open {
   padding: 20px 30px;
   border-top: 1px solid #e0e0e0;
   background-color: white;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-radius: 0;
   position: sticky;
   bottom: 0;
   z-index: 10;
@@ -275,13 +275,13 @@ body.modal-open {
   padding: 15px 20px;
   border-top: 2px solid #f0f0f0;
   background: #fafafa;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  border-radius: 0;
 }
 
 .btn-cancel {
   padding: 10px 24px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: var(--transition);
