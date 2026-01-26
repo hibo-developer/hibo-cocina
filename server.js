@@ -21,6 +21,7 @@ const http = require('http');
 
 // Importar módulos del proyecto
 const { initializeDatabase, closeDatabase } = require('./src/utils/database');
+const { runMigrations } = require('./src/utils/migrations');
 const { errorHandler, notFoundHandler, createResponse } = require('./src/middleware/errorHandler');
 const { getLogger } = require('./src/utils/logger');
 const { loggerMiddleware } = require('./src/middleware/loggerMiddleware');
@@ -193,6 +194,10 @@ async function startServer() {
     // Inicializar base de datos
     await initializeDatabase();
     log.info('Base de datos inicializada correctamente');
+
+    // Ejecutar migraciones
+    await runMigrations();
+    log.info('Migraciones ejecutadas correctamente');
 
     // Crear servidor HTTP (para Express + WebSocket)
     const server = http.createServer(app);

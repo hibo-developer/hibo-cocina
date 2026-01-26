@@ -1,7 +1,7 @@
 /**
  * Modelo para gestión de notificaciones persistentes
  */
-const db = require('../utils/database');
+const db = require('../utils/db-async');
 
 class Notificacion {
   /**
