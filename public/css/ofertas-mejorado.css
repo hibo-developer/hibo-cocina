@@ -1,0 +1,262 @@
+/* ============================================================================
+   OFERTAS Y EVENTOS - ESTILOS MEJORADOS
+   ============================================================================ */
+
+#ofertas {
+  padding: 20px;
+}
+
+#ofertas .section-header {
+  margin-bottom: 30px;
+}
+
+#ofertas h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+}
+
+/* Tabs */
+#ofertas .tab-btn {
+  transition: all 0.3s ease;
+}
+
+#ofertas .tab-btn:hover {
+  color: #4a90e2;
+}
+
+#ofertas .tab-btn.active {
+  border-bottom-color: #4a90e2;
+  color: #4a90e2;
+}
+
+/* Cards de Ofertas */
+.oferta-card {
+  background: white;
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.oferta-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-color: #4a90e2;
+}
+
+.oferta-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.oferta-codigo {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.oferta-estado {
+  padding: 4px 12px;
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.oferta-estado.activa {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.oferta-estado.proxima {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.oferta-estado.expirada {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.oferta-descuento {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e74c3c;
+  text-align: center;
+}
+
+.oferta-descuento small {
+  font-size: 12px;
+  color: #999;
+  display: block;
+}
+
+.oferta-precios {
+  display: flex;
+  gap: 20px;
+  margin: 15px 0;
+  align-items: center;
+}
+
+.precio-item {
+  flex: 1;
+}
+
+.precio-item label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.precio-original {
+  font-size: 16px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.precio-especial {
+  font-size: 22px;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+/* Tabla de Ofertas */
+#ofertas .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+}
+
+#ofertas .data-table th {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+#ofertas .data-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+#ofertas .data-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+#ofertas .data-table td.acciones {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Eventos */
+.evento-card {
+  background: white;
+  border-radius: 0;
+  border-left: 4px solid #4a90e2;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.evento-fecha {
+  display: inline-block;
+  background-color: #4a90e2;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.evento-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.info-item label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.info-item value {
+  display: block;
+  color: #2c3e50;
+  margin-top: 3px;
+}
+
+/* Stats */
+#ofertas .stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+#ofertas .stat-card {
+  background: white;
+  border-radius: 0;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+#ofertas .stat-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+#ofertas .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Acciones */
+#ofertas .action-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+#ofertas .btn {
+  padding: 8px 16px;
+  border-radius: 0;
+  font-size: 14px;
+}
+
+#ofertas .btn-danger {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#ofertas .btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#ofertas .btn-danger:hover:not(:disabled) {
+  background-color: #c0392b;
+}

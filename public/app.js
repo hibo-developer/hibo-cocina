@@ -1061,9 +1061,10 @@ async function cargarSanidad() {
     let controles = [];
     try {
       console.log('📡 Cargando controles APPCC...');
-      const resp = await fetch(`${API_BASE}/control-sanidad`);
+      const resp = await fetch(`${API_BASE}/sanidad`);
       if (!resp.ok) throw new Error(`Error ${resp.status}`);
-      controles = await resp.json();
+      const data = await resp.json();
+      controles = data.data || data || [];
       console.log('✅ Controles APPCC:', controles.length);
     } catch (error) {
       console.error('❌ Error cargando controles APPCC:', error);
@@ -4373,7 +4374,7 @@ async function mostrarModalNuevoControlAPPCC() {
   abrirModal('Nuevo Control APPCC', campos, async (formData) => {
     try {
       const datos = Object.fromEntries(formData);
-      const response = await fetch(`${API_BASE}/control-sanidad`, {
+      const response = await fetch(`${API_BASE}/sanidad`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datos)
@@ -4392,9 +4393,10 @@ async function mostrarModalNuevoControlAPPCC() {
 
 async function editarControlAPPCC(id) {
   try {
-    const response = await fetch(`${API_BASE}/control-sanidad/${id}`);
+    const response = await fetch(`${API_BASE}/sanidad/${id}`);
     if (!response.ok) throw new Error('Error al cargar control');
-    const control = await response.json();
+    const data = await response.json();
+    const control = data.data || data;
     
     // Cargar platos e ingredientes para autocompletar
     let platosCodigos = [];
@@ -4455,7 +4457,7 @@ async function editarControlAPPCC(id) {
       try {
         const datos = Object.fromEntries(formData);
         
-        const resp = await fetch(`${API_BASE}/control-sanidad/${id}`, {
+        const resp = await fetch(`${API_BASE}/sanidad/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datos)
@@ -4478,7 +4480,7 @@ async function editarControlAPPCC(id) {
 async function eliminarControlAPPCC(id) {
   confirmarAccion('¿Eliminar este control APPCC?', async () => {
     try {
-      const response = await fetch(`${API_BASE}/control-sanidad/${id}`, {
+      const response = await fetch(`${API_BASE}/sanidad/${id}`, {
         method: 'DELETE'
       });
       

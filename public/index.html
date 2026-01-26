@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/dashboard-mejorado.css">
   <link rel="stylesheet" href="css/platos-mejorado.css">
   <link rel="stylesheet" href="css/secciones-mejorado.css">
+  <link rel="stylesheet" href="css/ofertas-mejorado.css">
 </head>
 <body>
   <div class="container">
@@ -85,6 +86,18 @@
             </div>
           </div>
 
+          <!-- Grupo: Comercial -->
+          <div class="nav-dropdown">
+            <button class="nav-btn dropdown-toggle">
+              <i class="fas fa-shopping-cart"></i> Comercial <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-section="ofertas">
+                <i class="fas fa-tags"></i> Ofertas
+              </button>
+            </div>
+          </div>
+
           <!-- Grupo: Configuración -->
           <div class="nav-dropdown">
             <button class="nav-btn dropdown-toggle">
@@ -123,6 +136,156 @@
           <div class="card">
             <h3>Costos Promedio por Grupo</h3>
             <div id="statsCostos"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Ofertas -->
+      <section id="ofertas" class="section" style="display:none;">
+        <div class="section-header">
+          <h2>🎯 Ofertas y Eventos</h2>
+          <div class="actions">
+            <button class="btn" onclick="mostrarModalNuevaOferta()">+ Nueva Oferta</button>
+            <button class="btn" onclick="mostrarModalNuevoEvento()">+ Nuevo Evento</button>
+          </div>
+        </div>
+
+        <!-- TABS DE NAVEGACIÓN -->
+        <div style="border-bottom: 2px solid #e0e0e0; margin-bottom: 25px; display: flex; gap: 20px;">
+          <button class="tab-btn active" onclick="cambiarTabOferta('ofertas-activas')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid #4a90e2; font-weight: 600;">
+            💰 Ofertas Activas
+          </button>
+          <button class="tab-btn" onclick="cambiarTabOferta('todas-ofertas')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent;">
+            📋 Todas las Ofertas
+          </button>
+          <button class="tab-btn" onclick="cambiarTabOferta('eventos')" style="padding: 12px 24px; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent;">
+            🎉 Eventos
+          </button>
+        </div>
+
+        <!-- TAB: OFERTAS ACTIVAS -->
+        <div id="ofertas-activas-tab" style="display: block;">
+          <div class="filters">
+            <input type="text" id="searchOfertasActivas" placeholder="🔍 Buscar ofertas..." onkeyup="filtrarOfertasActivas()">
+            <button class="btn btn-secondary" onclick="limpiarFiltrosOfertas('activas')">Limpiar</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Precio Regular</th>
+                  <th>Precio Oferta</th>
+                  <th>Descuento</th>
+                  <th>Vigencia</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ofertasActivasTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px;">Cargando ofertas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: TODAS LAS OFERTAS -->
+        <div id="todas-ofertas-tab" style="display: none;">
+          <div class="filters">
+            <input type="text" id="searchTodasOfertas" placeholder="🔍 Buscar..." onkeyup="filtrarTodasOfertas()">
+            <select id="filterEstadoOferta" onchange="filtrarTodasOfertas()" style="padding: 8px; border-radius: 0; border: 1px solid #ddd;">
+              <option value="">Todos los estados</option>
+              <option value="activa">Activa</option>
+              <option value="proxima">Próxima</option>
+              <option value="expirada">Expirada</option>
+            </select>
+            <button class="btn btn-secondary" onclick="limpiarFiltrosOfertas('todas')">Limpiar</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onchange="toggleSeleccionTodos('ofertas', this)"></th>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Tipo</th>
+                  <th>Estado</th>
+                  <th>Vigencia</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="todasOfertasTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px;">Cargando ofertas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="action-bar" style="margin-top: 15px;">
+            <button class="btn btn-danger" id="btn-eliminar-ofertas" onclick="eliminarSeleccionados('ofertas', 'ofertas')" disabled>
+              🗑️ Eliminar Seleccionadas
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB: EVENTOS -->
+        <div id="eventos-tab" style="display: none;">
+          <div class="filters">
+            <input type="text" id="searchEventos" placeholder="🔍 Buscar eventos..." onkeyup="filtrarEventos()">
+            <button class="btn btn-secondary" onclick="limpiarFiltrosEventos()">Limpiar</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onchange="toggleSeleccionTodos('eventos', this)"></th>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Tipo</th>
+                  <th>Fecha</th>
+                  <th>Lugar</th>
+                  <th>Personas</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="eventosTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 20px;">Cargando eventos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="action-bar" style="margin-top: 15px;">
+            <button class="btn btn-danger" id="btn-eliminar-eventos" onclick="eliminarSeleccionados('eventos', 'eventos')" disabled>
+              🗑️ Eliminar Seleccionados
+            </button>
+          </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-cards" style="margin-top: 30px;">
+          <div class="stat-card">
+            <h3>Ofertas Activas</h3>
+            <p class="stat-value" id="totalOfertasActivas">-</p>
+          </div>
+          <div class="stat-card">
+            <h3>Descuento Promedio</h3>
+            <p class="stat-value" id="descuentoPromedio">-</p>
+          </div>
+          <div class="stat-card">
+            <h3>Eventos Programados</h3>
+            <p class="stat-value" id="totalEventos">-</p>
+          </div>
+          <div class="stat-card">
+            <h3>Próximo Evento</h3>
+            <p class="stat-value" id="proximoEvento" style="font-size: 14px;">-</p>
           </div>
         </div>
       </section>
@@ -183,6 +346,7 @@
   <script src="js/modules/sanidad.js"></script>
   <script src="js/modules/produccion.js"></script>
   <script src="js/modules/alergenos.js"></script>
+  <script src="js/modules/ofertas.js"></script>
   <script src="js/modules/navigation.js"></script>
 
   <!-- 5. Scripts principales (legado + migrado) -->

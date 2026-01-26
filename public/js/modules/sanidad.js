@@ -102,10 +102,12 @@ class SanidadModule {
   async obtenerControles(filtros = {}) {
     try {
       const query = new URLSearchParams(filtros).toString();
+      // El backend retorna directamente el listado en '/'
       return await this.apiService.get(`${this.endpoint}/controles?${query}`);
     } catch (error) {
       console.error('Error al obtener controles:', error);
-      throw error;
+      // Fallback: intentar usar el endpoint raíz
+      return await this.apiService.get(this.endpoint).catch(() => []);
     }
   }
 

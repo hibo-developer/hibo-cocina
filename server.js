@@ -51,6 +51,7 @@ const partidasRoutes = require('./src/routes/partidas');
 const sanidadRoutes = require('./src/routes/sanidad');
 const notificacionesRoutes = require('./src/routes/notificaciones');
 const alergenosRoutes = require('./src/routes/alergenos');
+const ofertasRoutes = require('./src/routes/ofertas');
 
 const app = express();
 const log = getLogger();
@@ -164,6 +165,9 @@ app.use('/api/notificaciones', notificacionesRoutes);
 
 // Rutas de alérgenos
 app.use('/api/alergenos', alergenosRoutes);
+
+// Rutas de ofertas y eventos
+app.use('/api', ofertasRoutes);
 
 // Alias de compatibilidad
 app.use('/api/sanidad', sanidadRoutes);
