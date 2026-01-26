@@ -90,34 +90,38 @@ if (NODE_ENV === 'development') {
 }
 
 // ============================================================================
-// REDIS CACHING
+// REDIS CACHING (OPCIONAL - Se puede deshabilitar si Redis no está disponible)
 // ============================================================================
 
-const redisCache = initializeRedis();
+const redisCache = process.env.DISABLE_REDIS === 'true' ? null : initializeRedis();
 
-// Middleware de caché para GET requests
-app.use('/api', createCacheMiddleware(redisCache, {
-  ttl: 3600,
-  cacheable: CACHE_CONFIG.cacheable,
-  ttlByRoute: CACHE_CONFIG.ttlByRoute
-}));
+// Middleware de caché para GET requests (solo si Redis está disponible)
+if (redisCache) {
+  app.use('/api', createCacheMiddleware(redisCache, {
+    ttl: 3600,
+    cacheable: CACHE_CONFIG.cacheable,
+    ttlByRoute: CACHE_CONFIG.ttlByRoute
+  }));
 
-// Middleware de invalidación para mutaciones
-app.use('/api', createInvalidationMiddleware(redisCache, {
-  invalidationMap: CACHE_CONFIG.invalidationMap
-}));
+  // Middleware de invalidación para mutaciones
+  app.use('/api', createInvalidationMiddleware(redisCache, {
+    invalidationMap: CACHE_CONFIG.invalidationMap
+  }));
 
-// Endpoint de estadísticas de caché
-app.get('/api/cache-stats', (req, res) => {
-  const stats = redisCache.getStats();
-  res.json(createResponse(true, stats, 'Cache statistics'));
-});
+  // Endpoint de estadísticas de caché
+  app.get('/api/cache-stats', (req, res) => {
+    const stats = redisCache.getStats();
+    res.json(createResponse(true, stats, 'Cache statistics'));
+  });
 
-// Endpoint para limpiar caché
-app.post('/api/cache-clear', (req, res) => {
-  redisCache.clear();
-  res.json(createResponse(true, null, 'Cache cleared'));
-});
+  // Endpoint para limpiar caché
+  app.post('/api/cache-clear', (req, res) => {
+    redisCache.clear();
+    res.json(createResponse(true, null, 'Cache cleared'));
+  });
+} else {
+  log.warn('Redis deshabilitado o no disponible - caché desactivado');
+}
 
 // ============================================================================
 // DOCUMENTACIÓN API
@@ -260,9 +264,11 @@ async function startServer() {
         }
         
         try {
-          // Cerrar Redis
-          await redisCache.close();
-          log.info('Redis cerrado');
+          // Cerrar Redis (si está habilitado)
+          if (redisCache) {
+            await redisCache.close();
+            log.info('Redis cerrado');
+          }
         } catch (err) {
           log.error('Error al cerrar Redis', err);
         }

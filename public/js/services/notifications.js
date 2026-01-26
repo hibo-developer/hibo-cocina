@@ -3,8 +3,9 @@
  * Integra WebSocket, almacenamiento local y persistencia
  */
 
-// Solo definir si no existe ya (evitar conflicto con notifications.js anterior)
-if (typeof NotificationManager === 'undefined') {
+console.log('🔍 notifications.js cargando...');
+
+// Definir NotificationManager (puede sobrescribir la anterior si la hay)
 class NotificationManager {
   constructor(wsClient) {
     this.wsClient = wsClient;
@@ -375,9 +376,15 @@ class NotificationManager {
     }
   }
 }
-} // Cerrar el if typeof NotificationManager === 'undefined'
 
-// Exportar para uso global
+// Asignar a window para uso global
 if (typeof window !== 'undefined') {
   window.NotificationManager = NotificationManager;
+  console.log('✅ window.NotificationManager asignado:', typeof window.NotificationManager);
+} else {
+  console.log('❌ window no está disponible');
 }
+
+
+
+

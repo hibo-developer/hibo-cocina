@@ -138,14 +138,43 @@
     document.addEventListener('DOMContentLoaded', function() {
       const token = localStorage.getItem('authToken') || 'guest';
       
-      // Crear cliente WebSocket
-      window.wsClient = new WebSocketClient(token);
+      console.log('🔧 DOMContentLoaded - Inicializando WebSocket y NotificationManager');
+      console.log('  - window.NotificationManager:', typeof window.NotificationManager);
+      console.log('  - window.WebSocketClient:', typeof window.WebSocketClient);
       
-      // Crear gestor de notificaciones
-      window.notificationManager = new NotificationManager(window.wsClient);
+      try {
+        // Crear cliente WebSocket
+        window.wsClient = new WebSocketClient(token);
+        console.log('✅ WebSocket cliente creado');
+      } catch (err) {
+        console.error('❌ Error creando WebSocket:', err);
+      }
       
-      // Crear panel de notificaciones
-      window.notificationPanel = new NotificationPanel(window.notificationManager);
+      try {
+        // Crear gestor de notificaciones
+        if (typeof window.NotificationManager === 'undefined') {
+          console.warn('⚠️ NotificationManager no está definido, usando SimpleNotificationManager');
+          window.notificationManager = window.simpleNotificationManager;
+        } else {
+          window.notificationManager = new NotificationManager(window.wsClient);
+          console.log('✅ NotificationManager instancia creada');
+        }
+      } catch (err) {
+        console.error('❌ Error creando NotificationManager:', err);
+        window.notificationManager = window.simpleNotificationManager;
+      }
+      
+      try {
+        // Crear panel de notificaciones
+        if (typeof window.NotificationPanel === 'undefined') {
+          console.warn('⚠️ NotificationPanel no está definido');
+        } else {
+          window.notificationPanel = new NotificationPanel(window.notificationManager);
+          console.log('✅ NotificationPanel creado');
+        }
+      } catch (err) {
+        console.error('❌ Error creando NotificationPanel:', err);
+      }
       
       // Conectar módulos a WebSocket para actualizaciones en tiempo real
       setTimeout(() => {
