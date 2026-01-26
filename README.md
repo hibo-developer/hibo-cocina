@@ -21,8 +21,9 @@ HIBO Cocina es una aplicación web completa para la gestión de restaurantes que
 
 - Node.js 16+ 
 - npm
+- (Opcional) Docker y Docker Compose
 
-### Instalación
+### Instalación Local
 
 ```bash
 # Clonar el repositorio
@@ -37,6 +38,30 @@ npm start
 ```
 
 La aplicación estará disponible en `http://localhost:3000`
+
+### 🐳 Instalación con Docker
+
+#### Opción 1: Desde GHCR (recomendado)
+```bash
+# Autenticarse en GHCR
+echo $GHCR_PAT | docker login ghcr.io -u hibo-developer --password-stdin
+
+# Pull y run
+docker pull ghcr.io/hibo-developer/hibo-cocina:latest
+docker run -d -p 3000:3000 --name hibo-cocina ghcr.io/hibo-developer/hibo-cocina:latest
+```
+
+#### Opción 2: Con Docker Compose (build local)
+```bash
+# Levantar servicios (app + Redis)
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f app
+
+# Parar servicios
+docker-compose down
+```
 
 ## 📁 Estructura del Proyecto
 
@@ -79,6 +104,30 @@ hibo-cocina/
 6. **Módulos de Negocio**: platos, ingredientes, escandallos, etc.
 
 ## 🔧 Desarrollo
+
+### Variables de Entorno
+
+El servidor admite las siguientes variables de entorno:
+
+| Variable | Descripción | Valor por defecto |
+|----------|-------------|-------------------|
+| `NODE_ENV` | Entorno de ejecución | `development` |
+| `PORT` | Puerto del servidor | `3000` |
+| `CORS_ORIGIN` | Origen permitido para CORS | `*` |
+| `REDIS_ENABLED` | Activar caché Redis | `false` |
+| `REDIS_HOST` | Host de Redis | `localhost` |
+| `REDIS_PORT` | Puerto de Redis | `6379` |
+| `DB_PATH` | Ruta de la base de datos SQLite | `data/hibo-cocina.db` |
+
+**Ejemplo de archivo `.env`:**
+```bash
+NODE_ENV=production
+PORT=3000
+CORS_ORIGIN=https://midominio.com
+REDIS_ENABLED=true
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
 
 ### Scripts Disponibles
 

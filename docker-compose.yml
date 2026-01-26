@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    image: hibo-cocina:local
+    container_name: hibo-cocina
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CORS_ORIGIN=*
+      - REDIS_ENABLED=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: hibo-cocina-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  data:
+  redis-data:

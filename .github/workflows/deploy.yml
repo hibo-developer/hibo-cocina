@@ -1,0 +1,106 @@
+name: Deploy to Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Set environment variables
+      run: |
+        if [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+          echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+          echo "DEPLOY_URL=${{ secrets.STAGING_URL }}" >> $GITHUB_ENV
+        else
+          echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+          echo "DEPLOY_URL=${{ secrets.PRODUCTION_URL }}" >> $GITHUB_ENV
+        fi
+    
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Get image tag
+      id: get-tag
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "IMAGE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+        else
+          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+        fi
+    
+    - name: Pull Docker image
+      run: |
+        docker pull ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+    
+    # Opción 1: Deploy a Azure Web App
+    - name: Deploy to Azure Web App (opcional)
+      if: env.DEPLOY_URL != ''
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: 'ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}'
+    
+    # Opción 2: Deploy vía SSH (servidor propio)
+    - name: Deploy to Server via SSH (opcional)
+      if: secrets.DEPLOY_SSH_KEY != ''
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_SSH_KEY }}
+        script: |
+          # Login a GHCR
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Pull nueva imagen
+          docker pull ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+          
+          # Parar contenedor anterior
+          docker stop hibo-cocina || true
+          docker rm hibo-cocina || true
+          
+          # Arrancar nuevo contenedor
+          docker run -d \
+            --name hibo-cocina \
+            -p 3000:3000 \
+            -e NODE_ENV=production \
+            -e REDIS_ENABLED=true \
+            -e REDIS_HOST=redis \
+            -v /data/hibo-cocina:/app/data \
+            --restart unless-stopped \
+            ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+          
+          # Verificar salud del servicio
+          sleep 5
+          curl -f http://localhost:3000/api/health || exit 1
+    
+    - name: Notify deployment
+      if: success()
+      run: |
+        echo "✅ Deployed ${{ env.IMAGE_TAG }} to ${{ env.DEPLOY_ENV }}"
+    
+    - name: Notify failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed for ${{ env.IMAGE_TAG }} to ${{ env.DEPLOY_ENV }}"
