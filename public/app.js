@@ -128,19 +128,138 @@ function inicializarEventos() {
   if (globalSearch) {
     globalSearch.addEventListener('input', (e) => {
       const termino = e.target.value.toLowerCase().trim();
-      console.log('Búsqueda global:', termino);
       
       if (termino.length === 0) {
         return;
       }
       
+      const resultados = {
+        platos: [],
+        ingredientes: [],
+        escandallos: [],
+        pedidos: [],
+        inventario: [],
+        partidas: [],
+        sanidad: [],
+        alergenos: []
+      };
+
       // Buscar en platos
       if (estadoApp.platosData && estadoApp.platosData.length > 0) {
-        const platoEncontrado = estadoApp.platosData.find(p => 
-          p.nombre.toLowerCase().includes(termino)
+        resultados.platos = estadoApp.platosData.filter(p => 
+          p.nombre.toLowerCase().includes(termino) ||
+          (p.grupo && p.grupo.toLowerCase().includes(termino)) ||
+          (p.descripcion && p.descripcion.toLowerCase().includes(termino))
         );
-        if (platoEncontrado) {
-          console.log('Plato encontrado:', platoEncontrado.nombre);
+      }
+
+      // Buscar en ingredientes
+      if (estadoApp.ingredientesData && estadoApp.ingredientesData.length > 0) {
+        resultados.ingredientes = estadoApp.ingredientesData.filter(i => 
+          i.nombre.toLowerCase().includes(termino) ||
+          (i.familia && i.familia.toLowerCase().includes(termino)) ||
+          (i.proveedor && i.proveedor.toLowerCase().includes(termino))
+        );
+      }
+
+      // Buscar en escandallos
+      if (estadoApp.escandallosData && estadoApp.escandallosData.length > 0) {
+        resultados.escandallos = estadoApp.escandallosData.filter(e => 
+          e.nombre.toLowerCase().includes(termino) ||
+          (e.referencia && e.referencia.toLowerCase().includes(termino))
+        );
+      }
+
+      // Buscar en pedidos
+      if (estadoApp.pedidosData && estadoApp.pedidosData.length > 0) {
+        resultados.pedidos = estadoApp.pedidosData.filter(p => 
+          (p.proveedor && p.proveedor.toLowerCase().includes(termino)) ||
+          (p.referencia && p.referencia.toLowerCase().includes(termino)) ||
+          (p.estado && p.estado.toLowerCase().includes(termino))
+        );
+      }
+
+      // Buscar en inventario
+      if (estadoApp.inventarioData && estadoApp.inventarioData.length > 0) {
+        resultados.inventario = estadoApp.inventarioData.filter(inv => 
+          (inv.nombre && inv.nombre.toLowerCase().includes(termino)) ||
+          (inv.ubicacion && inv.ubicacion.toLowerCase().includes(termino))
+        );
+      }
+
+      // Contar resultados
+      const totalResultados = Object.values(resultados).reduce((sum, arr) => sum + arr.length, 0);
+      
+      if (totalResultados > 0) {
+        console.log(`✓ Búsqueda: "${termino}" - ${totalResultados} resultado(s)`, resultados);
+      } else {
+        console.log(`✗ Búsqueda: "${termino}" - Sin resultados`);
+      }
+    });
+
+    // Permitir Enter para navegar al primer resultado
+    globalSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const termino = e.target.value.toLowerCase().trim();
+        
+        // Buscar en platos primero
+        if (estadoApp.platosData && estadoApp.platosData.length > 0) {
+          const platoEncontrado = estadoApp.platosData.find(p => 
+            p.nombre.toLowerCase().includes(termino)
+          );
+          if (platoEncontrado) {
+            cambiarSeccion('platos');
+            globalSearch.value = '';
+            return;
+          }
+        }
+
+        // Luego en ingredientes
+        if (estadoApp.ingredientesData && estadoApp.ingredientesData.length > 0) {
+          const ingredienteEncontrado = estadoApp.ingredientesData.find(i => 
+            i.nombre.toLowerCase().includes(termino)
+          );
+          if (ingredienteEncontrado) {
+            cambiarSeccion('ingredientes');
+            globalSearch.value = '';
+            return;
+          }
+        }
+
+        // Luego en escandallos
+        if (estadoApp.escandallosData && estadoApp.escandallosData.length > 0) {
+          const escandaloEncontrado = estadoApp.escandallosData.find(e => 
+            e.nombre.toLowerCase().includes(termino)
+          );
+          if (escandaloEncontrado) {
+            cambiarSeccion('escandallos');
+            globalSearch.value = '';
+            return;
+          }
+        }
+
+        // Luego en pedidos
+        if (estadoApp.pedidosData && estadoApp.pedidosData.length > 0) {
+          const pedidoEncontrado = estadoApp.pedidosData.find(p => 
+            (p.proveedor && p.proveedor.toLowerCase().includes(termino))
+          );
+          if (pedidoEncontrado) {
+            cambiarSeccion('pedidos');
+            globalSearch.value = '';
+            return;
+          }
+        }
+
+        // Finalmente en inventario
+        if (estadoApp.inventarioData && estadoApp.inventarioData.length > 0) {
+          const inventarioEncontrado = estadoApp.inventarioData.find(inv => 
+            (inv.nombre && inv.nombre.toLowerCase().includes(termino))
+          );
+          if (inventarioEncontrado) {
+            cambiarSeccion('inventario');
+            globalSearch.value = '';
+            return;
+          }
         }
       }
     });

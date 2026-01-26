@@ -198,6 +198,11 @@
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.5);
   color: white;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.search-input:not(:placeholder-shown) {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 768px) {
