@@ -97,7 +97,7 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { codigo, nombre, categoria, pvp, coste_produccion, activo, descripcion } = req.body;
+    const { codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion, familia } = req.body;
     
     if (!nombre || !codigo) {
       return res.status(400).json(
@@ -107,8 +107,8 @@ async function actualizar(req, res, next) {
 
     const db = getDatabase();
     db.run(
-      'UPDATE platos SET codigo = ?, nombre = ?, categoria = ?, pvp = ?, coste_produccion = ?, activo = ?, descripcion = ? WHERE id = ?',
-      [codigo, nombre, categoria, pvp, coste_produccion, activo ? 1 : 0, descripcion, id],
+      'UPDATE platos SET codigo = ?, nombre = ?, tipo = ?, precio_venta = ?, coste_racion = ?, activo = ?, descripcion = ?, familia = ? WHERE id = ?',
+      [codigo, nombre, tipo, precio_venta, coste_racion, activo ? 1 : 0, descripcion, familia, id],
       function(err) {
         if (err) {
           console.error('Error al actualizar plato:', err);
