@@ -183,11 +183,36 @@ function mostrarSeccion(seccion) {
     seccionElement.style.display = 'block';
   }
 
-  // Actualizar botones de navegación
-  document.querySelectorAll('.nav-btn').forEach(btn => {
+  // Actualizar botones de navegación (nav-btn directos)
+  document.querySelectorAll('.nav-btn:not(.dropdown-toggle)').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.section === seccion) {
       btn.classList.add('active');
+    }
+  });
+
+  // Actualizar items de dropdown
+  document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.dataset.section === seccion) {
+      item.classList.add('active');
+      // También activar visualmente el dropdown padre
+      const dropdown = item.closest('.nav-dropdown');
+      if (dropdown) {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        if (toggle) {
+          toggle.classList.add('has-active-item');
+        }
+      }
+    }
+  });
+
+  // Limpiar el indicador "has-active-item" de dropdowns sin items activos
+  document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+    const dropdown = toggle.closest('.nav-dropdown');
+    const hasActiveItem = dropdown && dropdown.querySelector('.dropdown-item.active');
+    if (!hasActiveItem) {
+      toggle.classList.remove('has-active-item');
     }
   });
 }
