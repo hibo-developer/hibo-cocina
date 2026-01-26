@@ -4,6 +4,7 @@
  */
 
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = require('express-rate-limit');
 const { createResponse } = require('./errorHandler');
 
 /**
@@ -35,20 +36,12 @@ const authLimiter = rateLimit({
   message: 'Demasiados intentos de inicio de sesión. Intenta más tarde.',
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req, res) => {
-    // Limita por IP + usuario para mayor seguridad usando helper IPv6
-    const email = req.body?.email || req.body?.username || 'unknown';
-    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-    // Remover IPv6 prefix si existe
-    const cleanIp = clientIp.includes('::ffff:') ? clientIp.replace('::ffff:', '') : clientIp;
-    return `${cleanIp}:${email}`;
-  },
-  handler: (req, res) => {
-    res.status(429).json(createResponse(false, null, 'Demasiados intentos de inicio de sesión. Intenta más tarde.', 429));
-  },
   skip: (req, res) => {
     // No limitar GET requests en auth
     return req.method === 'GET';
+  },
+  handler: (req, res) => {
+    res.status(429).json(createResponse(false, null, 'Demasiados intentos de inicio de sesión. Intenta más tarde.', 429));
   }
 });
 
@@ -64,7 +57,8 @@ const createLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json(createResponse(false, null, 'Límite de creación de recursos alcanzado', 429));
-  }
+  },
+  skip: (req, res) => false // Usar valores por defecto
 });
 
 /**
@@ -79,7 +73,8 @@ const updateLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json(createResponse(false, null, 'Límite de actualizaciones alcanzado', 429));
-  }
+  },
+  skip: (req, res) => false // Usar valores por defecto
 });
 
 /**
@@ -94,7 +89,8 @@ const deleteLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json(createResponse(false, null, 'Límite de eliminaciones alcanzado', 429));
-  }
+  },
+  skip: (req, res) => false // Usar valores por defecto
 });
 
 /**
@@ -108,7 +104,8 @@ const downloadLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     res.status(429).json(createResponse(false, null, 'Límite de descargas alcanzado', 429));
-  }
+  },
+  skip: (req, res) => false // Usar valores por defecto
 });
 
 module.exports = {
