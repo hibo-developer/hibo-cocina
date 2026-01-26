@@ -12,6 +12,59 @@ class PlatosModule {
   constructor() {
     this.api = apiService;
     this.state = stateManager;
+    this.wsClient = null;
+    this.wsInitialized = false;
+  }
+
+  /**
+   * Conectar a WebSocket para recibir actualizaciones en tiempo real
+   */
+  connectWebSocket(wsClient) {
+    if (this.wsInitialized) return;
+    
+    this.wsClient = wsClient;
+    
+    // Suscribirse a actualizaciones de platos
+    this.wsClient.on('platos:update', (data) => {
+      console.log('📡 Actualización de platos recibida:', data);
+      this.handleWebSocketUpdate(data);
+    });
+    
+    // Suscribirse al canal
+    if (this.wsClient.isConnected) {
+      this.wsClient.subscribePlatos();
+    } else {
+      this.wsClient.on('connected', () => {
+        this.wsClient.subscribePlatos();
+      });
+    }
+    
+    this.wsInitialized = true;
+    console.log('✅ WebSocket conectado para Platos');
+  }
+
+  /**
+   * Manejar actualizaciones desde WebSocket
+   */
+  async handleWebSocketUpdate(data) {
+    const { action, plato } = data;
+    
+    switch (action) {
+      case 'created':
+        console.log('➕ Plato creado:', plato.nombre);
+        await this.cargar();
+        break;
+        
+      case 'updated':
+        console.log('✏️ Plato actualizado:', plato.nombre);
+        await this.cargar();
+        break;
+        
+      case 'deleted':
+        console.log('🗑️ Plato eliminado:', plato.id);
+        await this.cargar();
+        break;
+    }
   }
 
   /**

@@ -147,6 +147,25 @@
       // Crear panel de notificaciones
       window.notificationPanel = new NotificationPanel(window.notificationManager);
       
+      // Conectar módulos a WebSocket para actualizaciones en tiempo real
+      setTimeout(() => {
+        // Esperar a que los módulos estén cargados
+        if (window.ingredientesModule) {
+          window.ingredientesModule.connectWebSocket(window.wsClient);
+        }
+        if (window.inventarioModule) {
+          window.inventarioModule.connectWebSocket(window.wsClient);
+        }
+        if (window.pedidosModule) {
+          window.pedidosModule.connectWebSocket(window.wsClient);
+        }
+        if (window.platosModule) {
+          window.platosModule.connectWebSocket(window.wsClient);
+        }
+        
+        console.log('✅ Módulos conectados a WebSocket');
+      }, 500);
+      
       console.log('✅ Sistema de notificaciones inicializado');
       console.log('WebSocketClient disponible en: window.wsClient');
       console.log('NotificationManager disponible en: window.notificationManager');

@@ -17,6 +17,59 @@ class IngredientesModule {
     this.apiService = window.apiService;
     this.stateManager = window.stateManager;
     this.endpoint = '/ingredientes';
+    this.wsClient = null;
+    this.wsInitialized = false;
+  }
+
+  /**
+   * Conectar a WebSocket para recibir actualizaciones en tiempo real
+   */
+  connectWebSocket(wsClient) {
+    if (this.wsInitialized) return;
+    
+    this.wsClient = wsClient;
+    
+    // Suscribirse a actualizaciones de ingredientes
+    this.wsClient.on('ingredientes:update', (data) => {
+      console.log('📡 Actualización de ingredientes recibida:', data);
+      this.handleWebSocketUpdate(data);
+    });
+    
+    // Suscribirse al canal
+    if (this.wsClient.isConnected) {
+      this.wsClient.subscribeIngredientes();
+    } else {
+      this.wsClient.on('connected', () => {
+        this.wsClient.subscribeIngredientes();
+      });
+    }
+    
+    this.wsInitialized = true;
+    console.log('✅ WebSocket conectado para Ingredientes');
+  }
+
+  /**
+   * Manejar actualizaciones desde WebSocket
+   */
+  async handleWebSocketUpdate(data) {
+    const { action, ingrediente } = data;
+    
+    switch (action) {
+      case 'created':
+        console.log('➕ Ingrediente creado:', ingrediente.nombre);
+        await this.cargar();
+        break;
+        
+      case 'updated':
+        console.log('✏️  Ingrediente actualizado:', ingrediente.nombre);
+        await this.cargar();
+        break;
+        
+      case 'deleted':
+        console.log('🗑️  Ingrediente eliminado:', ingrediente.id);
+        await this.cargar();
+        break;
+    }
   }
 
   // ========================================================================
