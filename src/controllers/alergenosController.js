@@ -1,8 +1,9 @@
-const db = require('../config/database');
+const { getDatabase } = require('../utils/database');
 
 const alergenosController = {
   // Listar todos los alérgenos personalizados
   listar: (req, res) => {
+    const db = getDatabase();
     const query = `
       SELECT 
         id, nombre, descripcion, icono, activo, palabras_clave, created_at
@@ -21,6 +22,7 @@ const alergenosController = {
 
   // Obtener un alérgeno por ID
   obtenerPorId: (req, res) => {
+    const db = getDatabase();
     const { id } = req.params;
     
     const query = `
@@ -44,6 +46,7 @@ const alergenosController = {
 
   // Crear nuevo alérgeno personalizado
   crear: (req, res) => {
+    const db = getDatabase();
     const { nombre, descripcion, icono, palabras_clave } = req.body;
     
     if (!nombre) {
@@ -74,6 +77,7 @@ const alergenosController = {
 
   // Actualizar alérgeno
   actualizar: (req, res) => {
+    const db = getDatabase();
     const { id } = req.params;
     const { nombre, descripcion, icono, palabras_clave, activo } = req.body;
     
@@ -117,6 +121,7 @@ const alergenosController = {
 
   // Eliminar alérgeno
   eliminar: (req, res) => {
+    const db = getDatabase();
     const { id } = req.params;
     
     const query = 'DELETE FROM alergenos_personalizados WHERE id = ?';
@@ -137,6 +142,7 @@ const alergenosController = {
 
   // Listar alérgenos oficiales UE
   listarOficiales: (req, res) => {
+    const db = getDatabase();
     const query = `
       SELECT 
         id, codigo, nombre, descripcion, icono, palabras_clave, orden, activo, created_at
@@ -155,6 +161,7 @@ const alergenosController = {
 
   // Actualizar palabras clave de alérgeno oficial
   actualizarOficial: (req, res) => {
+    const db = getDatabase();
     const { id } = req.params;
     const { palabras_clave, activo } = req.body;
 
