@@ -13,7 +13,7 @@ let db = null;
  */
 function initializeDatabase() {
   return new Promise((resolve, reject) => {
-    const dbPath = path.join(__dirname, '../../data/hibo-cocina.db');
+    const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../data/hibo-cocina.db');
     
     db = new sqlite3.Database(dbPath, (err) => {
       if (err) {

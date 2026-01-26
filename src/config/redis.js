@@ -3,7 +3,7 @@
  * ===================
  */
 
-const RedisCache = require('../middleware/redisCache');
+const { RedisCache } = require('../middleware/redisCache');
 
 /**
  * Configuración de caché por ruta
