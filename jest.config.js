@@ -1,6 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  globalSetup: '<rootDir>/jest.globalSetup.js',
   testMatch: ['**/__tests__/**/*.test.js'],
   collectCoverageFrom: [
     'src/**/*.js',
