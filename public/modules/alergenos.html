@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Alérgenos - HIBO Cocina</title>
+</head>
+<body>
+    <div class="section-header">
+        <h2>Gestión de Alérgenos</h2>
+        <p class="section-description">Configure las palabras clave para detección automática de alérgenos en ingredientes y platos</p>
+    </div>
+
+    <!-- Tabs de navegación -->
+    <div class="tabs-container">
+        <button class="tab-button active" onclick="cambiarTab('oficiales')">
+            Alérgenos UE (14 oficiales)
+        </button>
+        <button class="tab-button" onclick="cambiarTab('personalizados')">
+            Alérgenos Personalizados
+        </button>
+    </div>
+
+    <!-- Tab: Alérgenos Oficiales UE -->
+    <div id="tab-oficiales" class="tab-content active">
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="guardarAlergenosOficiales()">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+            <button class="btn btn-secondary" onclick="cargarAlergenosOficiales()">
+                <i class="fas fa-undo"></i> Recargar
+            </button>
+        </div>
+
+        <div class="info-box info-warning">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>Palabras Clave:</strong> Separe las palabras con comas. Ejemplo: <code>leche, lactosa, nata, mantequilla</code>
+                <br>El sistema detectará automáticamente estos términos en los nombres de ingredientes.
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="tabla-oficiales" class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%">
+                            <input type="checkbox" id="check-all-oficiales" 
+                                   onchange="toggleSeleccionTodos('oficiales', [])">
+                        </th>
+                        <th style="width: 5%">Ord</th>
+                        <th style="width: 15%">Código</th>
+                        <th style="width: 15%">Nombre</th>
+                        <th style="width: 45%">Palabras Clave</th>
+                        <th style="width: 10%">Estado</th>
+                        <th style="width: 5%">Icono</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-oficiales">
+                    <tr>
+                        <td colspan="7" class="text-center">Cargando alérgenos oficiales...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Alérgenos Personalizados -->
+    <div id="tab-personalizados" class="tab-content">
+        <div class="action-bar">
+            <button class="btn btn-success" onclick="abrirModalAlergenoPersonalizado()">
+                <i class="fas fa-plus"></i> Nuevo Alérgeno
+            </button>
+            <button class="btn btn-secondary" onclick="cargarAlergenosPersonalizados()">
+                <i class="fas fa-sync"></i> Recargar
+            </button>
+        </div>
+
+        <div class="info-box info-info">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>Alérgenos Personalizados:</strong> Cree categorías adicionales según las necesidades específicas de su establecimiento.
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="tabla-personalizados" class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%">
+                            <input type="checkbox" id="check-all-personalizados" 
+                                   onchange="toggleSeleccionTodos('personalizados', [])">
+                        </th>
+                        <th style="width: 20%">Nombre</th>
+                        <th style="width: 30%">Descripción</th>
+                        <th style="width: 30%">Palabras Clave</th>
+                        <th style="width: 10%">Estado</th>
+                        <th style="width: 5%">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-personalizados">
+                    <tr>
+                        <td colspan="6" class="text-center">Cargando alérgenos personalizados...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal: Crear/Editar Alérgeno Personalizado -->
+    <div id="modal-alergeno-personalizado" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-alergeno-titulo">Nuevo Alérgeno Personalizado</h3>
+                <span class="close" onclick="cerrarModalAlergenoPersonalizado()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-alergeno-personalizado">
+                    <input type="hidden" id="alergeno-id">
+                    
+                    <div class="form-group">
+                        <label for="alergeno-nombre">Nombre *</label>
+                        <input type="text" id="alergeno-nombre" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alergeno-descripcion">Descripción</label>
+                        <textarea id="alergeno-descripcion" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alergeno-palabras">Palabras Clave</label>
+                        <input type="text" id="alergeno-palabras" class="form-control" 
+                               placeholder="palabra1, palabra2, palabra3">
+                        <small class="form-text">Separe las palabras con comas</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alergeno-icono">Icono (emoji o código Font Awesome)</label>
+                        <input type="text" id="alergeno-icono" class="form-control" 
+                               placeholder="🚫 o fas fa-ban">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="alergeno-activo" checked>
+                            Activo
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalAlergenoPersonalizado()">
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" onclick="guardarAlergenoPersonalizado()">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        let alergenosOficiales = [];
+        let alergenosPersonalizados = [];
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarAlergenosOficiales();
+            cargarAlergenosPersonalizados();
+        });
+
+        // ====================================================================
+        // TABS
+        // ====================================================================
+
+        function cambiarTab(tab) {
+            // Actualizar botones
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Actualizar contenido
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        // ====================================================================
+        // ALÉRGENOS OFICIALES
+        // ====================================================================
+
+        async function cargarAlergenosOficiales() {
+            try {
+                const response = await fetch('/api/alergenos/oficiales');
+                const data = await response.json();
+                
+                alergenosOficiales = data;
+                renderizarAlergenosOficiales();
+                
+                mostrarNotificacion('Alérgenos oficiales cargados', 'success');
+            } catch (error) {
+                console.error('Error al cargar alérgenos oficiales:', error);
+                mostrarNotificacion('Error al cargar alérgenos oficiales', 'error');
+            }
+        }
+
+        function renderizarAlergenosOficiales() {
+            const tbody = document.getElementById('tbody-oficiales');
+            
+            if (alergenosOficiales.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center">No hay alérgenos oficiales registrados</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = alergenosOficiales.map(alergeno => `
+                <tr data-id="${alergeno.id}">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" value="${alergeno.id}">
+                    </td>
+                    <td>${alergeno.orden || '-'}</td>
+                    <td><code>${alergeno.codigo}</code></td>
+                    <td><strong>${alergeno.nombre}</strong></td>
+                    <td>
+                        <input type="text" 
+                               class="form-control form-control-sm"
+                               value="${alergeno.palabras_clave || ''}"
+                               data-id="${alergeno.id}"
+                               onchange="actualizarPalabrasClave(${alergeno.id}, this.value, 'oficial')">
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" 
+                                   ${alergeno.activo ? 'checked' : ''}
+                                   onchange="toggleActivoOficial(${alergeno.id}, this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <td class="text-center">${alergeno.icono || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function actualizarPalabrasClave(id, palabras, tipo) {
+            const alergeno = tipo === 'oficial' 
+                ? alergenosOficiales.find(a => a.id === id)
+                : alergenosPersonalizados.find(a => a.id === id);
+            
+            if (alergeno) {
+                alergeno.palabras_clave = palabras;
+            }
+        }
+
+        function toggleActivoOficial(id, activo) {
+            const alergeno = alergenosOficiales.find(a => a.id === id);
+            if (alergeno) {
+                alergeno.activo = activo ? 1 : 0;
+            }
+        }
+
+        async function guardarAlergenosOficiales() {
+            try {
+                const promesas = alergenosOficiales.map(alergeno => 
+                    fetch(`/api/alergenos/oficiales/${alergeno.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            palabras_clave: alergeno.palabras_clave,
+                            activo: alergeno.activo
+                        })
+                    })
+                );
+
+                await Promise.all(promesas);
+                mostrarNotificacion('Alérgenos oficiales actualizados correctamente', 'success');
+                cargarAlergenosOficiales();
+            } catch (error) {
+                console.error('Error al guardar alérgenos oficiales:', error);
+                mostrarNotificacion('Error al guardar cambios', 'error');
+            }
+        }
+
+        // ====================================================================
+        // ALÉRGENOS PERSONALIZADOS
+        // ====================================================================
+
+        async function cargarAlergenosPersonalizados() {
+            try {
+                const response = await fetch('/api/alergenos/personalizados');
+                const data = await response.json();
+                
+                alergenosPersonalizados = data;
+                renderizarAlergenosPersonalizados();
+                
+                mostrarNotificacion('Alérgenos personalizados cargados', 'success');
+            } catch (error) {
+                console.error('Error al cargar alérgenos personalizados:', error);
+                mostrarNotificacion('Error al cargar alérgenos personalizados', 'error');
+            }
+        }
+
+        function renderizarAlergenosPersonalizados() {
+            const tbody = document.getElementById('tbody-personalizados');
+            
+            if (alergenosPersonalizados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No hay alérgenos personalizados. 
+                            <a href="#" onclick="abrirModalAlergenoPersonalizado(); return false;">Crear uno nuevo</a>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = alergenosPersonalizados.map(alergeno => `
+                <tr data-id="${alergeno.id}">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" value="${alergeno.id}">
+                    </td>
+                    <td><strong>${alergeno.nombre}</strong></td>
+                    <td>${alergeno.descripcion || '-'}</td>
+                    <td>
+                        <input type="text" 
+                               class="form-control form-control-sm"
+                               value="${alergeno.palabras_clave || ''}"
+                               data-id="${alergeno.id}"
+                               onchange="actualizarYGuardarPersonalizado(${alergeno.id}, 'palabras_clave', this.value)">
+                    </td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" 
+                                   ${alergeno.activo ? 'checked' : ''}
+                                   onchange="actualizarYGuardarPersonalizado(${alergeno.id}, 'activo', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <td>
+                        <button class="btn-icon" onclick="editarAlergenoPersonalizado(${alergeno.id})" 
+                                title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-danger" onclick="eliminarAlergenoPersonalizado(${alergeno.id})" 
+                                title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function actualizarYGuardarPersonalizado(id, campo, valor) {
+            try {
+                const alergeno = alergenosPersonalizados.find(a => a.id === id);
+                if (!alergeno) return;
+
+                const body = {
+                    nombre: alergeno.nombre,
+                    descripcion: alergeno.descripcion,
+                    icono: alergeno.icono,
+                    palabras_clave: alergeno.palabras_clave,
+                    activo: alergeno.activo
+                };
+
+                if (campo === 'activo') {
+                    body.activo = valor ? 1 : 0;
+                } else {
+                    body[campo] = valor;
+                }
+
+                const response = await fetch(`/api/alergenos/personalizados/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.ok) {
+                    alergeno[campo] = campo === 'activo' ? (valor ? 1 : 0) : valor;
+                    mostrarNotificacion('Actualizado correctamente', 'success');
+                } else {
+                    throw new Error('Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al actualizar', 'error');
+            }
+        }
+
+        // ====================================================================
+        // MODAL ALÉRGENO PERSONALIZADO
+        // ====================================================================
+
+        function abrirModalAlergenoPersonalizado(id = null) {
+            const modal = document.getElementById('modal-alergeno-personalizado');
+            const titulo = document.getElementById('modal-alergeno-titulo');
+            
+            if (id) {
+                const alergeno = alergenosPersonalizados.find(a => a.id === id);
+                if (!alergeno) return;
+
+                titulo.textContent = 'Editar Alérgeno Personalizado';
+                document.getElementById('alergeno-id').value = id;
+                document.getElementById('alergeno-nombre').value = alergeno.nombre;
+                document.getElementById('alergeno-descripcion').value = alergeno.descripcion || '';
+                document.getElementById('alergeno-palabras').value = alergeno.palabras_clave || '';
+                document.getElementById('alergeno-icono').value = alergeno.icono || '';
+                document.getElementById('alergeno-activo').checked = alergeno.activo;
+            } else {
+                titulo.textContent = 'Nuevo Alérgeno Personalizado';
+                document.getElementById('form-alergeno-personalizado').reset();
+                document.getElementById('alergeno-id').value = '';
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function cerrarModalAlergenoPersonalizado() {
+            document.getElementById('modal-alergeno-personalizado').style.display = 'none';
+        }
+
+        function editarAlergenoPersonalizado(id) {
+            abrirModalAlergenoPersonalizado(id);
+        }
+
+        async function guardarAlergenoPersonalizado() {
+            const id = document.getElementById('alergeno-id').value;
+            const nombre = document.getElementById('alergeno-nombre').value.trim();
+            const descripcion = document.getElementById('alergeno-descripcion').value.trim();
+            const palabras = document.getElementById('alergeno-palabras').value.trim();
+            const icono = document.getElementById('alergeno-icono').value.trim();
+            const activo = document.getElementById('alergeno-activo').checked ? 1 : 0;
+
+            if (!nombre) {
+                mostrarNotificacion('El nombre es requerido', 'error');
+                return;
+            }
+
+            try {
+                const body = { nombre, descripcion, palabras_clave: palabras, icono, activo };
+                const url = id 
+                    ? `/api/alergenos/personalizados/${id}`
+                    : '/api/alergenos/personalizados';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (response.ok) {
+                    mostrarNotificacion(
+                        id ? 'Alérgeno actualizado correctamente' : 'Alérgeno creado correctamente',
+                        'success'
+                    );
+                    cerrarModalAlergenoPersonalizado();
+                    cargarAlergenosPersonalizados();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Error al guardar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion(error.message, 'error');
+            }
+        }
+
+        async function eliminarAlergenoPersonalizado(id) {
+            if (!confirm('¿Está seguro de eliminar este alérgeno personalizado?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/alergenos/personalizados/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mostrarNotificacion('Alérgeno eliminado correctamente', 'success');
+                    cargarAlergenosPersonalizados();
+                } else {
+                    throw new Error('Error al eliminar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al eliminar alérgeno', 'error');
+            }
+        }
+
+        // ====================================================================
+        // UTILIDADES
+        // ====================================================================
+
+        function toggleSeleccionTodos(tabla, idsExcluir = []) {
+            const checkAll = document.getElementById(`check-all-${tabla}`);
+            const checkboxes = document.querySelectorAll(`#tab-${tabla} .row-checkbox`);
+            
+            checkboxes.forEach(cb => {
+                if (!idsExcluir.includes(parseInt(cb.value))) {
+                    cb.checked = checkAll.checked;
+                }
+            });
+        }
+    </script>
+
+    <style>
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            color: #495057;
+        }
+
+        .tab-button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .info-box i {
+            font-size: 1.5em;
+        }
+
+        .info-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .info-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        /* Switch toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #28a745;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Botones de icono */
+        .btn-icon {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px 8px;
+            color: #007bff;
+            transition: color 0.3s;
+        }
+
+        .btn-icon:hover {
+            color: #0056b3;
+        }
+
+        .btn-icon.btn-danger {
+            color: #dc3545;
+        }
+
+        .btn-icon.btn-danger:hover {
+            color: #bd2130;
+        }
+    </style>
+</body>
+</html>
