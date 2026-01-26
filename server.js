@@ -7,6 +7,7 @@
  * - Rutas modularizadas en /src/routes
  * - Manejo de errores consistente
  * - Redis caching integrado
+ * - WebSocket en tiempo real
  */
 
 require('dotenv').config();
@@ -16,6 +17,7 @@ const cors = require('cors');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
+const http = require('http');
 
 // Importar módulos del proyecto
 const { initializeDatabase, closeDatabase } = require('./src/utils/database');
@@ -33,6 +35,9 @@ const {
 // Importar Redis
 const { RedisCache, createCacheMiddleware, createInvalidationMiddleware } = require('./src/middleware/redisCache');
 const { CACHE_CONFIG, initializeRedis } = require('./src/config/redis');
+
+// Importar WebSocket
+const { initializeWebSocket } = require('./src/config/websocket');
 
 // Importar rutas
 const authRoutes = require('./src/routes/auth');
@@ -185,8 +190,18 @@ async function startServer() {
     await initializeDatabase();
     log.info('Base de datos inicializada correctamente');
 
-    // Iniciar servidor HTTP
-    const server = app.listen(PORT, () => {
+    // Crear servidor HTTP (para Express + WebSocket)
+    const server = http.createServer(app);
+
+    // Inicializar WebSocket
+    const io = initializeWebSocket(server);
+    log.info('WebSocket inicializado');
+
+    // Hacer io global para acceso desde rutas
+    app.locals.io = io;
+
+    // Iniciar servidor
+    server.listen(PORT, () => {
       log.info(`Servidor HIBO COCINA iniciado`, {
         port: PORT,
         environment: NODE_ENV,
@@ -224,6 +239,16 @@ async function startServer() {
       
       server.close(async () => {
         log.info('Servidor HTTP cerrado');
+        
+        try {
+          // Cerrar WebSocket
+          if (io) {
+            io.close();
+            log.info('WebSocket cerrado');
+          }
+        } catch (err) {
+          log.error('Error al cerrar WebSocket', err);
+        }
         
         try {
           // Cerrar Redis
