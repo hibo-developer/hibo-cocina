@@ -7,6 +7,7 @@ const ingredientesController = require('../controllers/ingredientesController');
 const { validate } = require('../middleware/validator');
 const { ingredientesSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const { emitIngredientesUpdate } = require('../utils/websocket-helper');
 
 /**
  * @swagger
@@ -123,7 +124,16 @@ router.get('/:id', ingredientesController.obtenerPorId);
  *                     data:
  *                       $ref: '#/components/schemas/Ingrediente'
  */
-router.post('/', createLimiter, validate(ingredientesSchemas.crear), ingredientesController.crear);
+router.post('/', createLimiter, validate(ingredientesSchemas.crear), async (req, res) => {
+  try {
+    const result = await ingredientesController.crear(req, res);
+    if (res.statusCode === 201 && result) {
+      emitIngredientesUpdate(req.app, result, 'created');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -159,7 +169,16 @@ router.post('/', createLimiter, validate(ingredientesSchemas.crear), ingrediente
  *       200:
  *         description: Ingrediente actualizado
  */
-router.put('/:id', updateLimiter, validate(ingredientesSchemas.actualizar), ingredientesController.actualizar);
+router.put('/:id', updateLimiter, validate(ingredientesSchemas.actualizar), async (req, res) => {
+  try {
+    const result = await ingredientesController.actualizar(req, res);
+    if (res.statusCode === 200 && result) {
+      emitIngredientesUpdate(req.app, result, 'updated');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -178,7 +197,17 @@ router.put('/:id', updateLimiter, validate(ingredientesSchemas.actualizar), ingr
  *       200:
  *         description: Ingrediente eliminado
  */
-router.delete('/:id', deleteLimiter, ingredientesController.eliminar);
+router.delete('/:id', deleteLimiter, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await ingredientesController.eliminar(req, res);
+    if (res.statusCode === 200) {
+      emitIngredientesUpdate(req.app, { id: parseInt(id) }, 'deleted');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 module.exports = router;
 

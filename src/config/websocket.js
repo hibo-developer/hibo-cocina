@@ -5,6 +5,7 @@
 
 const { Server } = require('socket.io');
 const { getLogger } = require('../utils/logger');
+const Notificacion = require('../models/Notificacion');
 
 const log = getLogger();
 
@@ -95,14 +96,14 @@ function initializeWebSocket(server) {
     });
 
     // ========== EVENTOS DE NOTIFICACIONES ==========
-    socket.on('request:notifications', (callback) => {
+    socket.on('request:notifications', async (callback) => {
       // Obtener notificaciones pendientes
-      const notifications = getPendingNotifications(socket.userId);
+      const notifications = await getPendingNotifications(socket.userId);
       callback(notifications);
     });
 
-    socket.on('mark:notification:read', (notificationId) => {
-      markNotificationAsRead(socket.userId, notificationId);
+    socket.on('mark:notification:read', async (notificationId) => {
+      await markNotificationAsRead(socket.userId, notificationId);
       io.to(`user:${socket.userId}`).emit('notification:read', { notificationId });
     });
 
@@ -223,32 +224,75 @@ function emitPedidosUpdate(io, pedido, action = 'updated', userId = null) {
 }
 
 /**
- * Emitir notificación
+ * Emitir notificación y guardar en BD
  */
-function emitNotification(io, userId, notification) {
-  io.to(`user:${userId}`).emit('notification:new', {
-    id: notification.id,
-    type: notification.type,
-    title: notification.title,
-    message: notification.message,
-    timestamp: new Date(),
-    read: false
-  });
+async function emitNotification(io, userId, notification) {
+  try {
+    // Verificar preferencias del usuario
+    const debeRecibir = await Notificacion.debeRecibirNotificacion(userId, notification.type);
+    
+    if (!debeRecibir) {
+      log.info(`Notificación bloqueada por preferencias del usuario ${userId}`);
+      return;
+    }
+
+    // Guardar en BD
+    const notifGuardada = await Notificacion.crear({
+      usuario_id: userId,
+      tipo: notification.type,
+      titulo: notification.title,
+      mensaje: notification.message,
+      datos: notification.data
+    });
+
+    // Emitir a WebSocket
+    io.to(`user:${userId}`).emit('notification:new', {
+      id: notifGuardada.id,
+      type: notifGuardada.tipo,
+      title: notifGuardada.titulo,
+      message: notifGuardada.mensaje,
+      timestamp: notifGuardada.fecha_creacion,
+      read: false,
+      data: notifGuardada.datos
+    });
+
+    log.info(`Notificación enviada y guardada para usuario ${userId}`);
+  } catch (error) {
+    log.error('Error emitiendo notificación:', error);
+  }
 }
 
 /**
  * Obtener notificaciones pendientes del usuario
  */
-function getPendingNotifications(userId) {
-  // TODO: Implementar con base de datos
-  return [];
+async function getPendingNotifications(userId) {
+  try {
+    const notificaciones = await Notificacion.obtenerNoLeidasPorUsuario(userId);
+    return notificaciones.map(n => ({
+      id: n.id,
+      type: n.tipo,
+      title: n.titulo,
+      message: n.mensaje,
+      timestamp: n.fecha_creacion,
+      read: n.leida,
+      data: n.datos
+    }));
+  } catch (error) {
+    log.error('Error obteniendo notificaciones pendientes:', error);
+    return [];
+  }
 }
 
 /**
  * Marcar notificación como leída
  */
-function markNotificationAsRead(userId, notificationId) {
-  // TODO: Implementar con base de datos
+async function markNotificationAsRead(userId, notificationId) {
+  try {
+    await Notificacion.marcarComoLeida(notificationId);
+    log.info(`Notificación ${notificationId} marcada como leída por usuario ${userId}`);
+  } catch (error) {
+    log.error('Error marcando notificación como leída:', error);
+  }
 }
 
 /**

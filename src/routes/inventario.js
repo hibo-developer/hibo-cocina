@@ -7,6 +7,7 @@ const inventarioController = require('../controllers/inventarioController');
 const { validate } = require('../middleware/validator');
 const { inventarioSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const { emitInventarioUpdate } = require('../utils/websocket-helper');
 
 /**
  * @swagger
@@ -105,7 +106,16 @@ router.get('/:id', inventarioController.obtenerPorId);
  *       201:
  *         description: Item creado
  */
-router.post('/', createLimiter, validate(inventarioSchemas.crear), inventarioController.crear);
+router.post('/', createLimiter, validate(inventarioSchemas.crear), async (req, res) => {
+  try {
+    const result = await inventarioController.crear(req, res);
+    if (res.statusCode === 201 && result) {
+      emitInventarioUpdate(req.app, result, 'created');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -139,7 +149,26 @@ router.post('/', createLimiter, validate(inventarioSchemas.crear), inventarioCon
  *       200:
  *         description: Item actualizado
  */
-router.put('/:id', updateLimiter, validate(inventarioSchemas.actualizar), inventarioController.actualizar);
+router.put('/:id', updateLimiter, validate(inventarioSchemas.actualizar), async (req, res) => {
+  try {
+    const result = await inventarioController.actualizar(req, res);
+    if (res.statusCode === 200 && result) {
+      // Emitir actualización
+      emitInventarioUpdate(req.app, result, 'updated');
+      
+      // Verificar stock bajo y emitir alerta
+      if (result.cantidad_actual < result.cantidad_minima) {
+        emitInventarioUpdate(req.app, {
+          ...result,
+          alerta: true,
+          mensaje: `Stock bajo: ${result.cantidad_actual} < ${result.cantidad_minima}`
+        }, 'low-stock');
+      }
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -158,7 +187,17 @@ router.put('/:id', updateLimiter, validate(inventarioSchemas.actualizar), invent
  *       200:
  *         description: Item eliminado
  */
-router.delete('/:id', deleteLimiter, inventarioController.eliminar);
+router.delete('/:id', deleteLimiter, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await inventarioController.eliminar(req, res);
+    if (res.statusCode === 200) {
+      emitInventarioUpdate(req.app, { id: parseInt(id) }, 'deleted');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 module.exports = router;
 

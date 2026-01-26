@@ -7,6 +7,7 @@ const pedidosController = require('../controllers/pedidosController');
 const { validate } = require('../middleware/validator');
 const { pedidosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const { emitPedidosUpdate, emitNotification } = require('../utils/websocket-helper');
 
 /**
  * @swagger
@@ -148,7 +149,26 @@ router.get('/:id', pedidosController.obtenerPorId);
  *                     data:
  *                       $ref: '#/components/schemas/Pedido'
  */
-router.post('/', validate(pedidosSchemas.crear), pedidosController.crear);
+router.post('/', validate(pedidosSchemas.crear), async (req, res) => {
+  try {
+    const result = await pedidosController.crear(req, res);
+    if (res.statusCode === 201 && result) {
+      emitPedidosUpdate(req.app, result, 'created', result.usuario_id);
+      
+      // Notificación personal al usuario
+      if (result.usuario_id) {
+        emitNotification(req.app, result.usuario_id, {
+          type: 'pedido',
+          title: 'Pedido Creado',
+          message: `Tu pedido #${result.id} ha sido creado exitosamente`,
+          data: { pedidoId: result.id }
+        });
+      }
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -179,7 +199,35 @@ router.post('/', validate(pedidosSchemas.crear), pedidosController.crear);
  *       200:
  *         description: Pedido actualizado
  */
-router.put('/:id', validate(pedidosSchemas.actualizar), pedidosController.actualizar);
+router.put('/:id', validate(pedidosSchemas.actualizar), async (req, res) => {
+  try {
+    const result = await pedidosController.actualizar(req, res);
+    if (res.statusCode === 200 && result) {
+      emitPedidosUpdate(req.app, result, 'updated', result.usuario_id);
+      
+      // Notificación de cambio de estado si cambió
+      if (req.body.estado && result.usuario_id) {
+        const mensajesEstado = {
+          'pendiente': 'está pendiente de confirmación',
+          'confirmado': 'ha sido confirmado',
+          'en_preparacion': 'está en preparación',
+          'listo': 'está listo para recoger',
+          'entregado': 'ha sido entregado',
+          'cancelado': 'ha sido cancelado'
+        };
+        
+        emitNotification(req.app, result.usuario_id, {
+          type: 'pedido',
+          title: 'Estado de Pedido Actualizado',
+          message: `Tu pedido #${result.id} ${mensajesEstado[result.estado] || 'ha sido actualizado'}`,
+          data: { pedidoId: result.id, nuevoEstado: result.estado }
+        });
+      }
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -198,7 +246,17 @@ router.put('/:id', validate(pedidosSchemas.actualizar), pedidosController.actual
  *       200:
  *         description: Pedido eliminado
  */
-router.delete('/:id', pedidosController.eliminar);
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pedidosController.eliminar(req, res);
+    if (res.statusCode === 200) {
+      emitPedidosUpdate(req.app, { id: parseInt(id) }, 'deleted');
+    }
+  } catch (error) {
+    // Error ya manejado por el controlador
+  }
+});
 
 module.exports = router;
 
