@@ -4,9 +4,21 @@
  */
 
 const path = require('path');
+const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
 
 // Usar base de datos de prueba
-process.env.DATABASE_PATH = path.join(__dirname, 'data', 'test-hibo-cocina.db');
+const testDbPath = path.join(__dirname, 'data', 'test-hibo-cocina.db');
+process.env.DATABASE_PATH = testDbPath;
+
+// Limpiar BD anterior de pruebas
+try {
+  if (fs.existsSync(testDbPath)) {
+    fs.unlinkSync(testDbPath);
+  }
+} catch (e) {
+  // Ignorar errores si el archivo está en uso
+}
 
 // Deshabilitar Redis en tests - usar memoryStore
 process.env.REDIS_ENABLED = 'false';
@@ -39,5 +51,12 @@ jest.mock('ioredis', () => {
 
 console.log('[TEST SETUP] Redis disabled for testing');
 console.log(`[TEST SETUP] Using database: ${process.env.DATABASE_PATH}`);
+
+// Ejecutar migraciones en beforeAll global
+module.exports = {
+  setupFilesAfterEnv: [],
+  testEnvironment: 'node'
+};
+
 
 
