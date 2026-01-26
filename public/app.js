@@ -71,9 +71,44 @@ function inicializarEventosBasicos() {
 
 function inicializarEventos() {
   // Navegación
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      cambiarSeccion(btn.dataset.section);
+  document.querySelectorAll('.nav-btn:not(.dropdown-toggle)').forEach(btn => {
+    if (btn.dataset.section) {
+      btn.addEventListener('click', () => {
+        cambiarSeccion(btn.dataset.section);
+      });
+    }
+  });
+
+  // Dropdown navigation
+  document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Cerrar otros dropdowns
+      document.querySelectorAll('.nav-dropdown').forEach(other => {
+        if (other !== dropdown) {
+          other.classList.remove('active');
+        }
+      });
+      // Toggle este dropdown
+      dropdown.classList.toggle('active');
+    });
+
+    // Items del menú dropdown
+    dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
+        cambiarSeccion(item.dataset.section);
+        dropdown.classList.remove('active');
+      });
+    });
+  });
+
+  // Cerrar dropdowns al hacer click fuera
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+      dropdown.classList.remove('active');
     });
   });
 

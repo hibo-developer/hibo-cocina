@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="css/sanidad-mejorado.css">
   <link rel="stylesheet" href="css/produccion-mejorado.css">
@@ -21,20 +22,82 @@
         <h1>🍳 HIBO COCINA</h1>
         <p>Sistema de Gestión Integral de Producción y Pedidos</p>
       </div>
-    </header>
+      
+      <!-- Navbar integrado en el header -->
+      <nav class="navbar">
+        <div class="navbar-left">
+          <button class="nav-btn active" data-section="dashboard">
+            <i class="fas fa-home"></i> Inicio
+          </button>
+        </div>
 
-    <nav class="navbar">
-      <button class="nav-btn active" data-section="dashboard">Dashboard</button>
-      <button class="nav-btn" data-section="platos">Platos</button>
-      <button class="nav-btn" data-section="ingredientes">Ingredientes</button>
-      <button class="nav-btn" data-section="escandallos">Escandallos</button>
-      <button class="nav-btn" data-section="inventario">Inventario</button>
-      <button class="nav-btn" data-section="pedidos">Pedidos</button>
-      <button class="nav-btn" data-section="produccion">Producción</button>
-      <button class="nav-btn" data-section="sanidad">Sanidad</button>
-      <button class="nav-btn" data-section="alergenos">Alérgenos</button>
-      <button class="nav-btn" data-section="estadisticas">Estadísticas</button>
-    </nav>
+        <div class="navbar-right">
+          <!-- Grupo: Gestión de Datos -->
+          <div class="nav-dropdown">
+            <button class="nav-btn dropdown-toggle">
+              <i class="fas fa-database"></i> Gestión <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-section="platos">
+                <i class="fas fa-plate-wheat"></i> Platos
+              </button>
+              <button class="dropdown-item" data-section="ingredientes">
+                <i class="fas fa-carrot"></i> Ingredientes
+              </button>
+              <button class="dropdown-item" data-section="escandallos">
+                <i class="fas fa-file-invoice"></i> Escandallos
+              </button>
+            </div>
+          </div>
+
+          <!-- Grupo: Control de Stock -->
+          <div class="nav-dropdown">
+            <button class="nav-btn dropdown-toggle">
+              <i class="fas fa-boxes"></i> Stock <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-section="inventario">
+                <i class="fas fa-warehouse"></i> Inventario
+              </button>
+              <button class="dropdown-item" data-section="pedidos">
+                <i class="fas fa-shopping-cart"></i> Pedidos
+              </button>
+            </div>
+          </div>
+
+          <!-- Grupo: Producción y Calidad -->
+          <div class="nav-dropdown">
+            <button class="nav-btn dropdown-toggle">
+              <i class="fas fa-industry"></i> Producción <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-section="produccion">
+                <i class="fas fa-tasks"></i> Partidas
+              </button>
+              <button class="dropdown-item" data-section="sanidad">
+                <i class="fas fa-shield-alt"></i> Sanidad
+              </button>
+            </div>
+          </div>
+
+          <!-- Grupo: Configuración -->
+          <div class="nav-dropdown">
+            <button class="nav-btn dropdown-toggle">
+              <i class="fas fa-cog"></i> Config <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item" data-section="alergenos">
+                <i class="fas fa-exclamation-triangle"></i> Alérgenos
+              </button>
+            </div>
+          </div>
+
+          <button class="nav-btn" data-section="estadisticas">
+            <i class="fas fa-chart-bar"></i> Estadísticas
+          </button>
+        </div>
+      </nav>
+    </header>
 
     <main class="main-content">
       <!-- Contenedor donde se cargarán los módulos dinámicamente -->
