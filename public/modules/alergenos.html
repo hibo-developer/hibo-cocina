@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Alérgenos - HIBO Cocina</title>
-</head>
-<body>
-    <div class="section-header">
-        <h2>Gestión de Alérgenos</h2>
-        <p class="section-description">Configure las palabras clave para detección automática de alérgenos en ingredientes y platos</p>
-    </div>
+<!-- Sección Alérgenos -->
+<section id="alergenos" class="section" style="display:none;">
+    <h2>⚠️ Gestión de Alérgenos</h2>
+    <p class="section-description">Configure las palabras clave para detección automática de alérgenos en ingredientes y platos</p>
 
     <!-- Tabs de navegación -->
     <div class="tabs-container">
@@ -506,12 +498,10 @@
             checkboxes.forEach(cb => {
                 if (!idsExcluir.includes(parseInt(cb.value))) {
                     cb.checked = checkAll.checked;
-                }
             });
         }
-    </script>
-
-    <style>
+    </style>
+</section>
         /* Tabs */
         .tabs-container {
             display: flex;
@@ -642,5 +632,4 @@
             color: #bd2130;
         }
     </style>
-</body>
-</html>
+</section>

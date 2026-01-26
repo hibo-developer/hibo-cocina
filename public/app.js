@@ -255,6 +255,9 @@ function cambiarSeccion(seccion) {
       break;
     case 'alergenos':
       // El módulo de alérgenos carga sus propios datos
+      if (typeof inicializarModuloAlergenos === 'function') {
+        inicializarModuloAlergenos();
+      }
       console.log('Módulo de alérgenos cargado');
       break;
     case 'estadisticas':
