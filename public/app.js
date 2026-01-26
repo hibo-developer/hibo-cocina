@@ -84,7 +84,13 @@ function inicializarEventos() {
     const toggle = dropdown.querySelector('.dropdown-toggle');
     const menu = dropdown.querySelector('.dropdown-menu');
     
+    if (!toggle) {
+      console.warn('No se encontró dropdown-toggle', dropdown);
+      return;
+    }
+    
     toggle.addEventListener('click', (e) => {
+      console.log('Click en dropdown-toggle', toggle.textContent);
       e.stopPropagation();
       // Cerrar otros dropdowns
       document.querySelectorAll('.nav-dropdown').forEach(other => {
@@ -94,22 +100,27 @@ function inicializarEventos() {
       });
       // Toggle este dropdown
       dropdown.classList.toggle('active');
+      console.log('Dropdown activo:', dropdown.classList.contains('active'));
     });
 
     // Items del menú dropdown
     dropdown.querySelectorAll('.dropdown-item').forEach(item => {
       item.addEventListener('click', () => {
+        console.log('Click en dropdown-item:', item.textContent);
         cambiarSeccion(item.dataset.section);
         dropdown.classList.remove('active');
       });
     });
   });
 
-  // Cerrar dropdowns al hacer click fuera
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
-      dropdown.classList.remove('active');
-    });
+  // Cerrar dropdowns al hacer click fuera (excepto en elementos del dropdown)
+  document.addEventListener('click', (e) => {
+    // No cerrar si hacemos click dentro de un dropdown
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+        dropdown.classList.remove('active');
+      });
+    }
   });
 
   // Busqueda y filtros
