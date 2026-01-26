@@ -6,6 +6,7 @@
  * - Middleware centralizado
  * - Rutas modularizadas en /src/routes
  * - Manejo de errores consistente
+ * - Redis caching integrado
  */
 
 require('dotenv').config();
@@ -28,6 +29,10 @@ const {
   updateLimiter, 
   deleteLimiter 
 } = require('./src/middleware/rateLimiter');
+
+// Importar Redis
+const { RedisCache, createCacheMiddleware, createInvalidationMiddleware } = require('./src/middleware/redisCache');
+const { CACHE_CONFIG, initializeRedis } = require('./src/config/redis');
 
 // Importar rutas
 const authRoutes = require('./src/routes/auth');
@@ -76,6 +81,36 @@ if (NODE_ENV === 'development') {
     next();
   });
 }
+
+// ============================================================================
+// REDIS CACHING
+// ============================================================================
+
+const redisCache = initializeRedis();
+
+// Middleware de caché para GET requests
+app.use('/api', createCacheMiddleware(redisCache, {
+  ttl: 3600,
+  cacheable: CACHE_CONFIG.cacheable,
+  ttlByRoute: CACHE_CONFIG.ttlByRoute
+}));
+
+// Middleware de invalidación para mutaciones
+app.use('/api', createInvalidationMiddleware(redisCache, {
+  invalidationMap: CACHE_CONFIG.invalidationMap
+}));
+
+// Endpoint de estadísticas de caché
+app.get('/api/cache-stats', (req, res) => {
+  const stats = redisCache.getStats();
+  res.json(createResponse(true, stats, 'Cache statistics'));
+});
+
+// Endpoint para limpiar caché
+app.post('/api/cache-clear', (req, res) => {
+  redisCache.clear();
+  res.json(createResponse(true, null, 'Cache cleared'));
+});
 
 // ============================================================================
 // DOCUMENTACIÓN API
@@ -189,6 +224,14 @@ async function startServer() {
       
       server.close(async () => {
         log.info('Servidor HTTP cerrado');
+        
+        try {
+          // Cerrar Redis
+          await redisCache.close();
+          log.info('Redis cerrado');
+        } catch (err) {
+          log.error('Error al cerrar Redis', err);
+        }
         
         try {
           await closeDatabase();
