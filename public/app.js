@@ -130,70 +130,98 @@ function inicializarEventos() {
       const termino = e.target.value.toLowerCase().trim();
       
       if (termino.length === 0) {
+        console.log('Búsqueda limpia');
         return;
       }
       
+      // Búsqueda en el DOM actual (más confiable que arrays de estado)
       const resultados = {
         platos: [],
         ingredientes: [],
         escandallos: [],
         pedidos: [],
-        inventario: [],
-        partidas: [],
-        sanidad: [],
-        alergenos: []
+        inventario: []
       };
 
-      // Buscar en platos
-      if (estadoApp.platosData && estadoApp.platosData.length > 0) {
-        resultados.platos = estadoApp.platosData.filter(p => 
-          p.nombre.toLowerCase().includes(termino) ||
-          (p.grupo && p.grupo.toLowerCase().includes(termino)) ||
-          (p.descripcion && p.descripcion.toLowerCase().includes(termino))
-        );
-      }
+      // Buscar en tablas de platos
+      const tablasPlatos = document.querySelectorAll('#platos table tbody tr');
+      tablasPlatos.forEach(fila => {
+        const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+        if (nombre.includes(termino)) {
+          resultados.platos.push({
+            nombre: fila.querySelector('td:first-child')?.textContent || '',
+            fila: fila
+          });
+        }
+      });
 
-      // Buscar en ingredientes
-      if (estadoApp.ingredientesData && estadoApp.ingredientesData.length > 0) {
-        resultados.ingredientes = estadoApp.ingredientesData.filter(i => 
-          i.nombre.toLowerCase().includes(termino) ||
-          (i.familia && i.familia.toLowerCase().includes(termino)) ||
-          (i.proveedor && i.proveedor.toLowerCase().includes(termino))
-        );
-      }
+      // Buscar en tablas de ingredientes
+      const tablasIngredientes = document.querySelectorAll('#ingredientes table tbody tr');
+      tablasIngredientes.forEach(fila => {
+        const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+        if (nombre.includes(termino)) {
+          resultados.ingredientes.push({
+            nombre: fila.querySelector('td:first-child')?.textContent || '',
+            fila: fila
+          });
+        }
+      });
 
-      // Buscar en escandallos
-      if (estadoApp.escandallosData && estadoApp.escandallosData.length > 0) {
-        resultados.escandallos = estadoApp.escandallosData.filter(e => 
-          e.nombre.toLowerCase().includes(termino) ||
-          (e.referencia && e.referencia.toLowerCase().includes(termino))
-        );
-      }
+      // Buscar en tablas de escandallos
+      const tablasEscandallos = document.querySelectorAll('#escandallos table tbody tr');
+      tablasEscandallos.forEach(fila => {
+        const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+        if (nombre.includes(termino)) {
+          resultados.escandallos.push({
+            nombre: fila.querySelector('td:first-child')?.textContent || '',
+            fila: fila
+          });
+        }
+      });
 
-      // Buscar en pedidos
-      if (estadoApp.pedidosData && estadoApp.pedidosData.length > 0) {
-        resultados.pedidos = estadoApp.pedidosData.filter(p => 
-          (p.proveedor && p.proveedor.toLowerCase().includes(termino)) ||
-          (p.referencia && p.referencia.toLowerCase().includes(termino)) ||
-          (p.estado && p.estado.toLowerCase().includes(termino))
-        );
-      }
+      // Buscar en tablas de pedidos
+      const tablasPedidos = document.querySelectorAll('#pedidos table tbody tr');
+      tablasPedidos.forEach(fila => {
+        const proveedor = fila.querySelector('td')?.textContent.toLowerCase() || '';
+        if (proveedor.includes(termino)) {
+          resultados.pedidos.push({
+            nombre: fila.querySelector('td')?.textContent || '',
+            fila: fila
+          });
+        }
+      });
 
-      // Buscar en inventario
-      if (estadoApp.inventarioData && estadoApp.inventarioData.length > 0) {
-        resultados.inventario = estadoApp.inventarioData.filter(inv => 
-          (inv.nombre && inv.nombre.toLowerCase().includes(termino)) ||
-          (inv.ubicacion && inv.ubicacion.toLowerCase().includes(termino))
-        );
-      }
+      // Buscar en tablas de inventario
+      const tablasInventario = document.querySelectorAll('#inventario table tbody tr');
+      tablasInventario.forEach(fila => {
+        const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+        if (nombre.includes(termino)) {
+          resultados.inventario.push({
+            nombre: fila.querySelector('td:first-child')?.textContent || '',
+            fila: fila
+          });
+        }
+      });
 
       // Contar resultados
       const totalResultados = Object.values(resultados).reduce((sum, arr) => sum + arr.length, 0);
       
       if (totalResultados > 0) {
         console.log(`✓ Búsqueda: "${termino}" - ${totalResultados} resultado(s)`, resultados);
+        // Destacar las filas encontradas
+        document.querySelectorAll('table tbody tr').forEach(fila => {
+          fila.style.backgroundColor = '';
+        });
+        Object.values(resultados).forEach(arr => {
+          arr.forEach(item => {
+            item.fila.style.backgroundColor = 'rgba(255, 193, 7, 0.2)';
+          });
+        });
       } else {
         console.log(`✗ Búsqueda: "${termino}" - Sin resultados`);
+        document.querySelectorAll('table tbody tr').forEach(fila => {
+          fila.style.backgroundColor = '';
+        });
       }
     });
 
@@ -203,60 +231,60 @@ function inicializarEventos() {
         const termino = e.target.value.toLowerCase().trim();
         
         // Buscar en platos primero
-        if (estadoApp.platosData && estadoApp.platosData.length > 0) {
-          const platoEncontrado = estadoApp.platosData.find(p => 
-            p.nombre.toLowerCase().includes(termino)
-          );
-          if (platoEncontrado) {
+        const filasPlatos = document.querySelectorAll('#platos table tbody tr');
+        for (let fila of filasPlatos) {
+          const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+          if (nombre.includes(termino)) {
             cambiarSeccion('platos');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
             globalSearch.value = '';
             return;
           }
         }
 
         // Luego en ingredientes
-        if (estadoApp.ingredientesData && estadoApp.ingredientesData.length > 0) {
-          const ingredienteEncontrado = estadoApp.ingredientesData.find(i => 
-            i.nombre.toLowerCase().includes(termino)
-          );
-          if (ingredienteEncontrado) {
+        const filasIngredientes = document.querySelectorAll('#ingredientes table tbody tr');
+        for (let fila of filasIngredientes) {
+          const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+          if (nombre.includes(termino)) {
             cambiarSeccion('ingredientes');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
             globalSearch.value = '';
             return;
           }
         }
 
         // Luego en escandallos
-        if (estadoApp.escandallosData && estadoApp.escandallosData.length > 0) {
-          const escandaloEncontrado = estadoApp.escandallosData.find(e => 
-            e.nombre.toLowerCase().includes(termino)
-          );
-          if (escandaloEncontrado) {
+        const filasEscandallos = document.querySelectorAll('#escandallos table tbody tr');
+        for (let fila of filasEscandallos) {
+          const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+          if (nombre.includes(termino)) {
             cambiarSeccion('escandallos');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
             globalSearch.value = '';
             return;
           }
         }
 
         // Luego en pedidos
-        if (estadoApp.pedidosData && estadoApp.pedidosData.length > 0) {
-          const pedidoEncontrado = estadoApp.pedidosData.find(p => 
-            (p.proveedor && p.proveedor.toLowerCase().includes(termino))
-          );
-          if (pedidoEncontrado) {
+        const filasPedidos = document.querySelectorAll('#pedidos table tbody tr');
+        for (let fila of filasPedidos) {
+          const proveedor = fila.querySelector('td')?.textContent.toLowerCase() || '';
+          if (proveedor.includes(termino)) {
             cambiarSeccion('pedidos');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
             globalSearch.value = '';
             return;
           }
         }
 
         // Finalmente en inventario
-        if (estadoApp.inventarioData && estadoApp.inventarioData.length > 0) {
-          const inventarioEncontrado = estadoApp.inventarioData.find(inv => 
-            (inv.nombre && inv.nombre.toLowerCase().includes(termino))
-          );
-          if (inventarioEncontrado) {
+        const filasInventario = document.querySelectorAll('#inventario table tbody tr');
+        for (let fila of filasInventario) {
+          const nombre = fila.querySelector('td:first-child')?.textContent.toLowerCase() || '';
+          if (nombre.includes(termino)) {
             cambiarSeccion('inventario');
+            fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
             globalSearch.value = '';
             return;
           }
