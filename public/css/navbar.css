@@ -112,7 +112,7 @@
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  right: 0;
+  left: 0;
   background: white;
   border: 1px solid var(--light-gray);
   border-radius: 4px;
@@ -120,7 +120,7 @@
   min-width: 200px;
   display: none;
   flex-direction: column;
-  z-index: 1000;
+  z-index: 2000;
   margin-top: 5px;
 }
 

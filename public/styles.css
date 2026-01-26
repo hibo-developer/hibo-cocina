@@ -63,7 +63,8 @@ body::-webkit-scrollbar {
 }
 
 /* Header */
-.header {
+/* DEPRECATED: Definiciones movidas a css/navbar.css */
+/* .header {
   background: linear-gradient(135deg, #1a3a52 0%, #2c5f8d 100%);
   color: white;
   padding: 30px 20px;
@@ -84,15 +85,15 @@ body::-webkit-scrollbar {
 .header p {
   font-size: 0.95em;
   opacity: 0.9;
-}
+} */
 
 /* Navigation */
-.navbar {
+/* DEPRECATED: Definiciones movidas a css/navbar.css */
+/* .navbar {
   display: flex;
   background: white;
   border-bottom: 2px solid var(--light-gray);
   overflow-x: auto;
-  overflow-y: hidden;
   padding: 5px 20px;
   position: fixed;
   top: 127px;
@@ -105,7 +106,7 @@ body::-webkit-scrollbar {
 
 .navbar::-webkit-scrollbar {
   display: none;
-}
+} */
 
 .nav-btn {
   flex: 1;
