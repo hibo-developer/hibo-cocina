@@ -259,7 +259,7 @@ window.abrirModalAlergenoPersonalizado = function(id = null) {
         document.getElementById('alergeno-id').value = '';
     }
 
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 };
 
 window.cerrarModalAlergenoPersonalizado = function() {

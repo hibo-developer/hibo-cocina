@@ -44,9 +44,14 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
   animation: fadeIn 0.3s ease;
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+
+.modal.show {
+  display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
+  align-items: flex-start;
 }
 
 body.modal-open {
@@ -56,16 +61,17 @@ body.modal-open {
 .modal-content {
   background-color: white;
   padding: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 700px;
-  max-height: 85vh;
+  max-height: 90vh;
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s ease;
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin: auto;
 }
 
 /* Modal overlay dinámico */
@@ -98,7 +104,7 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   z-index: 10;
 }
 
@@ -197,7 +203,7 @@ body.modal-open {
 #modalFields textarea {
   padding: 10px 12px;
   border: 2px solid #e0e0e0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: 0.85em;
   font-family: inherit;
   transition: var(--transition);
@@ -232,7 +238,7 @@ body.modal-open {
   padding: 20px 30px;
   border-top: 1px solid #e0e0e0;
   background-color: white;
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   position: sticky;
   bottom: 0;
   z-index: 10;
@@ -253,7 +259,7 @@ body.modal-open {
 .btn-cancel {
   padding: 10px 24px;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: var(--transition);
