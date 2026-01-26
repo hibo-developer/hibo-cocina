@@ -2,26 +2,11 @@
  * Tests para las rutas de PLATOS
  */
 const request = require('supertest');
-const path = require('path');
-const { initializeTestDatabase } = require('./helpers/testHelper');
-
-// Mock de Express
-const express = require('express');
-const bodyParser = require('body-parser');
+const { app, initializeTestDatabase } = require('./helpers/testHelper');
 
 describe('Platos API Routes', () => {
-  let app;
-  let server;
-
   beforeAll(async () => {
     await initializeTestDatabase();
-    
-    app = express();
-    app.use(bodyParser.json());
-    
-    // Importar rutas
-    const platosRoutes = require('../src/routes/platos');
-    app.use('/api/platos', platosRoutes);
   });
 
   test('GET /api/platos debería retornar código 200', async () => {
@@ -37,7 +22,9 @@ describe('Platos API Routes', () => {
       .get('/api/platos')
       .expect(200);
 
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('data');
+    expect(Array.isArray(response.body.data)).toBe(true);
   });
 
   test('POST /api/platos debería crear un plato válido', async () => {
@@ -52,7 +39,8 @@ describe('Platos API Routes', () => {
       .send(nuevoPlato)
       .expect(201);
 
-    expect(response.body).toBeDefined();
-    expect(response.body.id).toBeDefined();
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveProperty('id');
   });
 });

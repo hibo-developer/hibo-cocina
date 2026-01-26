@@ -52,6 +52,21 @@ jest.mock('ioredis', () => {
 console.log('[TEST SETUP] Redis disabled for testing');
 console.log(`[TEST SETUP] Using database: ${process.env.DATABASE_PATH}`);
 
+// Inicializar base de datos de test ejecutando el script de inicialización
+const { execSync } = require('child_process');
+
+try {
+  // Ejecutar script de inicialización de forma síncrona
+  execSync('node scripts/export-schema.js && node scripts/init-test-db.js', {
+    stdio: 'inherit',
+    cwd: __dirname
+  });
+  console.log('[TEST SETUP] Test database initialized');
+} catch (err) {
+  console.error('[TEST SETUP] Error initializing test database:', err);
+  process.exit(1);
+}
+
 // Ejecutar migraciones en beforeAll global
 module.exports = {
   setupFilesAfterEnv: [],

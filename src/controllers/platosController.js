@@ -60,7 +60,7 @@ async function obtenerPorId(req, res, next) {
  */
 async function crear(req, res, next) {
   try {
-    const { codigo, nombre, categoria, pvp, coste_produccion, activo, descripcion } = req.body;
+    const { codigo, nombre, tipo, pvp, coste_produccion, activo, descripcion } = req.body;
     
     // Validaciones básicas
     if (!nombre || !codigo) {
@@ -71,8 +71,8 @@ async function crear(req, res, next) {
 
     const db = getDatabase();
     db.run(
-      'INSERT INTO platos (codigo, nombre, categoria, pvp, coste_produccion, activo, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [codigo, nombre, categoria, pvp || 0, coste_produccion || 0, activo !== false ? 1 : 0, descripcion],
+      'INSERT INTO platos (codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [codigo, nombre, tipo, pvp || 0, coste_produccion || 0, activo !== false ? 1 : 0, descripcion],
       function(err) {
         if (err) {
           console.error('Error al crear plato:', err);
