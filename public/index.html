@@ -128,6 +128,32 @@
   <script src="https://cdn.socket.io/4.7.0/socket.io.min.js"></script>
   <script src="js/services/websocket.js"></script>
 
+  <!-- 8. Sistema de notificaciones en tiempo real -->
+  <script src="js/services/notifications.js"></script>
+  <script src="js/ui/notification-panel.js"></script>
+
+  <!-- 9. Inicialización de WebSocket y notificaciones -->
+  <script>
+    // Inicializar WebSocket y NotificationManager cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('authToken') || 'guest';
+      
+      // Crear cliente WebSocket
+      window.wsClient = new WebSocketClient(token);
+      
+      // Crear gestor de notificaciones
+      window.notificationManager = new NotificationManager(window.wsClient);
+      
+      // Crear panel de notificaciones
+      window.notificationPanel = new NotificationPanel(window.notificationManager);
+      
+      console.log('✅ Sistema de notificaciones inicializado');
+      console.log('WebSocketClient disponible en: window.wsClient');
+      console.log('NotificationManager disponible en: window.notificationManager');
+      console.log('NotificationPanel disponible en: window.notificationPanel');
+    });
+  </script>
+
   <!-- Footer con links a documentación -->
   <footer class="footer">
     <div class="footer-content">

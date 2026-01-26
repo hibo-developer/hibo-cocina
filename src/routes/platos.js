@@ -7,6 +7,7 @@ const platosController = require('../controllers/platosController');
 const { validate } = require('../middleware/validator');
 const { platosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const { emitPlatosUpdate, getIO } = require('../utils/websocket-helper');
 
 /**
  * @swagger
@@ -179,7 +180,19 @@ router.get('/:id', platosController.obtenerPorId);
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', createLimiter, validate(platosSchemas.crear), platosController.crear);
+router.post('/', createLimiter, validate(platosSchemas.crear), async (req, res) => {
+  try {
+    // Llamar al controlador
+    const result = await platosController.crear(req, res);
+    
+    // Emitir evento de WebSocket
+    if (res.statusCode === 201 && result) {
+      emitPlatosUpdate(req.app, result, 'created');
+    }
+  } catch (error) {
+    // El error ya fue manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -234,7 +247,19 @@ router.post('/', createLimiter, validate(platosSchemas.crear), platosController.
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', updateLimiter, validate(platosSchemas.actualizar), platosController.actualizar);
+router.put('/:id', updateLimiter, validate(platosSchemas.actualizar), async (req, res) => {
+  try {
+    // Llamar al controlador
+    const result = await platosController.actualizar(req, res);
+    
+    // Emitir evento de WebSocket
+    if (res.statusCode === 200 && result) {
+      emitPlatosUpdate(req.app, result, 'updated');
+    }
+  } catch (error) {
+    // El error ya fue manejado por el controlador
+  }
+});
 
 /**
  * @swagger
@@ -263,6 +288,20 @@ router.put('/:id', updateLimiter, validate(platosSchemas.actualizar), platosCont
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', deleteLimiter, platosController.eliminar);
+router.delete('/:id', deleteLimiter, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Llamar al controlador
+    const result = await platosController.eliminar(req, res);
+    
+    // Emitir evento de WebSocket
+    if (res.statusCode === 200) {
+      emitPlatosUpdate(req.app, { id: parseInt(id) }, 'deleted');
+    }
+  } catch (error) {
+    // El error ya fue manejado por el controlador
+  }
+});
 
 module.exports = router;
