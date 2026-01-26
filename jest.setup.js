@@ -11,15 +11,6 @@ const sqlite3 = require('sqlite3').verbose();
 const testDbPath = path.join(__dirname, 'data', 'test-hibo-cocina.db');
 process.env.DATABASE_PATH = testDbPath;
 
-// Limpiar BD anterior de pruebas
-try {
-  if (fs.existsSync(testDbPath)) {
-    fs.unlinkSync(testDbPath);
-  }
-} catch (e) {
-  // Ignorar errores si el archivo está en uso
-}
-
 // Deshabilitar Redis en tests - usar memoryStore
 process.env.REDIS_ENABLED = 'false';
 process.env.NODE_ENV = 'test';
@@ -52,26 +43,10 @@ jest.mock('ioredis', () => {
 console.log('[TEST SETUP] Redis disabled for testing');
 console.log(`[TEST SETUP] Using database: ${process.env.DATABASE_PATH}`);
 
-// Inicializar base de datos de test ejecutando el script de inicialización
-const { execSync } = require('child_process');
+// Nota: La inicialización de BD se realiza en jest.globalSetup.js
+// Aquí solo mantenemos variables de entorno y mocks.
 
-try {
-  // Ejecutar script de inicialización de forma síncrona
-  execSync('node scripts/export-schema.js && node scripts/init-test-db.js', {
-    stdio: 'inherit',
-    cwd: __dirname
-  });
-  console.log('[TEST SETUP] Test database initialized');
-} catch (err) {
-  console.error('[TEST SETUP] Error initializing test database:', err);
-  process.exit(1);
-}
-
-// Ejecutar migraciones en beforeAll global
-module.exports = {
-  setupFilesAfterEnv: [],
-  testEnvironment: 'node'
-};
+module.exports = {};
 
 
 
