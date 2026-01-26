@@ -6,6 +6,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { validate } = require('../middleware/validator');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimiter');
 const Joi = require('joi');
 
 // Esquemas de validación para auth
@@ -32,8 +33,8 @@ const authSchemas = {
 };
 
 // Rutas públicas
-router.post('/register', validate(authSchemas.register), authController.register);
-router.post('/login', validate(authSchemas.login), authController.login);
+router.post('/register', authLimiter, validate(authSchemas.register), authController.register);
+router.post('/login', authLimiter, validate(authSchemas.login), authController.login);
 
 // Rutas protegidas
 router.get('/me', authenticateToken, authController.getMe);

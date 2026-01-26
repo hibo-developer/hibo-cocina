@@ -6,6 +6,7 @@ const router = express.Router();
 const pedidosController = require('../controllers/pedidosController');
 const { validate } = require('../middleware/validator');
 const { pedidosSchemas } = require('../middleware/validationSchemas');
+const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger

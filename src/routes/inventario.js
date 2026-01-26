@@ -6,6 +6,7 @@ const router = express.Router();
 const inventarioController = require('../controllers/inventarioController');
 const { validate } = require('../middleware/validator');
 const { inventarioSchemas } = require('../middleware/validationSchemas');
+const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger
@@ -104,7 +105,7 @@ router.get('/:id', inventarioController.obtenerPorId);
  *       201:
  *         description: Item creado
  */
-router.post('/', validate(inventarioSchemas.crear), inventarioController.crear);
+router.post('/', createLimiter, validate(inventarioSchemas.crear), inventarioController.crear);
 
 /**
  * @swagger
@@ -138,7 +139,7 @@ router.post('/', validate(inventarioSchemas.crear), inventarioController.crear);
  *       200:
  *         description: Item actualizado
  */
-router.put('/:id', validate(inventarioSchemas.actualizar), inventarioController.actualizar);
+router.put('/:id', updateLimiter, validate(inventarioSchemas.actualizar), inventarioController.actualizar);
 
 /**
  * @swagger
@@ -157,7 +158,7 @@ router.put('/:id', validate(inventarioSchemas.actualizar), inventarioController.
  *       200:
  *         description: Item eliminado
  */
-router.delete('/:id', inventarioController.eliminar);
+router.delete('/:id', deleteLimiter, inventarioController.eliminar);
 
 module.exports = router;
 

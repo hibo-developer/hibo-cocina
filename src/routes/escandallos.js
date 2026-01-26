@@ -6,6 +6,7 @@ const router = express.Router();
 const escandallosController = require('../controllers/escandallosController');
 const { validate } = require('../middleware/validator');
 const { escandallosSchemas } = require('../middleware/validationSchemas');
+const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger
@@ -88,7 +89,7 @@ router.get('/:id', escandallosController.obtenerPorId);
  *       201:
  *         description: Escandallo creado
  */
-router.post('/', validate(escandallosSchemas.crear), escandallosController.crear);
+router.post('/', createLimiter, validate(escandallosSchemas.crear), escandallosController.crear);
 
 /**
  * @swagger
@@ -107,7 +108,7 @@ router.post('/', validate(escandallosSchemas.crear), escandallosController.crear
  *       200:
  *         description: Escandallo actualizado
  */
-router.put('/:id', validate(escandallosSchemas.actualizar), escandallosController.actualizar);
+router.put('/:id', updateLimiter, validate(escandallosSchemas.actualizar), escandallosController.actualizar);
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ router.put('/:id', validate(escandallosSchemas.actualizar), escandallosControlle
  *       200:
  *         description: Escandallo eliminado
  */
-router.delete('/:id', escandallosController.eliminar);
+router.delete('/:id', deleteLimiter, escandallosController.eliminar);
 
 module.exports = router;
 

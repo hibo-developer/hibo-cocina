@@ -6,6 +6,7 @@ const router = express.Router();
 const platosController = require('../controllers/platosController');
 const { validate } = require('../middleware/validator');
 const { platosSchemas } = require('../middleware/validationSchemas');
+const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger
@@ -178,7 +179,7 @@ router.get('/:id', platosController.obtenerPorId);
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', validate(platosSchemas.crear), platosController.crear);
+router.post('/', createLimiter, validate(platosSchemas.crear), platosController.crear);
 
 /**
  * @swagger
@@ -233,7 +234,7 @@ router.post('/', validate(platosSchemas.crear), platosController.crear);
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', validate(platosSchemas.actualizar), platosController.actualizar);
+router.put('/:id', updateLimiter, validate(platosSchemas.actualizar), platosController.actualizar);
 
 /**
  * @swagger
@@ -262,6 +263,6 @@ router.put('/:id', validate(platosSchemas.actualizar), platosController.actualiz
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', platosController.eliminar);
+router.delete('/:id', deleteLimiter, platosController.eliminar);
 
 module.exports = router;

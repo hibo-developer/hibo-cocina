@@ -6,6 +6,7 @@ const router = express.Router();
 const ingredientesController = require('../controllers/ingredientesController');
 const { validate } = require('../middleware/validator');
 const { ingredientesSchemas } = require('../middleware/validationSchemas');
+const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger
@@ -122,7 +123,7 @@ router.get('/:id', ingredientesController.obtenerPorId);
  *                     data:
  *                       $ref: '#/components/schemas/Ingrediente'
  */
-router.post('/', validate(ingredientesSchemas.crear), ingredientesController.crear);
+router.post('/', createLimiter, validate(ingredientesSchemas.crear), ingredientesController.crear);
 
 /**
  * @swagger
@@ -158,7 +159,7 @@ router.post('/', validate(ingredientesSchemas.crear), ingredientesController.cre
  *       200:
  *         description: Ingrediente actualizado
  */
-router.put('/:id', validate(ingredientesSchemas.actualizar), ingredientesController.actualizar);
+router.put('/:id', updateLimiter, validate(ingredientesSchemas.actualizar), ingredientesController.actualizar);
 
 /**
  * @swagger
@@ -177,7 +178,7 @@ router.put('/:id', validate(ingredientesSchemas.actualizar), ingredientesControl
  *       200:
  *         description: Ingrediente eliminado
  */
-router.delete('/:id', ingredientesController.eliminar);
+router.delete('/:id', deleteLimiter, ingredientesController.eliminar);
 
 module.exports = router;
 

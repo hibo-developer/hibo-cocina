@@ -21,6 +21,13 @@ const { initializeDatabase, closeDatabase } = require('./src/utils/database');
 const { errorHandler, notFoundHandler, createResponse } = require('./src/middleware/errorHandler');
 const { getLogger } = require('./src/utils/logger');
 const { loggerMiddleware } = require('./src/middleware/loggerMiddleware');
+const { 
+  generalLimiter, 
+  authLimiter, 
+  createLimiter, 
+  updateLimiter, 
+  deleteLimiter 
+} = require('./src/middleware/rateLimiter');
 
 // Importar rutas
 const authRoutes = require('./src/routes/auth');
@@ -55,6 +62,9 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Servir archivos estáticos
 app.use(express.static('public'));
+
+// Rate Limiting (aplica a todas las rutas de API)
+app.use('/api', generalLimiter);
 
 // Logging de requests
 app.use(loggerMiddleware);
