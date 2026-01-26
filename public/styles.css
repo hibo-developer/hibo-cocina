@@ -108,7 +108,8 @@ body::-webkit-scrollbar {
   display: none;
 } */
 
-.nav-btn {
+/* DEPRECATED: Estilos viejos de nav-btn, ahora en css/navbar.css */
+/* .nav-btn {
   flex: 1;
   padding: 12px 16px;
   border: none;
@@ -132,7 +133,7 @@ body::-webkit-scrollbar {
 .nav-btn.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
-}
+} */
 
 /* Main Content */
 .main-content {
