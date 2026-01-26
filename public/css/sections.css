@@ -115,6 +115,15 @@
   display: block;
 }
 
+/* Action Bar - Barra de botones de acción */
+.action-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
 /* Production Cards */
 .production-cards {
   display: grid;
