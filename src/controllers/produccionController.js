@@ -8,6 +8,23 @@ const { createResponse } = require('../middleware/errorHandler');
 const ServicioValidaciones = require('../utils/servicioValidaciones');
 const ServicioCalculos = require('../utils/servicioCalculos');
 const logger = require('../utils/logger');
+const { getIO } = require('../config/websocket');
+
+// Helper para emitir actualizaciones de producción
+function emitProduccionUpdate(action, data) {
+  try {
+    const io = getIO();
+    if (io && io.to) {
+      io.to('updates:produccion').emit('produccion:update', {
+        action,
+        data,
+        timestamp: new Date()
+      });
+    }
+  } catch (error) {
+    logger.warn('Error emitiendo actualización de producción:', error.message);
+  }
+}
 
 // ============================================================================
 // ÓRDENES DE PRODUCCIÓN
@@ -238,6 +255,10 @@ async function crearOrden(req, res, next) {
           };
 
           logger.info(`Orden de producción creada: ${codigo}`);
+          
+          // Emitir actualización por WebSocket
+          emitProduccionUpdate('orden-creada', nuevaOrden);
+          
           res.status(201).json(createResponse(true, nuevaOrden, null, 201));
         });
       });
@@ -356,6 +377,10 @@ async function iniciarProduccion(req, res, next) {
         }
 
         logger.info(`Producción iniciada: Orden ${id}`);
+        
+        // Emitir actualización por WebSocket
+        emitProduccionUpdate('orden-iniciada', { id, estado: 'EN_PROCESO', codigo: orden.codigo });
+        
         res.json(createResponse(true, { id, estado: 'EN_PROCESO' }, 'Producción iniciada', 200));
       });
     });
@@ -415,12 +440,18 @@ async function finalizarProduccion(req, res, next) {
         }
 
         logger.info(`Producción finalizada: Orden ${id}, Rendimiento: ${rendimiento.toFixed(2)}%`);
-        res.json(createResponse(true, {
+        
+        // Emitir actualización por WebSocket
+        const resultData = {
           id,
           estado: 'COMPLETADA',
           cantidad_producida,
-          rendimiento: rendimiento.toFixed(2)
-        }, 'Producción finalizada', 200));
+          rendimiento: rendimiento.toFixed(2),
+          codigo: orden.codigo
+        };
+        emitProduccionUpdate('orden-finalizada', resultData);
+        
+        res.json(createResponse(true, resultData, 'Producción finalizada', 200));
       });
     });
   } catch (error) {
@@ -466,6 +497,10 @@ async function cancelarOrden(req, res, next) {
         }
 
         logger.info(`Orden cancelada: ${id}`);
+        
+        // Emitir actualización por WebSocket
+        emitProduccionUpdate('orden-cancelada', { id, estado: 'CANCELADA', codigo: orden.codigo });
+        
         res.json(createResponse(true, { id, estado: 'CANCELADA' }, 'Orden cancelada', 200));
       });
     });

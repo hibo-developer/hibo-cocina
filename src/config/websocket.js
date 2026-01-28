@@ -95,6 +95,18 @@ function initializeWebSocket(server) {
       socket.leave(`user:pedidos:${socket.userId}`);
     });
 
+    // ========== EVENTOS DE PRODUCCIÓN ==========
+    socket.on('subscribe:produccion', () => {
+      socket.join('updates:produccion');
+      socket.join(`user:produccion:${socket.userId}`);
+      log.debug(`Cliente ${socket.id} suscrito a producción`);
+    });
+
+    socket.on('unsubscribe:produccion', () => {
+      socket.leave('updates:produccion');
+      socket.leave(`user:produccion:${socket.userId}`);
+    });
+
     // ========== EVENTOS DE NOTIFICACIONES ==========
     socket.on('request:notifications', async (callback) => {
       // Obtener notificaciones pendientes
@@ -316,11 +328,49 @@ function extractUserIdFromToken(token) {
   return Buffer.from(token).toString('base64').substring(0, 10);
 }
 
+/**
+ * Emitir actualización de producción a los clientes suscritos
+ */
+function emitProduccionUpdate(io, action, data, userId = null) {
+  io.to('updates:produccion').emit('produccion:update', {
+    action,
+    data,
+    timestamp: new Date()
+  });
+
+  // Notificar al usuario si está especificado
+  if (userId) {
+    io.to(`user:produccion:${userId}`).emit('produccion:personal-update', {
+      action,
+      data,
+      timestamp: new Date()
+    });
+  }
+
+  // Notificar cambios importantes
+  if (action === 'orden-iniciada' || action === 'orden-finalizada' || action === 'orden-cancelada') {
+    const messages = {
+      'orden-iniciada': '▶️ Producción iniciada',
+      'orden-finalizada': '✅ Producción completada',
+      'orden-cancelada': '❌ Producción cancelada'
+    };
+
+    io.to('updates:all').emit('notification:new', {
+      type: 'produccion',
+      title: 'Actualización de Producción',
+      message: `${messages[action]}: ${data.codigo || data.plato_nombre || ''}`,
+      ordenId: data.id,
+      timestamp: new Date()
+    });
+  }
+}
+
 module.exports = {
   initializeWebSocket,
   emitPlatosUpdate,
   emitIngredientesUpdate,
   emitInventarioUpdate,
   emitPedidosUpdate,
+  emitProduccionUpdate,
   emitNotification
 };
