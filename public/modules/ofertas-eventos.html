@@ -1,0 +1,433 @@
+<!-- Módulo de OFERTAS Y EVENTOS -->
+<div class="module-header">
+  <h2>📢 Ofertas y Eventos</h2>
+  <div class="module-actions">
+    <button class="btn btn-primary" onclick="abrirModalNuevaOferta()">➕ Nueva Oferta</button>
+    <button class="btn btn-primary" onclick="abrirModalNuevoEvento()">🎉 Nuevo Evento</button>
+  </div>
+</div>
+
+<!-- Tabs de navegación -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="ofertas" onclick="cambiarTabOfertasEventos('ofertas')">
+    🏷️ Ofertas
+  </button>
+  <button class="tab-btn" data-tab="eventos" onclick="cambiarTabOfertasEventos('eventos')">
+    📅 Eventos
+  </button>
+</div>
+
+<!-- ========================================================================== -->
+<!-- TAB: OFERTAS -->
+<!-- ========================================================================== -->
+<div id="tab-ofertas" class="tab-content active">
+  
+  <!-- Filtros -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Estado:</label>
+      <select id="filtroEstadoOferta" onchange="cargarOfertas()">
+        <option value="">Todos</option>
+        <option value="activa">Activas</option>
+        <option value="inactiva">Inactivas</option>
+        <option value="pausada">Pausadas</option>
+        <option value="finalizada">Finalizadas</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Tipo:</label>
+      <select id="filtroTipoOferta" onchange="cargarOfertas()">
+        <option value="">Todos</option>
+        <option value="oferta">Oferta</option>
+        <option value="promocion">Promoción</option>
+        <option value="descuento">Descuento</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Búsqueda:</label>
+      <input type="text" id="busquedaOferta" placeholder="Buscar por código o nombre..." onkeyup="filtrarOfertasLocal()">
+    </div>
+  </div>
+
+  <!-- Tabla de ofertas -->
+  <div class="table-container">
+    <table id="tablaOfertas">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Descuento</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Precio Regular</th>
+          <th>Precio Oferta</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyOfertas">
+        <tr><td colspan="10" class="text-center">Cargando ofertas...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Estadísticas de ofertas -->
+  <div class="stats-section" style="margin-top: 30px;">
+    <h3>📊 Estadísticas de Ofertas</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Ofertas</div>
+        <div class="stat-value" id="statTotalOfertas">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ofertas Activas</div>
+        <div class="stat-value" id="statOfertasActivas">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Aplicaciones</div>
+        <div class="stat-value" id="statTotalAplicaciones">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Descuento Total</div>
+        <div class="stat-value" id="statDescuentoTotal">$0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- TAB: EVENTOS -->
+<!-- ========================================================================== -->
+<div id="tab-eventos" class="tab-content" style="display: none;">
+  
+  <!-- Filtros -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Estado:</label>
+      <select id="filtroEstadoEvento" onchange="cargarEventos()">
+        <option value="">Todos</option>
+        <option value="planificado">Planificado</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="en_progreso">En Progreso</option>
+        <option value="completado">Completado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Tipo:</label>
+      <select id="filtroTipoEvento" onchange="cargarEventos()">
+        <option value="">Todos</option>
+        <option value="cumpleaños">Cumpleaños</option>
+        <option value="corporativo">Corporativo</option>
+        <option value="boda">Boda</option>
+        <option value="catering">Catering</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Búsqueda:</label>
+      <input type="text" id="busquedaEvento" placeholder="Buscar por código o nombre..." onkeyup="filtrarEventosLocal()">
+    </div>
+  </div>
+
+  <!-- Tabla de eventos -->
+  <div class="table-container">
+    <table id="tablaEventos">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Fecha Evento</th>
+          <th>Lugar</th>
+          <th>Capacidad</th>
+          <th>Confirmados</th>
+          <th>Precio Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyEventos">
+        <tr><td colspan="10" class="text-center">Cargando eventos...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Estadísticas de eventos -->
+  <div class="stats-section" style="margin-top: 30px;">
+    <h3>📊 Estadísticas de Eventos</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Eventos</div>
+        <div class="stat-value" id="statTotalEventos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Próximos</div>
+        <div class="stat-value" id="statEventosProximos">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Asistentes</div>
+        <div class="stat-value" id="statTotalAsistentes">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ingresos Estimados</div>
+        <div class="stat-value" id="statIngresosEventos">$0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================== -->
+<!-- MODALES -->
+<!-- ========================================================================== -->
+
+<!-- Modal: Nueva Oferta -->
+<div id="modalNuevaOferta" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>➕ Nueva Oferta</h3>
+      <button class="modal-close" onclick="cerrarModalOferta()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formNuevaOferta" onsubmit="guardarOferta(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código *</label>
+            <input type="text" name="codigo" required maxlength="50">
+          </div>
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" name="nombre" required maxlength="200">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select name="tipo">
+              <option value="oferta">Oferta</option>
+              <option value="promocion">Promoción</option>
+              <option value="descuento">Descuento</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select name="estado">
+              <option value="activa">Activa</option>
+              <option value="inactiva">Inactiva</option>
+              <option value="pausada">Pausada</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea name="descripcion" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio Regular ($)</label>
+            <input type="number" name="precio_regular" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Precio Oferta ($)</label>
+            <input type="number" name="precio_oferta" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Descuento (%)</label>
+            <input type="number" name="descuento_porcentaje" step="0.01" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha Inicio</label>
+            <input type="date" name="fecha_inicio">
+          </div>
+          <div class="form-group">
+            <label>Fecha Fin</label>
+            <input type="date" name="fecha_fin">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Términos y Condiciones</label>
+          <textarea name="terminos_condiciones" rows="3" maxlength="2000"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalOferta()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Oferta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Evento -->
+<div id="modalNuevoEvento" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🎉 Nuevo Evento</h3>
+      <button class="modal-close" onclick="cerrarModalEvento()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formNuevoEvento" onsubmit="guardarEvento(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código *</label>
+            <input type="text" name="codigo" required maxlength="50">
+          </div>
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" name="nombre" required maxlength="200">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de Evento</label>
+            <select name="tipo_evento">
+              <option value="cumpleaños">Cumpleaños</option>
+              <option value="corporativo">Corporativo</option>
+              <option value="boda">Boda</option>
+              <option value="catering">Catering</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select name="estado">
+              <option value="planificado">Planificado</option>
+              <option value="confirmado">Confirmado</option>
+              <option value="en_progreso">En Progreso</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea name="descripcion" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha del Evento *</label>
+            <input type="datetime-local" name="fecha_evento" required>
+          </div>
+          <div class="form-group">
+            <label>Lugar</label>
+            <input type="text" name="lugar" maxlength="200">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Capacidad</label>
+            <input type="number" name="capacidad" min="0" value="0">
+          </div>
+          <div class="form-group">
+            <label>Precio Entrada ($)</label>
+            <input type="number" name="precio_entrada" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Precio Total ($)</label>
+            <input type="number" name="precio_total" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Decoración</label>
+          <textarea name="decoracion" rows="2" maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <textarea name="notas" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalEvento()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Gestionar Asistentes -->
+<div id="modalAsistentes" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 900px;">
+    <div class="modal-header">
+      <h3>👥 Gestionar Asistentes</h3>
+      <button class="modal-close" onclick="cerrarModalAsistentes()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 20px;">
+        <h4 id="tituloEventoAsistentes"></h4>
+        <button class="btn btn-primary btn-sm" onclick="abrirModalNuevoAsistente()">➕ Agregar Asistente</button>
+      </div>
+      <div class="table-container">
+        <table id="tablaAsistentes">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acompañantes</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyAsistentes">
+            <tr><td colspan="6" class="text-center">Cargando asistentes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Asistente -->
+<div id="modalNuevoAsistente" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>👤 Agregar Asistente</h3>
+      <button class="modal-close" onclick="cerrarModalNuevoAsistente()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formNuevoAsistente" onsubmit="guardarAsistente(event)">
+        <input type="hidden" name="evento_id" id="asistenteEventoId">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" name="nombre" required maxlength="200">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" maxlength="200">
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" name="telefono" maxlength="20">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Estado de Confirmación</label>
+            <select name="estado_confirmacion">
+              <option value="pendiente">Pendiente</option>
+              <option value="confirmado">Confirmado</option>
+              <option value="rechazado">Rechazado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Número de Acompañantes</label>
+            <input type="number" name="numero_acompanantes" min="0" value="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Restricciones Dietéticas</label>
+          <textarea name="restricciones_dieteticas" rows="2" maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <textarea name="notas" rows="2" maxlength="500"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalNuevoAsistente()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Asistente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

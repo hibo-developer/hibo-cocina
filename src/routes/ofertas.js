@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 const ofertasController = require('../controllers/ofertasController');
 const { validate } = require('../middleware/validator');
-const { ofertasSchemas } = require('../middleware/validationSchemas');
+const { ofertasSchemas, eventosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 const ServicioValidaciones = require('../utils/servicioValidaciones');
 const { createResponse } = require('../middleware/errorHandler');
@@ -77,7 +77,7 @@ router.get('/ofertas/:id', ofertasController.obtenerOfertaPorId);
  *             type: object
  *             required: [codigo, nombre]
  */
-router.post('/ofertas', createLimiter, ofertasController.crearOferta);
+router.post('/ofertas', createLimiter, validate(ofertasSchemas.crear), ofertasController.crearOferta);
 
 /**
  * @swagger
@@ -86,7 +86,7 @@ router.post('/ofertas', createLimiter, ofertasController.crearOferta);
  *     summary: Actualizar oferta
  *     tags: [Ofertas]
  */
-router.put('/ofertas/:id', updateLimiter, ofertasController.actualizarOferta);
+router.put('/ofertas/:id', updateLimiter, validate(ofertasSchemas.actualizar), ofertasController.actualizarOferta);
 
 /**
  * @swagger
@@ -121,7 +121,7 @@ router.delete('/ofertas/:id', deleteLimiter, ofertasController.eliminarOferta);
  *               cliente_id:
  *                 type: integer
  */
-router.post('/ofertas/aplicar', createLimiter, ofertasController.aplicarOferta);
+router.post('/ofertas/aplicar', createLimiter, validate(ofertasSchemas.aplicar), ofertasController.aplicarOferta);
 
 // ============================================================================
 // VALIDACIÓN DE OFERTAS
@@ -189,7 +189,7 @@ router.get('/eventos/:id', ofertasController.obtenerEventoPorId);
  *     summary: Crear nuevo evento
  *     tags: [Eventos]
  */
-router.post('/eventos', createLimiter, ofertasController.crearEvento);
+router.post('/eventos', createLimiter, validate(eventosSchemas.crear), ofertasController.crearEvento);
 
 /**
  * @swagger
@@ -198,7 +198,7 @@ router.post('/eventos', createLimiter, ofertasController.crearEvento);
  *     summary: Actualizar evento
  *     tags: [Eventos]
  */
-router.put('/eventos/:id', updateLimiter, ofertasController.actualizarEvento);
+router.put('/eventos/:id', updateLimiter, validate(eventosSchemas.actualizar), ofertasController.actualizarEvento);
 
 /**
  * @swagger
@@ -233,7 +233,7 @@ router.get('/eventos/:evento_id/asistentes', ofertasController.obtenerAsistentes
  *     summary: Agregar asistente a evento
  *     tags: [Eventos]
  */
-router.post('/eventos/:evento_id/asistentes', createLimiter, ofertasController.agregarAsistente);
+router.post('/eventos/:evento_id/asistentes', createLimiter, validate(eventosSchemas.agregarAsistente), ofertasController.agregarAsistente);
 
 /**
  * @swagger

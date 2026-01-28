@@ -8,6 +8,8 @@ const router = express.Router();
 const produccionController = require('../controllers/produccionController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const { createLimiter } = require('../middleware/rateLimiter');
+const { validate } = require('../middleware/validator');
+const { produccionSchemas } = require('../middleware/validationSchemas');
 
 // Aplicar autenticación a todas las rutas
 router.use(authenticateToken);
@@ -117,7 +119,7 @@ router.get('/ordenes/:id', produccionController.obtenerOrdenPorId);
  *       400:
  *         description: Datos inválidos
  */
-router.post('/ordenes', createLimiter, produccionController.crearOrden);
+router.post('/ordenes', createLimiter, validate(produccionSchemas.crearOrden), produccionController.crearOrden);
 
 /**
  * @swagger
@@ -354,7 +356,7 @@ router.get('/lotes/:id', produccionController.obtenerLotePorId);
  *       400:
  *         description: Datos inválidos
  */
-router.post('/lotes', createLimiter, produccionController.crearLote);
+router.post('/lotes', createLimiter, validate(produccionSchemas.crearLote), produccionController.crearLote);
 
 /**
  * @swagger
@@ -502,7 +504,7 @@ router.get('/consumos/:id', produccionController.obtenerConsumoPorId);
  *       400:
  *         description: Datos inválidos
  */
-router.post('/consumos', createLimiter, produccionController.crearConsumo);
+router.post('/consumos', createLimiter, validate(produccionSchemas.crearConsumo), produccionController.crearConsumo);
 
 /**
  * @swagger
