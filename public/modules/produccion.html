@@ -1,94 +1,296 @@
-<!-- Sección Producción -->
+<!-- Sección Producción - Órdenes y Lotes -->
 <section id="produccion" class="section" style="display:none;">
-  <h2>🍳 Control de Producción</h2>
+  <h2>🏭 Gestión de Producción</h2>
   
   <!-- Tabs de producción -->
   <div class="tabs">
-    <button class="tab-button active" onclick="cambiarTab('partidas')">Partidas de Cocina</button>
-    <button class="tab-button" onclick="cambiarTab('trazabilidad')">Trazabilidad</button>
-    <button class="tab-button" onclick="cambiarTab('resumen')">Resumen</button>
+    <button class="tab-button active" onclick="cambiarTab('ordenes')">📋 Órdenes</button>
+    <button class="tab-button" onclick="cambiarTab('lotes')">📦 Lotes</button>
+    <button class="tab-button" onclick="cambiarTab('consumos')">📊 Consumos</button>
+    <button class="tab-button" onclick="cambiarTab('estadisticas')">📈 Estadísticas</button>
   </div>
 
-  <!-- Tab: Partidas -->
-  <div id="tab-partidas" class="tab-content">
+  <!-- Tab: Órdenes de Producción -->
+  <div id="tab-ordenes" class="tab-content">
     <div class="toolbar">
-      <button class="btn btn-primary" onclick="abrirModalDinamico('partida_cocina')">🍳 Nueva Partida</button>
-      <button class="btn btn-primary" onclick="abrirModalDinamico('sanidad')">⚕️ Control Sanidad</button>
-      <button class="btn btn-primary" onclick="abrirModalDinamico('etiquetas')">🏷️ Crear Etiqueta</button>
-      <button id="btn-eliminar-partidas" class="btn btn-danger" onclick="eliminarSeleccionados('partidas', 'partidas')" disabled>🗑️ Eliminar (0)</button>
+      <button class="btn btn-primary" onclick="abrirModalNuevaOrdenProduccion()">➕ Nueva Orden</button>
+      <button class="btn btn-secondary" onclick="cargarOrdenesProduccion()">🔄 Actualizar</button>
+      <div class="filter-group">
+        <select id="filtroEstadoOrdenes" onchange="filtrarOrdenesProduccion()">
+          <option value="">Todos los estados</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="EN_PROCESO">En Proceso</option>
+          <option value="PAUSADA">Pausada</option>
+          <option value="COMPLETADA">Completada</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </div>
     </div>
 
-    <div id="partidasTable" class="table-container">
+    <div id="ordenesTableContainer" class="table-container">
       <table>
         <thead>
           <tr>
-            <th><input type="checkbox" id="check-all-partidas" onchange="toggleSeleccionTodos('partidas', [])"></th>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Responsable</th>
-            <th>Descripción</th>
+            <th>Código</th>
+            <th>Plato</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
             <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Responsable</th>
+            <th>Rendimiento</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody id="partidasTableBody">
+        <tbody id="ordenesTableBody">
+          <tr><td colspan="9" style="text-align: center; padding: 30px;">⏳ Cargando órdenes...</td></tr>
         </tbody>
       </table>
-      <div id="partidas-paginacion" class="pagination-container"></div>
     </div>
   </div>
 
-  <!-- Tab: Resumen -->
-  <div id="tab-resumen" class="tab-content">
-    <div class="production-grid">
-      <div class="card">
-        <h3>📋 Trazabilidad Activa</h3>
-        <div class="metric" id="totalTrazabilidad">0</div>
-        <p>Registros de trazabilidad</p>
-      </div>
-
-      <div class="card">
-        <h3>🍳 Partidas Activas</h3>
-        <div class="metric" id="totalPartidas">0</div>
-        <p>En producción actualmente</p>
-      </div>
-
-      <div class="card">
-        <h3>⚠️ Control de Sanidad</h3>
-        <div class="metric">✓</div>
-        <p>Todo bajo control</p>
-      </div>
-
-      <div class="card">
-        <h3>🏷️ Etiquetas Generadas</h3>
-        <div class="metric">0</div>
-        <p>Hoy</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab: Trazabilidad -->
-  <div id="tab-trazabilidad" class="tab-content">
+  <!-- Tab: Lotes -->
+  <div id="tab-lotes" class="tab-content">
     <div class="toolbar">
-      <input type="text" id="searchTrazabilidad" placeholder="Buscar en trazabilidad...">
-      <button class="btn btn-primary" onclick="abrirModalDinamico('produccion')">➕ Nueva Trazabilidad</button>
+      <button class="btn btn-primary" onclick="abrirModalNuevoLote()">➕ Nuevo Lote</button>
+      <button class="btn btn-secondary" onclick="cargarLotesProduccion()">🔄 Actualizar</button>
+      <div class="filter-group">
+        <select id="filtroEstadoLotes" onchange="filtrarLotesProduccion()">
+          <option value="">Todos los estados</option>
+          <option value="ACTIVO">Activo</option>
+          <option value="INACTIVO">Inactivo</option>
+        </select>
+      </div>
     </div>
 
-    <div id="trazabilidadTable" class="table-container">
+    <div id="lotesTableContainer" class="table-container">
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Partida</th>
-            <th>Fecha/Hora</th>
-            <th>Usuario</th>
-            <th>Tipo</th>
+            <th>Código Lote</th>
+            <th>Orden</th>
+            <th>Cantidad</th>
+            <th>Fecha Producción</th>
+            <th>Caducidad</th>
+            <th>Estado</th>
+            <th>Ubicación</th>
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody id="trazabilidadTableBody">
+        <tbody id="lotesTableBody">
+          <tr><td colspan="8" style="text-align: center; padding: 30px;">⏳ Cargando lotes...</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Tab: Consumos -->
+  <div id="tab-consumos" class="tab-content">
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="abrirModalNuevoConsumo()">➕ Registrar Consumo</button>
+      <button class="btn btn-secondary" onclick="cargarConsumosProduccion()">🔄 Actualizar</button>
+      <div class="filter-group">
+        <input type="number" id="filtroOrdenIdConsumos" placeholder="Filtrar por orden ID" onchange="filtrarConsumosProduccion()" style="width: 150px;">
+      </div>
+    </div>
+
+    <div id="consumosTableContainer" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Orden</th>
+            <th>Ingrediente</th>
+            <th>Planificado</th>
+            <th>Consumido</th>
+            <th>Unidad</th>
+            <th>Coste</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="consumosTableBody">
+          <tr><td colspan="9" style="text-align: center; padding: 30px;">⏳ Cargando consumos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Estadísticas -->
+  <div id="tab-estadisticas" class="tab-content">
+    <div class="toolbar">
+      <input type="date" id="filtroFechaDesdeStats" placeholder="Desde" onchange="cargarEstadisticasProduccion()">
+      <input type="date" id="filtroFechaHastaStats" placeholder="Hasta" onchange="cargarEstadisticasProduccion()">
+      <button class="btn btn-secondary" onclick="cargarEstadisticasProduccion()">🔄 Actualizar</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Órdenes</div>
+        <div class="stat-value" id="statTotalOrdenes">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completadas</div>
+        <div class="stat-value" id="statOrdenesCompletadas">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En Proceso</div>
+        <div class="stat-value" id="statOrdenesEnProceso">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Canceladas</div>
+        <div class="stat-value" id="statOrdenesCanceladas">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rendimiento Prom.</div>
+        <div class="stat-value" id="statRendimiento">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Coste Total</div>
+        <div class="stat-value" id="statCosteTotal">$0</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3>Rendimientos por Plato</h3>
+      <div id="rendimientosTableContainer" class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Plato</th>
+              <th>Total Órdenes</th>
+              <th>Completadas</th>
+              <th>Rendimiento Prom.</th>
+              <th>Min - Max</th>
+            </tr>
+          </thead>
+          <tbody id="rendimientosTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales -->
+  <div id="modalNuevaOrdenProduccion" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>➕ Nueva Orden de Producción</h3>
+        <button class="modal-close" onclick="cerrarModalProduccion('modalNuevaOrdenProduccion')">&times;</button>
+      </div>
+      <form onsubmit="crearOrdenProduccion(event)">
+        <div class="form-group">
+          <label>Plato *</label>
+          <select id="platoSelectProduccion" required></select>
+        </div>
+        <div class="form-group">
+          <label>Cantidad Planificada *</label>
+          <input type="number" id="cantidadPlanificada" placeholder="Cantidad" min="1" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Fecha Planificada *</label>
+          <input type="date" id="fechaPlanificada" required>
+        </div>
+        <div class="form-group">
+          <label>Prioridad</label>
+          <select id="prioridadOrden">
+            <option value="NORMAL">Normal</option>
+            <option value="BAJA">Baja</option>
+            <option value="ALTA">Alta</option>
+            <option value="URGENTE">Urgente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Responsable</label>
+          <input type="text" id="responsableOrden" placeholder="Nombre del responsable">
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea id="observacionesOrden" placeholder="Observaciones adicionales"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Crear Orden</button>
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalProduccion('modalNuevaOrdenProduccion')">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalNuevoLote" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📦 Nuevo Lote</h3>
+        <button class="modal-close" onclick="cerrarModalProduccion('modalNuevoLote')">&times;</button>
+      </div>
+      <form onsubmit="crearLoteProduccion(event)">
+        <div class="form-group">
+          <label>Orden *</label>
+          <select id="ordenSelectLote" required></select>
+        </div>
+        <div class="form-group">
+          <label>Cantidad *</label>
+          <input type="number" id="cantidadLote" placeholder="Cantidad" min="1" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Fecha Producción *</label>
+          <input type="datetime-local" id="fechaProduccionLote" required>
+        </div>
+        <div class="form-group">
+          <label>Fecha Caducidad</label>
+          <input type="date" id="fechaCaducidadLote">
+        </div>
+        <div class="form-group">
+          <label>Ubicación</label>
+          <input type="text" id="ubicacionLote" placeholder="Ubicación de almacenamiento">
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea id="observacionesLote" placeholder="Observaciones del lote"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Crear Lote</button>
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalProduccion('modalNuevoLote')">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalNuevoConsumo" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📊 Registrar Consumo</h3>
+        <button class="modal-close" onclick="cerrarModalProduccion('modalNuevoConsumo')">&times;</button>
+      </div>
+      <form onsubmit="crearConsumoProduccion(event)">
+        <div class="form-group">
+          <label>Orden *</label>
+          <select id="ordenSelectConsumo" required></select>
+        </div>
+        <div class="form-group">
+          <label>Ingrediente *</label>
+          <select id="ingredienteSelectConsumo" required></select>
+        </div>
+        <div class="form-group">
+          <label>Cantidad Planificada *</label>
+          <input type="number" id="cantidadPlanificadaConsumo" placeholder="Cantidad" min="1" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Cantidad Consumida</label>
+          <input type="number" id="cantidadConsumidaConsumo" placeholder="Cantidad real consumida" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Coste Unitario</label>
+          <input type="number" id="costeConsumo" placeholder="Coste unitario" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea id="observacionesConsumo" placeholder="Observaciones del consumo"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Registrar Consumo</button>
+          <button type="button" class="btn btn-secondary" onclick="cerrarModalProduccion('modalNuevoConsumo')">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
 </section>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Producción - Hibo Cocina</title>
+  <link rel="stylesheet" href="/css/dashboard-produccion.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🏭 Dashboard de Producción</h1>
+        <p style="color: #666; margin-top: 5px;">Gestión de órdenes y procesos productivos</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="abrirModalNuevaOrden()">
+          ➕ Nueva Orden
+        </button>
+        <button class="btn btn-success" onclick="cargarOrdenes()">
+          🔄 Actualizar
+        </button>
+      </div>
+    </header>
+
+    <div id="loading" class="loading">
+      <div>⏳ Cargando datos de producción...</div>
+    </div>
+
+    <div id="content" style="display: none;">
+      <!-- KPIs -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" id="statPendientes">0</div>
+          <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚙️</div>
+          <div class="stat-value" id="statEnProceso">0</div>
+          <div class="stat-label">En Proceso</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="statCompletadas">0</div>
+          <div class="stat-label">Completadas Hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value" id="statRendimiento">0%</div>
+          <div class="stat-label">Rendimiento Prom.</div>
+        </div>
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="content-grid">
+        <!-- Lista de órdenes -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Órdenes de Producción</div>
+          </div>
+          
+          <!-- Filtros -->
+          <div class="filters">
+            <button class="filter-btn active" data-filter="TODAS" onclick="filtrarOrdenes(this, 'TODAS')">
+              Todas
+            </button>
+            <button class="filter-btn" data-filter="PENDIENTE" onclick="filtrarOrdenes(this, 'PENDIENTE')">
+              Pendientes
+            </button>
+            <button class="filter-btn" data-filter="EN_PROCESO" onclick="filtrarOrdenes(this, 'EN_PROCESO')">
+              En Proceso
+            </button>
+            <button class="filter-btn" data-filter="COMPLETADA" onclick="filtrarOrdenes(this, 'COMPLETADA')">
+              Completadas
+            </button>
+          </div>
+
+          <div class="order-list" id="orderList">
+            <div class="empty-state">
+              <div class="empty-state-icon">📦</div>
+              <div>No hay órdenes de producción</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel lateral -->
+        <div>
+          <!-- Resumen rápido -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div class="card-title">📈 Resumen Rápido</div>
+            </div>
+            <div class="quick-stats">
+              <div class="quick-stat">
+                <div class="quick-stat-value" id="quickTotalOrdenes">0</div>
+                <div class="quick-stat-label">Total Órdenes</div>
+              </div>
+              <div class="quick-stat">
+                <div class="quick-stat-value" id="quickProduccionHoy">0</div>
+                <div class="quick-stat-label">Producido Hoy</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Últimas actividades -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚡ Actividad Reciente</div>
+            </div>
+            <div id="actividadReciente">
+              <p style="color: #999; text-align: center; padding: 20px;">
+                No hay actividad reciente
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Nueva Orden -->
+  <div id="modalNuevaOrden" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">➕ Nueva Orden de Producción</h2>
+        <button class="modal-close" onclick="cerrarModal('modalNuevaOrden')">&times;</button>
+      </div>
+      <form id="formNuevaOrden" onsubmit="crearOrden(event)">
+        <div class="form-group">
+          <label class="form-label">Plato *</label>
+          <select class="form-control" id="inputPlato" required>
+            <option value="">Seleccione un plato...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cantidad Planificada *</label>
+          <input type="number" class="form-control" id="inputCantidad" min="1" step="0.1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha Planificada *</label>
+          <input type="date" class="form-control" id="inputFecha" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Responsable</label>
+          <input type="text" class="form-control" id="inputResponsable">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prioridad</label>
+          <select class="form-control" id="inputPrioridad">
+            <option value="BAJA">Baja</option>
+            <option value="NORMAL" selected>Normal</option>
+            <option value="ALTA">Alta</option>
+            <option value="URGENTE">Urgente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observaciones</label>
+          <textarea class="form-control" id="inputObservaciones" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%;">
+          ✅ Crear Orden
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000/api';
+    let token = null; // Aquí deberías obtener el token del usuario
+    let ordenes = [];
+    let filtroActual = 'TODAS';
+
+    // Cargar datos iniciales
+    document.addEventListener('DOMContentLoaded', async () => {
+      await cargarPlatos();
+      await cargarOrdenes();
+      
+      // Establecer fecha de hoy por defecto
+      document.getElementById('inputFecha').valueAsDate = new Date();
+    });
+
+    async function cargarPlatos() {
+      try {
+        const res = await fetch(`${API_BASE}/platos`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          const select = document.getElementById('inputPlato');
+          select.innerHTML = '<option value="">Seleccione un plato...</option>';
+          data.data.forEach(plato => {
+            const option = document.createElement('option');
+            option.value = plato.id;
+            option.textContent = `${plato.codigo} - ${plato.nombre}`;
+            select.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('Error al cargar platos:', error);
+      }
+    }
+
+    async function cargarOrdenes() {
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          ordenes = data.data;
+          actualizarDashboard();
+          renderizarOrdenes();
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error al cargar órdenes:', error);
+        alert('Error al conectar con el servidor. Verifica que esté corriendo.');
+      }
+    }
+
+    function actualizarDashboard() {
+      // KPIs
+      const pendientes = ordenes.filter(o => o.estado === 'PENDIENTE').length;
+      const enProceso = ordenes.filter(o => o.estado === 'EN_PROCESO').length;
+      
+      const hoy = new Date().toISOString().split('T')[0];
+      const completadasHoy = ordenes.filter(o => 
+        o.estado === 'COMPLETADA' && o.fecha_fin?.startsWith(hoy)
+      ).length;
+      
+      const ordenesConRendimiento = ordenes.filter(o => o.rendimiento > 0);
+      const rendimientoProm = ordenesConRendimiento.length > 0
+        ? ordenesConRendimiento.reduce((acc, o) => acc + o.rendimiento, 0) / ordenesConRendimiento.length
+        : 0;
+
+      document.getElementById('statPendientes').textContent = pendientes;
+      document.getElementById('statEnProceso').textContent = enProceso;
+      document.getElementById('statCompletadas').textContent = completadasHoy;
+      document.getElementById('statRendimiento').textContent = rendimientoProm.toFixed(1) + '%';
+
+      // Quick stats
+      document.getElementById('quickTotalOrdenes').textContent = ordenes.length;
+      
+      const producidoHoy = ordenes
+        .filter(o => o.fecha_fin?.startsWith(hoy))
+        .reduce((acc, o) => acc + (o.cantidad_producida || 0), 0);
+      document.getElementById('quickProduccionHoy').textContent = producidoHoy.toFixed(0);
+    }
+
+    function renderizarOrdenes() {
+      const lista = document.getElementById('orderList');
+      const ordenesFiltradas = filtroActual === 'TODAS' 
+        ? ordenes 
+        : ordenes.filter(o => o.estado === filtroActual);
+
+      if (ordenesFiltradas.length === 0) {
+        lista.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <div>No hay órdenes con el filtro seleccionado</div>
+          </div>
+        `;
+        return;
+      }
+
+      lista.innerHTML = ordenesFiltradas.map(orden => `
+        <div class="order-item ${orden.estado.toLowerCase()}">
+          <div class="order-header">
+            <span class="order-code">${orden.codigo}</span>
+            <span class="order-badge badge-${orden.estado.toLowerCase()}">
+              ${orden.estado.replace('_', ' ')}
+            </span>
+          </div>
+          <div class="order-details">
+            <strong>${orden.plato_nombre || 'Plato ' + orden.plato_id}</strong><br>
+            📦 Planificado: ${orden.cantidad_planificada} unidades<br>
+            📅 Fecha: ${new Date(orden.fecha_planificada).toLocaleDateString()}<br>
+            ${orden.responsable ? `👤 Responsable: ${orden.responsable}<br>` : ''}
+            ${orden.cantidad_producida > 0 ? `✅ Producido: ${orden.cantidad_producida} (${orden.rendimiento?.toFixed(1)}%)<br>` : ''}
+          </div>
+          <div class="order-actions">
+            ${orden.estado === 'PENDIENTE' ? `
+              <button class="btn-small btn-start" onclick="iniciarOrden(${orden.id})">
+                ▶️ Iniciar
+              </button>
+            ` : ''}
+            ${orden.estado === 'EN_PROCESO' ? `
+              <button class="btn-small btn-finish" onclick="finalizarOrden(${orden.id})">
+                ✅ Finalizar
+              </button>
+            ` : ''}
+            ${orden.estado !== 'COMPLETADA' && orden.estado !== 'CANCELADA' ? `
+              <button class="btn-small btn-cancel" onclick="cancelarOrden(${orden.id})">
+                ❌ Cancelar
+              </button>
+            ` : ''}
+            <button class="btn-small btn-view" onclick="verDetalle(${orden.id})">
+              👁️ Ver
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filtrarOrdenes(btn, filtro) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroActual = filtro;
+      renderizarOrdenes();
+    }
+
+    function abrirModalNuevaOrden() {
+      document.getElementById('modalNuevaOrden').classList.add('show');
+    }
+
+    function cerrarModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    async function crearOrden(event) {
+      event.preventDefault();
+      
+      const data = {
+        plato_id: parseInt(document.getElementById('inputPlato').value),
+        cantidad_planificada: parseFloat(document.getElementById('inputCantidad').value),
+        fecha_planificada: document.getElementById('inputFecha').value,
+        responsable: document.getElementById('inputResponsable').value || null,
+        prioridad: document.getElementById('inputPrioridad').value,
+        observaciones: document.getElementById('inputObservaciones').value || null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          alert('✅ Orden creada correctamente');
+          cerrarModal('modalNuevaOrden');
+          document.getElementById('formNuevaOrden').reset();
+          await cargarOrdenes();
+        } else {
+          alert('❌ Error: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error al crear orden:', error);
+        alert('❌ Error al crear orden');
+      }
+    }
+
+    async function iniciarOrden(id) {
+      if (!confirm('¿Iniciar producción de esta orden?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes/${id}/iniciar`, {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          alert('✅ Producción iniciada');
+          await cargarOrdenes();
+        } else {
+          alert('❌ Error: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al iniciar producción');
+      }
+    }
+
+    async function finalizarOrden(id) {
+      const cantidadProducida = prompt('Cantidad producida:');
+      if (!cantidadProducida) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes/${id}/finalizar`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify({ cantidad_producida: parseFloat(cantidadProducida) })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          alert(`✅ Producción finalizada. Rendimiento: ${result.data.rendimiento}%`);
+          await cargarOrdenes();
+        } else {
+          alert('❌ Error: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al finalizar producción');
+      }
+    }
+
+    async function cancelarOrden(id) {
+      const motivo = prompt('Motivo de cancelación:');
+      if (motivo === null) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes/${id}/cancelar`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify({ motivo })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          alert('✅ Orden cancelada');
+          await cargarOrdenes();
+        } else {
+          alert('❌ Error: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al cancelar orden');
+      }
+    }
+
+    async function verDetalle(id) {
+      try {
+        const res = await fetch(`${API_BASE}/produccion/ordenes/${id}`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          const orden = result.data;
+          alert(`
+📋 Orden: ${orden.codigo}
+🍽️ Plato: ${orden.plato_nombre}
+📦 Planificado: ${orden.cantidad_planificada}
+${orden.cantidad_producida > 0 ? `✅ Producido: ${orden.cantidad_producida} (${orden.rendimiento}%)` : ''}
+📅 Fecha: ${new Date(orden.fecha_planificada).toLocaleDateString()}
+📊 Estado: ${orden.estado}
+${orden.observaciones ? `📝 Obs: ${orden.observaciones}` : ''}
+          `.trim());
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  </script>
+</body>
+</html>

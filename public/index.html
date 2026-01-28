@@ -53,6 +53,10 @@
               <button class="dropdown-item" data-section="escandallos">
                 <i class="fas fa-file-invoice"></i> Escandallos
               </button>
+              <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0;">
+              <button class="dropdown-item" onclick="abrirModalImport()">
+                <i class="fas fa-upload"></i> Importar desde Excel
+              </button>
             </div>
           </div>
 
@@ -349,6 +353,10 @@
   <script src="js/modules/ofertas.js"></script>
   <script src="js/modules/navigation.js"></script>
 
+  <!-- 4.5 Servicios de Producción -->
+  <script src="js/services/produccion-service.js"></script>
+  <script src="js/ui/produccion-ui.js"></script>
+
   <!-- 5. Scripts principales (legado + migrado) -->
   <script src="module-loader.js"></script>
   <script src="modales-dinamicos.js"></script>
@@ -434,6 +442,325 @@
       console.log('NotificationManager disponible en: window.notificationManager');
       console.log('NotificationPanel disponible en: window.notificationPanel');
     });
+  </script>
+
+  <!-- Modal de Importación de Excel -->
+  <div id="importExcelModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div class="modal-content" style="background: white; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; font-size: 18px;">📤 Importar Datos desde Excel</h2>
+        <button class="btn-close" onclick="cerrarModalImport()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Zona de Drop -->
+        <div class="upload-zone" id="uploadZone" style="
+          border: 2px dashed #007bff;
+          border-radius: 8px;
+          padding: 40px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background-color: #f8f9fa;
+        " onmouseenter="this.style.backgroundColor='#e9ecef'" onmouseleave="this.style.backgroundColor='#f8f9fa'">
+          <div style="font-size: 40px; margin-bottom: 15px;">📁</div>
+          <h4 style="margin: 10px 0;">Arrastra un archivo aquí o haz clic para seleccionar</h4>
+          <p style="color: #6c757d; margin: 10px 0; font-size: 14px;">
+            Formatos soportados: .xlsx, .xls, .csv (máx 50MB)
+          </p>
+          
+          <!-- Ficheros soportados por tipo -->
+          <div style="margin-top: 20px; text-align: left; background: #fff3cd; padding: 15px; border-radius: 4px; font-size: 13px;">
+            <strong>📋 Tipos de importación:</strong>
+            <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+              <li><strong>platos.xlsx</strong> - Importa tabla de platos</li>
+              <li><strong>ingredientes.xlsx</strong> - Importa ingredientes y precios</li>
+              <li><strong>escandallos.xlsx</strong> - Importa composición de platos</li>
+              <li><strong>oferta_c.xlsx</strong> - Importa ofertas y eventos</li>
+            </ul>
+          </div>
+
+          <input type="file" id="fileInput" style="display: none;" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+        </div>
+
+        <!-- Indicador de archivo seleccionado -->
+        <div id="fileSelected" style="display: none; margin-top: 20px;">
+          <div style="background: #e7f3ff; padding: 15px; border-radius: 4px; border-left: 4px solid #0066cc;">
+            <strong>Archivo seleccionado:</strong>
+            <p id="fileName" style="margin: 5px 0; color: #0066cc; font-weight: 500;"></p>
+            <small id="fileSize" style="color: #666;"></small>
+          </div>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div id="progressContainer" style="display: none; margin-top: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>Importando...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <progress id="progressBar" value="0" max="100" style="width: 100%; height: 25px; border-radius: 4px;"></progress>
+        </div>
+
+        <!-- Área de resultados -->
+        <div id="resultsContainer" style="display: none; margin-top: 20px;">
+          <div id="resultsContent"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" onclick="cerrarModalImport()" style="padding: 8px 16px; border: 1px solid #ddd; background: #f5f5f5; border-radius: 4px; cursor: pointer;">Cancelar</button>
+        <button class="btn btn-primary" id="btnImportar" onclick="subirArchivo()" style="display: none; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">✅ Importar</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #importExcelModal.show {
+      display: flex !important;
+    }
+
+    .upload-zone:hover {
+      border-color: #0056b3;
+    }
+
+    .upload-zone.drag-over {
+      border-color: #0056b3;
+      background-color: #e9ecef;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    }
+
+    #resultsContent {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .resultado-item {
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 4px;
+      border-left: 4px solid;
+      font-size: 14px;
+    }
+
+    .resultado-success {
+      background: #d4edda;
+      border-left-color: #28a745;
+      color: #155724;
+    }
+
+    .resultado-error {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+      color: #721c24;
+    }
+
+    .resultado-warning {
+      background: #fff3cd;
+      border-left-color: #ffc107;
+      color: #856404;
+    }
+  </style>
+
+  <script>
+    let archivoSeleccionado = null;
+
+    // Manejo del upload zone
+    const uploadZone = document.getElementById('uploadZone');
+
+    uploadZone.addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        document.getElementById('fileInput').files = files;
+        handleFileSelect({ target: { files } });
+      }
+    });
+
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      if (files.length === 0) return;
+
+      archivoSeleccionado = files[0];
+      
+      // Validar tamaño
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (archivoSeleccionado.size > maxSize) {
+        alert('El archivo es demasiado grande. Máximo 50MB.');
+        return;
+      }
+
+      // Mostrar información del archivo
+      document.getElementById('fileSelected').style.display = 'block';
+      document.getElementById('fileName').textContent = archivoSeleccionado.name;
+      document.getElementById('fileSize').textContent = 
+        `Tamaño: ${(archivoSeleccionado.size / 1024 / 1024).toFixed(2)} MB`;
+      
+      // Mostrar botón de importación
+      document.getElementById('btnImportar').style.display = 'inline-block';
+    }
+
+    async function subirArchivo() {
+      if (!archivoSeleccionado) {
+        alert('Por favor selecciona un archivo');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', archivoSeleccionado);
+
+      // Mostrar barra de progreso
+      document.getElementById('progressContainer').style.display = 'block';
+      document.getElementById('btnImportar').disabled = true;
+
+      try {
+        const xhr = new XMLHttpRequest();
+
+        // Actualizar progreso
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            document.getElementById('progressBar').value = percentComplete;
+            document.getElementById('progressPercent').textContent = 
+              Math.round(percentComplete) + '%';
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            mostrarResultados(response.resumen);
+          } else {
+            const error = JSON.parse(xhr.responseText);
+            mostrarError(error.error || 'Error desconocido');
+          }
+          document.getElementById('btnImportar').disabled = false;
+        });
+
+        xhr.addEventListener('error', () => {
+          mostrarError('Error en la conexión');
+          document.getElementById('btnImportar').disabled = false;
+        });
+
+        xhr.open('POST', '/api/importar');
+        xhr.send(formData);
+
+      } catch (error) {
+        mostrarError(error.message);
+        document.getElementById('btnImportar').disabled = false;
+      }
+    }
+
+    function mostrarResultados(resumen) {
+      const resultsContainer = document.getElementById('resultsContainer');
+      const resultsContent = document.getElementById('resultsContent');
+
+      let html = `
+        <div style="background: #e8f5e9; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+          <h4 style="margin: 0 0 10px 0; color: #2e7d32;">✅ Importación completada</h4>
+          <p style="margin: 5px 0; color: #558b2f;"><strong>Archivo:</strong> ${resumen.archivo}</p>
+          <p style="margin: 5px 0; color: #558b2f;"><strong>Hora:</strong> ${new Date(resumen.timestamp).toLocaleString('es-ES')}</p>
+        </div>
+
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+          <h5 style="margin: 0 0 10px 0;">Resumen de importación:</h5>
+      `;
+
+      const entidades = ['platos', 'ingredientes', 'escandallos', 'ofertas', 'eventos'];
+      let totalImportados = 0;
+      let totalErrores = 0;
+
+      entidades.forEach(entidad => {
+        const data = resumen[entidad];
+        if (data && (data.importados > 0 || data.errores > 0)) {
+          totalImportados += data.importados;
+          totalErrores += data.errores;
+
+          const label = {
+            platos: '🍽️ Platos',
+            ingredientes: '🥘 Ingredientes',
+            escandallos: '📊 Escandallos',
+            ofertas: '🎁 Ofertas',
+            eventos: '🎉 Eventos'
+          };
+
+          html += `
+            <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 4px; border-left: 4px solid #2196F3;">
+              <div style="display: flex; justify-content: space-between;">
+                <strong>${label[entidad]}</strong>
+                <span style="color: #4caf50;">✓ ${data.importados}</span>
+              </div>
+              ${data.errores > 0 ? `<small style="color: #f44336;">⚠️ ${data.errores} errores</small>` : ''}
+            </div>
+          `;
+        }
+      });
+
+      html += `
+          <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ddd; display: flex; justify-content: space-between;">
+            <strong>Total importados:</strong>
+            <strong style="color: #4caf50; font-size: 18px;">${totalImportados}</strong>
+          </div>
+          ${totalErrores > 0 ? `
+            <div style="margin-top: 8px; color: #f44336;">
+              <strong>⚠️ Errores: ${totalErrores}</strong>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      resultsContent.innerHTML = html;
+      resultsContainer.style.display = 'block';
+      document.getElementById('progressContainer').style.display = 'none';
+    }
+
+    function mostrarError(mensaje) {
+      const resultsContainer = document.getElementById('resultsContainer');
+      const resultsContent = document.getElementById('resultsContent');
+
+      resultsContent.innerHTML = `
+        <div class="resultado-item resultado-error">
+          <strong>❌ Error:</strong> ${mensaje}
+        </div>
+      `;
+
+      resultsContainer.style.display = 'block';
+      document.getElementById('progressContainer').style.display = 'none';
+    }
+
+    function cerrarModalImport() {
+      const modal = document.getElementById('importExcelModal');
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      
+      // Resetear formulario
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileSelected').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('progressContainer').style.display = 'none';
+      document.getElementById('btnImportar').style.display = 'none';
+      archivoSeleccionado = null;
+    }
+
+    function abrirModalImport() {
+      const modal = document.getElementById('importExcelModal');
+      modal.classList.add('show');
+      modal.style.display = 'flex';
+    }
   </script>
 
   <!-- Footer -->
