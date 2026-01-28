@@ -53,6 +53,8 @@ const notificacionesRoutes = require('./src/routes/notificaciones');
 const exportRoutes = require('./src/routes/export');
 const alergenosRoutes = require('./src/routes/alergenos');
 const ofertasRoutes = require('./src/routes/ofertas');
+const importRoutes = require('./src/routes/import');
+const produccionRoutes = require('./src/routes/produccion');
 
 const app = express();
 const log = getLogger();
@@ -161,6 +163,9 @@ app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/partidas-cocina', partidasRoutes);
 app.use('/api/control-sanidad', sanidadRoutes);
 
+// Rutas de producción
+app.use('/api/produccion', produccionRoutes);
+
 // Rutas de notificaciones
 app.use('/api/notificaciones', notificacionesRoutes);
 
@@ -175,6 +180,9 @@ app.use('/api/sanidad', sanidadRoutes);
 
 // Rutas de exportación (descargas masivas)
 app.use('/api/export', exportRoutes);
+
+// Rutas de importación (cargas masivas)
+app.use('/api/importar', importRoutes);
 
 // Rutas de utilidad
 app.get('/api/health', (req, res) => {
@@ -225,6 +233,17 @@ async function startServer() {
     // Hacer io global para acceso desde rutas
     app.locals.io = io;
 
+    // Inicializar Gestor de Alertas de Inventario
+    try {
+      const GestorAlertasInventario = require('./src/utils/gestorAlertasInventario');
+      const gestorAlertas = new GestorAlertasInventario(io);
+      gestorAlertas.iniciar();
+      app.locals.gestorAlertas = gestorAlertas;
+      log.info('✅ Gestor de Alertas de Inventario iniciado');
+    } catch (error) {
+      log.warn('⚠️ No se pudo iniciar el Gestor de Alertas:', error.message);
+    }
+
     // Iniciar servidor
     server.listen(PORT, () => {
       log.info(`Servidor HIBO COCINA iniciado`, {
@@ -264,6 +283,16 @@ async function startServer() {
       
       server.close(async () => {
         log.info('Servidor HTTP cerrado');
+        
+        try {
+          // Detener gestor de alertas
+          if (app.locals.gestorAlertas) {
+            app.locals.gestorAlertas.detener();
+            log.info('Gestor de Alertas detenido');
+          }
+        } catch (err) {
+          log.error('Error al detener Gestor de Alertas', err);
+        }
         
         try {
           // Cerrar WebSocket

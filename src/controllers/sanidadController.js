@@ -3,6 +3,9 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 async function obtenerTodas(req, res, next) {
   try {
@@ -42,8 +45,13 @@ async function crear(req, res, next) {
   try {
     const { plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones } = req.body;
     
-    if (!fecha_produccion) {
-      return res.status(400).json(createResponse(false, null, 'fecha_produccion es requerida', 400));
+    // Validar estructura del control de sanidad (APPCC)
+    const validacion = ServicioValidaciones.validarSanidad(req.body, true);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al crear control de sanidad:', validacion.errores);
+      return res.status(400).json(
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
     }
 
     const db = getDatabase();
@@ -52,9 +60,10 @@ async function crear(req, res, next) {
       [plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones],
       function(err) {
         if (err) {
-          console.error('Error al crear control:', err);
+          logger.error('Error al crear control de sanidad:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
+        logger.info(`Control de sanidad creado: ID ${this.lastID} - ${fecha_produccion}`);
         res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
       }
     );
@@ -68,8 +77,13 @@ async function actualizar(req, res, next) {
     const { id } = req.params;
     const { plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones } = req.body;
     
-    if (!fecha_produccion) {
-      return res.status(400).json(createResponse(false, null, 'fecha_produccion es requerida', 400));
+    // Validar estructura del control de sanidad (APPCC)
+    const validacion = ServicioValidaciones.validarSanidad(req.body, false);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al actualizar control de sanidad:', validacion.errores);
+      return res.status(400).json(
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
     }
 
     const db = getDatabase();
@@ -78,13 +92,14 @@ async function actualizar(req, res, next) {
       [plato_codigo, ingrediente_codigo, fecha_produccion, punto_critico, corrector, responsable, observaciones, id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar control:', err);
+          logger.error('Error al actualizar control de sanidad:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
         if (this.changes === 0) {
-          return res.status(404).json(createResponse(false, null, 'Control no encontrado', 404));
+          return res.status(404).json(createResponse(false, null, 'Control de sanidad no encontrado', 404));
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Control de sanidad actualizado: ID ${id}`);
+        res.json(createResponse(true, { id }, 'Control de sanidad actualizado correctamente', 200));
       }
     );
   } catch (error) {

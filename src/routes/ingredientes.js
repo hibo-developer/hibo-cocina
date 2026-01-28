@@ -8,6 +8,9 @@ const { validate } = require('../middleware/validator');
 const { ingredientesSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 const { emitIngredientesUpdate } = require('../utils/websocket-helper');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const { createResponse } = require('../middleware/errorHandler');
+const { getLogger } = require('../utils/logger');
 
 /**
  * @swagger
@@ -209,6 +212,34 @@ router.delete('/:id', deleteLimiter, async (req, res) => {
   }
 });
 
-module.exports = router;
+/**
+ * @swagger
+ * /api/ingredientes/validar:
+ *   post:
+ *     summary: Validar datos de ingrediente
+ *     description: Valida los datos de un ingrediente sin crear/actualizar el registro
+ *     tags:
+ *       - Ingredientes
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Validación completada
+ */
+router.post('/validar', (req, res) => {
+  try {
+    const validacion = ServicioValidaciones.validarIngrediente(req.body, true);
+    res.json(createResponse(validacion.valido, validacion, 
+      validacion.valido ? 'Datos válidos' : 'Errores de validación'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando ingrediente:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
 
 module.exports = router;

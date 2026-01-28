@@ -1,0 +1,310 @@
+
+> hibo-cocina@1.0.0 test
+> jest --detectOpenHandles __tests__/pedidos.test.js
+
+[GLOBAL SETUP] Eliminada BD de test previa
+[GLOBAL SETUP] Esquema aplicado a BD de test
+[MIGRATIONS] Ejecutando migraciones para base de datos de pruebas...
+[MIGRATIONS] Ô£à 001_tablas_base.sql
+[MIGRATIONS] Ô£à 002_usuarios_y_auth.sql
+[MIGRATIONS] ÔÜá´©Å  003_actualizar_ingredientes.sql - SQLITE_ERROR: duplicate column name: familia
+[MIGRATIONS] ÔÜá´©Å  004_actualizar_platos.sql - SQLITE_ERROR: duplicate column name: familia
+[MIGRATIONS] ÔÜá´©Å  005_alergenos_platos.sql - SQLITE_ERROR: duplicate column name: sesamo
+[MIGRATIONS] ÔÜá´©Å  006_actualizar_inventario.sql - SQLITE_ERROR: duplicate column name: ingrediente_i
+[MIGRATIONS] Ô£à 007_actualizar_inventario_ingrediente_id.sql
+[MIGRATIONS] ÔÜá´©Å  007_agregar_alergenos_faltantes.sql - SQLITE_ERROR: duplicate column name: crustaceos
+[MIGRATIONS] ÔÜá´©Å  007_agregar_tipo_entidades.sql - SQLITE_ERROR: duplicate column name: tipo_entidad
+[MIGRATIONS] ÔÜá´©Å  008_agregar_precios_ingredientes.sql - SQLITE_ERROR: duplicate column name: coste_unidad
+[MIGRATIONS] Ô£à 008_alergenos_personalizados.sql
+[MIGRATIONS] ÔÜá´©Å  009_alergenos_palabras_clave.sql - SQLITE_ERROR: duplicate column name: palabras_clav
+[MIGRATIONS] Ô£à 010_alergenos_oficiales.sql
+[MIGRATIONS] Ô£à 011_corregir_alergenos_mariscos.sql
+[MIGRATIONS] Ô£à 011_notificaciones.sql
+[MIGRATIONS] Ô£à 012_excel_campos_basicos.sql
+[MIGRATIONS] Ô£à 013_excel_raw_data_espejo.sql
+[MIGRATIONS] Ô£à 014_modulo_produccion.sql
+[MIGRATIONS] Ô£à Todas las migraciones completadas
+[GLOBAL SETUP] Base de datos de test lista
+  console.log
+    [TEST SETUP] Redis disabled for testing
+
+      at Object.log (jest.setup.js:43:9)
+
+  console.log
+    [TEST SETUP] Using database: C:\hibo-cocina\data\test-hibo-cocina.db
+
+      at Object.log (jest.setup.js:44:9)
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ­ƒöä add secrets lifecycle management: https://dotenvx.com/ops
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+21:29:01 [[33mwarn[39m] Redis caching disabled
+  console.log
+    Ô£à Conectado a la base de datos SQLite
+
+      at Database.log (src/utils/database.js:23:17)
+
+  console.log
+    Ô£à Test database initialized
+
+      at log (__tests__/helpers/testHelper.js:127:13)
+
+2026-01-27 21:29:01 [[32MINFO[39M]: Usuario registrado: testuser@test.com
+2026-01-27 21:29:01 [[32MINFO[39M]: POST /register
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:02 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:02 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:02 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:02 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:02 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:02 [[32MINFO[39M]: GET /
+2026-01-27 21:29:02 [[32MINFO[39M]: GET /
+2026-01-27 21:29:02 [[32MINFO[39M]: GET /
+2026-01-27 21:29:02 [[32MINFO[39M]: GET /1
+2026-01-27 21:29:02 [[32MINFO[39M]: GET /99999
+2026-01-27 21:29:32 [[33MWARN[39M]: Not found route:
+2026-01-27 21:29:32 [[32MINFO[39M]: POST /api/pedidos/1/items
+2026-01-27 21:29:32 [[33MWARN[39M]: Not found route:
+2026-01-27 21:29:32 [[32MINFO[39M]: DELETE /api/pedidos/1/items/1
+2026-01-27 21:29:32 [[33MWARN[39M]: Not found route:
+2026-01-27 21:29:32 [[32MINFO[39M]: GET /api/pedidos/1/total
+2026-01-27 21:29:52 [[32MINFO[39M]: DELETE /1
+2026-01-27 21:29:52 [[32MINFO[39M]: DELETE /99999
+2026-01-27 21:29:52 [[32MINFO[39M]: GET /
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:52 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:52 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:52 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation failed:
+2026-01-27 21:29:52 [[33MWARN[39M]: Validation error: Errores de validaci├│n en la solicitud
+2026-01-27 21:29:52 [[32MINFO[39M]: POST /api/pedidos
+2026-01-27 21:29:52 [[32MINFO[39M]: GET /
+FAIL __tests__/pedidos.test.js (51.083 s)
+  ­ƒôï M├│dulo de Pedidos
+    POST /api/pedidos - Crear pedido
+      ÔêÜ Ô£à debe crear pedido v├ílido con l├¡neas (19 ms)
+      ÔêÜ ÔØî debe rechazar sin cliente_nombre (23 ms)
+      ÔêÜ ÔØî debe rechazar sin fecha (19 ms)
+      ÔêÜ ÔØî debe rechazar total negativo (26 ms)
+    GET /api/pedidos - Listar pedidos
+      ÔêÜ Ô£à debe obtener lista de pedidos (9 ms)
+      ÔêÜ Ô£à debe retornar estructura correcta (6 ms)
+      ÔêÜ Ô£à debe soportar filtros b├ísicos (6 ms)
+    GET /api/pedidos/:id - Obtener pedido espec├¡fico
+      ÔêÜ Ô£à debe obtener pedido por id (7 ms)
+      ÔêÜ Ô£à GET a id inexistente maneja bien (10 ms)
+    PUT /api/pedidos/:id - Actualizar pedido
+      ├ù Ô£à debe permitir actualizar estado (10009 ms)
+      ├ù Ô£à debe permitir actualizar notas (10012 ms)
+      ├ù Ô£à debe permitir actualizar cliente (10001 ms)
+    POST /api/pedidos/:id/items - Agregar l├¡nea
+      ÔêÜ Ô£à debe aceptar agregar l├¡nea de pedido (23 ms)
+    DELETE /api/pedidos/:id/items/:item_id - Eliminar l├¡nea
+      ÔêÜ Ô£à debe aceptar eliminar l├¡nea de pedido (24 ms)
+    GET /api/pedidos/:id/total - Obtener total
+      ÔêÜ Ô£à debe calcular total (14 ms)
+    Transiciones de Estado
+      ├ù Ô£à debe permitir PENDIENTE -> COMPLETADO (10004 ms)
+      ├ù Ô£à debe permitir PENDIENTE -> CANCELADO (10015 ms)
+    DELETE /api/pedidos/:id - Eliminar pedido
+      ÔêÜ Ô£à endpoint delete responde (16 ms)
+      ÔêÜ Ô£à delete a id inexistente maneja bien (10 ms)
+    Validaciones y Seguridad
+      ÔêÜ ÔØî debe rechazar acceso sin token v├ílido (14 ms)
+      ÔêÜ Ô£à debe validar datos requeridos (22 ms)
+    Casos Especiales
+      ÔêÜ Ô£à debe crear pedido sin l├¡neas (vac├¡o) (34 ms)
+      ÔêÜ Ô£à debe manejar cliente con nombre largo (20 ms)
+      ÔêÜ Ô£à debe soportar m├║ltiples l├¡neas (1 ms)
+      ÔêÜ Ô£à flujo completo: crear -> listar -> obtener -> actualizar -> delete (28 ms)
+
+  ÔùÅ ­ƒôï M├│dulo de Pedidos ÔÇ║ PUT /api/pedidos/:id - Actualizar pedido ÔÇ║ Ô£à debe permitir actualizar estado
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      150 |   describe('PUT /api/pedidos/:id - Actualizar pedido', () => {
+      151 |
+    > 152 |     it('Ô£à debe permitir actualizar estado', async () => {
+          |     ^
+      153 |       const res = await makeAuthRequest('put', '/api/pedidos/1', token)
+      154 |         .send({
+      155 |           estado: 'COMPLETADO'
+
+      at it (__tests__/pedidos.test.js:152:5)
+      at describe (__tests__/pedidos.test.js:150:3)
+      at Object.describe (__tests__/pedidos.test.js:12:1)
+
+  ÔùÅ ­ƒôï M├│dulo de Pedidos ÔÇ║ PUT /api/pedidos/:id - Actualizar pedido ÔÇ║ Ô£à debe permitir actualizar notas
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      159 |     });
+      160 |
+    > 161 |     it('Ô£à debe permitir actualizar notas', async () => {
+          |     ^
+      162 |       const res = await makeAuthRequest('put', '/api/pedidos/1', token)
+      163 |         .send({
+      164 |           notas: 'Sin cebolla'
+
+      at it (__tests__/pedidos.test.js:161:5)
+      at describe (__tests__/pedidos.test.js:150:3)
+      at Object.describe (__tests__/pedidos.test.js:12:1)
+
+  ÔùÅ ­ƒôï M├│dulo de Pedidos ÔÇ║ PUT /api/pedidos/:id - Actualizar pedido ÔÇ║ Ô£à debe permitir actualizar cliente
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      168 |     });
+      169 |
+    > 170 |     it('Ô£à debe permitir actualizar cliente', async () => {
+          |     ^
+      171 |       const res = await makeAuthRequest('put', '/api/pedidos/1', token)
+      172 |         .send({
+      173 |           cliente_nombre: 'Cliente Actualizado'
+
+      at it (__tests__/pedidos.test.js:170:5)
+      at describe (__tests__/pedidos.test.js:150:3)
+      at Object.describe (__tests__/pedidos.test.js:12:1)
+
+  ÔùÅ ­ƒôï M├│dulo de Pedidos ÔÇ║ Transiciones de Estado ÔÇ║ Ô£à debe permitir PENDIENTE -> COMPLETADO
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      228 |   describe('Transiciones de Estado', () => {
+      229 |
+    > 230 |     it('Ô£à debe permitir PENDIENTE -> COMPLETADO', async () => {
+          |     ^
+      231 |       const res = await makeAuthRequest('put', '/api/pedidos/1', token)
+      232 |         .send({ estado: 'COMPLETADO' });
+      233 |
+
+      at it (__tests__/pedidos.test.js:230:5)
+      at describe (__tests__/pedidos.test.js:228:3)
+      at Object.describe (__tests__/pedidos.test.js:12:1)
+
+  ÔùÅ ­ƒôï M├│dulo de Pedidos ÔÇ║ Transiciones de Estado ÔÇ║ Ô£à debe permitir PENDIENTE -> CANCELADO
+
+    thrown: "Exceeded timeout of 10000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      235 |     });
+      236 |
+    > 237 |     it('Ô£à debe permitir PENDIENTE -> CANCELADO', async () => {
+          |     ^
+      238 |       const res = await makeAuthRequest('put', '/api/pedidos/1', token)
+      239 |         .send({ estado: 'CANCELADO' });
+      240 |
+
+      at it (__tests__/pedidos.test.js:237:5)
+      at describe (__tests__/pedidos.test.js:228:3)
+      at Object.describe (__tests__/pedidos.test.js:12:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 20 passed, 25 total
+Snapshots:   0 total
+Time:        51.116 s, estimated 52 s
+Ran all test suites matching __tests__/pedidos.test.js.
+
+Jest has detected the following 5 open handles potentially keeping Jest from exiting:
+
+  ÔùÅ  TCPSERVERWRAP
+
+      80 |  */
+      81 | function makeAuthRequest(method, path, token) {
+    > 82 |   const req = request(app)[method](path);
+         |                                   ^
+      83 |   if (token) {
+      84 |     req.set('Authorization', `Bearer ${token}`);
+      85 |   }
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as put] (node_modules/supertest/index.js:40:18)
+      at makeAuthRequest (__tests__/helpers/testHelper.js:82:35)
+      at Object.makeAuthRequest (__tests__/pedidos.test.js:153:25)
+
+
+  ÔùÅ  TCPSERVERWRAP
+
+      80 |  */
+      81 | function makeAuthRequest(method, path, token) {
+    > 82 |   const req = request(app)[method](path);
+         |                                   ^
+      83 |   if (token) {
+      84 |     req.set('Authorization', `Bearer ${token}`);
+      85 |   }
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as put] (node_modules/supertest/index.js:40:18)
+      at makeAuthRequest (__tests__/helpers/testHelper.js:82:35)
+      at Object.makeAuthRequest (__tests__/pedidos.test.js:162:25)
+
+
+  ÔùÅ  TCPSERVERWRAP
+
+      80 |  */
+      81 | function makeAuthRequest(method, path, token) {
+    > 82 |   const req = request(app)[method](path);
+         |                                   ^
+      83 |   if (token) {
+      84 |     req.set('Authorization', `Bearer ${token}`);
+      85 |   }
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as put] (node_modules/supertest/index.js:40:18)
+      at makeAuthRequest (__tests__/helpers/testHelper.js:82:35)
+      at Object.makeAuthRequest (__tests__/pedidos.test.js:171:25)
+
+
+  ÔùÅ  TCPSERVERWRAP
+
+      80 |  */
+      81 | function makeAuthRequest(method, path, token) {
+    > 82 |   const req = request(app)[method](path);
+         |                                   ^
+      83 |   if (token) {
+      84 |     req.set('Authorization', `Bearer ${token}`);
+      85 |   }
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as put] (node_modules/supertest/index.js:40:18)
+      at makeAuthRequest (__tests__/helpers/testHelper.js:82:35)
+      at Object.makeAuthRequest (__tests__/pedidos.test.js:231:25)
+
+
+  ÔùÅ  TCPSERVERWRAP
+
+      80 |  */
+      81 | function makeAuthRequest(method, path, token) {
+    > 82 |   const req = request(app)[method](path);
+         |                                   ^
+      83 |   if (token) {
+      84 |     req.set('Authorization', `Bearer ${token}`);
+      85 |   }
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.<computed> [as put] (node_modules/supertest/index.js:40:18)
+      at makeAuthRequest (__tests__/helpers/testHelper.js:82:35)
+      at Object.makeAuthRequest (__tests__/pedidos.test.js:238:25)
+

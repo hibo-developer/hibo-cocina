@@ -2,6 +2,9 @@
  * Controlador para gestión de notificaciones
  */
 const Notificacion = require('../models/Notificacion');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 /**
  * Obtener todas las notificaciones de un usuario

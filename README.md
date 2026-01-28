@@ -13,6 +13,8 @@ HIBO Cocina es una aplicación web completa para la gestión de restaurantes que
 - **Pedidos**: Gestión de pedidos a proveedores
 - **Producción**: Partidas de cocina y trazabilidad
 - **Sanidad (APPCC)**: Control de sanidad alimentaria
+- **Ofertas y Eventos**: Gestión comercial y promociones
+- **Importación de Excel**: 📤 Carga masiva de datos desde archivos
 - **Estadísticas**: Dashboard con métricas y gráficos
 
 ## 🚀 Inicio Rápido
@@ -143,6 +145,39 @@ npm test           # Ejecutar tests
 - `POST /api/platos` - Crear nuevo plato
 - `PUT /api/platos/:id` - Actualizar plato
 - `DELETE /api/platos/:id` - Eliminar plato
+
+#### 📤 Importación de Datos
+
+- `POST /api/importar` - Importar datos desde archivo Excel/CSV
+  - **Formatos soportados**: .xlsx, .xls, .csv
+  - **Tamaño máximo**: 50MB
+  - **Auto-detección**: Por nombre de archivo
+  - **Tipo de archivos**:
+    - `platos.xlsx` → Importa Platos
+    - `ingredientes.xlsx` → Importa Ingredientes
+    - `escandallos.xlsx` → Importa Escandallos
+    - `oferta_c.xlsx` → Importa Ofertas y Eventos
+
+**Ejemplo (curl)**:
+```bash
+curl -X POST http://localhost:3000/api/importar \
+  -F "file=@data/platos.xlsx"
+```
+
+**Respuesta**:
+```json
+{
+  "success": true,
+  "resumen": {
+    "archivo": "platos.xlsx",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "platos": { "importados": 5, "errores": 0 },
+    "ingredientes": { "importados": 0, "errores": 0 },
+    "ofertas": { "importados": 0, "errores": 0 },
+    "eventos": { "importados": 0, "errores": 0 }
+  }
+}
+```
 
 (Similar para ingredientes, escandallos, inventario, pedidos, etc.)
 

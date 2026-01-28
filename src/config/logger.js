@@ -46,19 +46,17 @@ const logger = winston.createLogger({
   ]
 });
 
-// Agregar console transport en desarrollo
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({ format: 'HH:mm:ss' }),
-        winston.format.printf(
-          (info) => `${info.timestamp} [${info.level}] ${info.message}`
-        )
+// Agregar console transport (siempre)
+logger.add(
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.timestamp({ format: 'HH:mm:ss' }),
+      winston.format.printf(
+        (info) => `${info.timestamp} [${info.level}] ${info.message}${info.stack ? '\n' + info.stack : ''}`
       )
-    })
-  );
-}
+    )
+  })
+);
 
 module.exports = logger;

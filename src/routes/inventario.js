@@ -8,6 +8,9 @@ const { validate } = require('../middleware/validator');
 const { inventarioSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 const { emitInventarioUpdate } = require('../utils/websocket-helper');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const { createResponse } = require('../middleware/errorHandler');
+const { getLogger } = require('../utils/logger');
 
 /**
  * @swagger
@@ -199,6 +202,85 @@ router.delete('/:id', deleteLimiter, async (req, res) => {
   }
 });
 
-module.exports = router;
+/**
+ * @swagger
+ * /api/inventario/validar:
+ *   post:
+ *     summary: Validar datos de movimiento de inventario
+ *     description: Valida los datos de un movimiento sin registrarlo
+ *     tags:
+ *       - Inventario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ */
+router.post('/validar', (req, res) => {
+  try {
+    const validacion = ServicioValidaciones.validarMovimientoInventario(req.body, true);
+    res.json(createResponse(validacion.valido, validacion, 
+      validacion.valido ? 'Datos válidos' : 'Errores de validación'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando movimiento de inventario:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
+
+/**
+ * @swagger
+ * /api/inventario/alertas:
+ *   get:
+ *     summary: Obtener alertas de inventario
+ *     description: Retorna alertas de stock bajo, próximo a caducar, etc.
+ *     tags:
+ *       - Inventario
+ *     parameters:
+ *       - in: query
+ *         name: tipo
+ *         schema:
+ *           type: string
+ *           enum: [bajo, critico, caducidad, todos]
+ *     responses:
+ *       200:
+ *         description: Alertas obtenidas
+ */
+router.get('/alertas', inventarioController.obtenerAlertas);
+
+/**
+ * @swagger
+ * /api/inventario/alertas/criticas:
+ *   get:
+ *     summary: Obtener solo alertas críticas
+ *     description: Retorna items con stock crítico (< 50% del mínimo)
+ *     tags:
+ *       - Inventario
+ *     responses:
+ *       200:
+ *         description: Alertas críticas obtenidas
+ */
+router.get('/alertas/criticas', inventarioController.obtenerAlertasCriticas);
+
+/**
+ * @swagger
+ * /api/inventario/alertas/caducidad:
+ *   get:
+ *     summary: Obtener alertas de caducidad
+ *     description: Retorna items próximos a vencer o vencidos
+ *     tags:
+ *       - Inventario
+ *     parameters:
+ *       - in: query
+ *         name: dias
+ *         schema:
+ *           type: integer
+ *           default: 7
+ *     responses:
+ *       200:
+ *         description: Alertas de caducidad obtenidas
+ */
+router.get('/alertas/caducidad', inventarioController.obtenerAlertasCaducidad);
 
 module.exports = router;

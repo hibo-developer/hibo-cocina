@@ -3,6 +3,9 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 async function obtenerTodas(req, res, next) {
   try {
@@ -52,9 +55,10 @@ async function crear(req, res, next) {
       [nombre, responsable, descripcion, activo !== false ? 1 : 0],
       function(err) {
         if (err) {
-          console.error('Error al crear partida:', err);
+          logger.error('Error al crear partida:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
+        logger.info(`Partida creada: ID ${this.lastID} - ${nombre}`);
         res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
       }
     );
@@ -78,13 +82,14 @@ async function actualizar(req, res, next) {
       [nombre, responsable, descripcion, activo ? 1 : 0, id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar partida:', err);
+          logger.error('Error al actualizar partida:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
         if (this.changes === 0) {
           return res.status(404).json(createResponse(false, null, 'Partida no encontrada', 404));
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Partida actualizada: ID ${id} - ${nombre}`);
+        res.json(createResponse(true, { id }, 'Partida actualizada correctamente', 200));
       }
     );
   } catch (error) {

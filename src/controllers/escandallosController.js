@@ -3,6 +3,9 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 async function obtenerTodos(req, res, next) {
   try {
@@ -48,22 +51,55 @@ async function crear(req, res, next) {
   try {
     const { plato_id, ingrediente_id, cantidad } = req.body;
     
-    if (!plato_id || !ingrediente_id) {
+    // Validar estructura del escandallo
+    const validacion = ServicioValidaciones.validarEscandallo(req.body, true);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al crear escandallo:', validacion.errores);
       return res.status(400).json(
-        createResponse(false, null, 'plato_id e ingrediente_id son requeridos', 400)
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
       );
     }
 
+    // Validar referencias a plato e ingrediente
+    const refValidas = await ServicioValidaciones.validarReferencias('escandallo', {
+      plato_id,
+      ingrediente_id
+    });
+    if (!refValidas.valido) {
+      return res.status(400).json(
+        createResponse(false, { errores: refValidas.errores }, 'Referencias inválidas', 400)
+      );
+    }
+
+    // Validar que no exista escandallo duplicado
     const db = getDatabase();
-    db.run(
-      'INSERT INTO escandallos (plato_id, ingrediente_id, cantidad) VALUES (?, ?, ?)',
-      [plato_id, ingrediente_id, cantidad || 0],
-      function(err) {
+    db.get(
+      'SELECT id FROM escandallos WHERE plato_id = ? AND ingrediente_id = ?',
+      [plato_id, ingrediente_id],
+      (err, row) => {
         if (err) {
-          console.error('Error al crear escandallo:', err);
+          logger.error('Error al verificar escandallo duplicado:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
-        res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
+        if (row) {
+          return res.status(400).json(
+            createResponse(false, null, 'Ya existe un escandallo con este plato e ingrediente', 400)
+          );
+        }
+
+        // Crear escandallo
+        db.run(
+          'INSERT INTO escandallos (plato_id, ingrediente_id, cantidad) VALUES (?, ?, ?)',
+          [plato_id, ingrediente_id, cantidad || 0],
+          function(err) {
+            if (err) {
+              logger.error('Error al crear escandallo:', err);
+              return res.status(500).json(createResponse(false, null, err.message, 500));
+            }
+            logger.info(`Escandallo creado: ID ${this.lastID} - Plato ${plato_id}, Ingrediente ${ingrediente_id}`);
+            res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
+          }
+        );
       }
     );
   } catch (error) {
@@ -76,9 +112,23 @@ async function actualizar(req, res, next) {
     const { id } = req.params;
     const { plato_id, ingrediente_id, cantidad } = req.body;
     
-    if (!plato_id || !ingrediente_id) {
+    // Validar estructura del escandallo
+    const validacion = ServicioValidaciones.validarEscandallo(req.body, false);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al actualizar escandallo:', validacion.errores);
       return res.status(400).json(
-        createResponse(false, null, 'plato_id e ingrediente_id son requeridos', 400)
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
+    }
+
+    // Validar referencias a plato e ingrediente
+    const refValidas = await ServicioValidaciones.validarReferencias('escandallo', {
+      plato_id,
+      ingrediente_id
+    });
+    if (!refValidas.valido) {
+      return res.status(400).json(
+        createResponse(false, { errores: refValidas.errores }, 'Referencias inválidas', 400)
       );
     }
 
@@ -88,13 +138,14 @@ async function actualizar(req, res, next) {
       [plato_id, ingrediente_id, cantidad, id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar escandallo:', err);
+          logger.error('Error al actualizar escandallo:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
         if (this.changes === 0) {
           return res.status(404).json(createResponse(false, null, 'Escandallo no encontrado', 404));
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Escandallo actualizado: ID ${id}`);
+        res.json(createResponse(true, { id }, 'Escandallo actualizado correctamente', 200));
       }
     );
   } catch (error) {

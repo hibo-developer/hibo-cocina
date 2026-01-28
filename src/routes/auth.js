@@ -12,10 +12,13 @@ const Joi = require('joi');
 // Esquemas de validación para auth
 const authSchemas = {
   register: Joi.object({
-    username: Joi.string().required().alphanum().min(3).max(30).messages({
-      'any.required': 'username es requerido',
-      'string.alphanum': 'username solo puede contener letras y números',
-      'string.min': 'username debe tener al menos 3 caracteres'
+    email: Joi.string().email().required().messages({
+      'any.required': 'email es requerido',
+      'string.email': 'email no válido'
+    }),
+    nombre: Joi.string().required().min(2).max(100).messages({
+      'any.required': 'nombre es requerido',
+      'string.min': 'nombre debe tener al menos 2 caracteres'
     }),
     password: Joi.string().required().min(6).max(100).messages({
       'any.required': 'password es requerido',
@@ -23,8 +26,9 @@ const authSchemas = {
     })
   }),
   login: Joi.object({
-    username: Joi.string().required().messages({
-      'any.required': 'username es requerido'
+    email: Joi.string().email().required().messages({
+      'any.required': 'email es requerido',
+      'string.email': 'email no válido'
     }),
     password: Joi.string().required().messages({
       'any.required': 'password es requerido'

@@ -7,6 +7,9 @@ const escandallosController = require('../controllers/escandallosController');
 const { validate } = require('../middleware/validator');
 const { escandallosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const { createResponse } = require('../middleware/errorHandler');
+const { getLogger } = require('../utils/logger');
 
 /**
  * @swagger
@@ -129,6 +132,31 @@ router.put('/:id', updateLimiter, validate(escandallosSchemas.actualizar), escan
  */
 router.delete('/:id', deleteLimiter, escandallosController.eliminar);
 
-module.exports = router;
+/**
+ * @swagger
+ * /api/escandallos/validar:
+ *   post:
+ *     summary: Validar datos de escandallo
+ *     description: Valida los datos de un escandallo sin crear/actualizar el registro
+ *     tags:
+ *       - Escandallos
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ */
+router.post('/validar', (req, res) => {
+  try {
+    const validacion = ServicioValidaciones.validarEscandallo(req.body, true);
+    res.json(createResponse(validacion.valido, validacion, 
+      validacion.valido ? 'Datos válidos' : 'Errores de validación'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando escandallo:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
 
 module.exports = router;

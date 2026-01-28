@@ -36,6 +36,56 @@ class ServicioExcel {
   }
 
   /**
+   * Normaliza texto para comparar nombres de columnas
+   * - Minúsculas
+   * - Sin acentos
+   * - Sin espacios extra ni caracteres no alfanuméricos
+   */
+  static normalizarTexto(valor) {
+    if (valor === null || valor === undefined) return '';
+    const texto = String(valor)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // quitar acentos
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[^a-z0-9_]/g, '');
+    return texto;
+  }
+
+  /**
+   * Obtiene el primer campo existente usando una lista de sinónimos
+   * Busca por coincidencia normalizada (tolerante a acentos y espacios)
+   */
+  static getCampo(fila, sinonimos = []) {
+    if (!fila || !sinonimos || sinonimos.length === 0) return null;
+
+    // Crear mapa normalizado de claves → valor
+    const mapa = new Map();
+    for (const [clave, valor] of Object.entries(fila)) {
+      mapa.set(ServicioExcel.normalizarTexto(clave), valor);
+    }
+
+    // Probar sinónimos
+    for (const s of sinonimos) {
+      const claveNorm = ServicioExcel.normalizarTexto(s);
+      if (mapa.has(claveNorm)) {
+        const v = mapa.get(claveNorm);
+        if (v !== null && v !== undefined && String(v).trim() !== '') {
+          return v;
+        }
+      }
+    }
+
+    // Si no se encontró, intentar heurística: primera columna no vacía
+    for (const v of Object.values(fila)) {
+      if (v !== null && v !== undefined && String(v).trim() !== '') {
+        return v;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Limpia un array de datos (como limpiar_dataframe en Python)
    * - Elimina filas completamente vacías
    * - Normaliza nombres de columnas

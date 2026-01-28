@@ -8,6 +8,10 @@ const { validate } = require('../middleware/validator');
 const { platosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 const { emitPlatosUpdate, getIO } = require('../utils/websocket-helper');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const { createResponse } = require('../middleware/errorHandler');
+const { getLogger } = require('../utils/logger');
 
 /**
  * @swagger
@@ -304,4 +308,102 @@ router.delete('/:id', deleteLimiter, async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// NUEVOS ENDPOINTS - CÁLCULOS Y VALIDACIONES
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * @swagger
+ * /api/platos/{id}/coste:
+ *   get:
+ *     summary: Calcular coste de un plato
+ *     description: Calcula el coste total del plato basado en sus escandallos
+ *     tags:
+ *       - Platos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Coste calculado correctamente
+ */
+router.get('/:id/coste', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const coste = await ServicioCalculos.calcularCostePlato(parseInt(id));
+    res.json(createResponse(true, coste, 'Coste calculado'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error calculando coste:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
+
+/**
+ * @swagger
+ * /api/platos/{id}/margen:
+ *   get:
+ *     summary: Calcular margen de ganancia
+ *     description: Calcula el margen de ganancia del plato
+ *     tags:
+ *       - Platos
+ */
+router.get('/:id/margen', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const margen = await ServicioCalculos.calcularMargen(parseInt(id));
+    res.json(createResponse(true, margen, 'Margen calculado'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error calculando margen:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
+
+/**
+ * @swagger
+ * /api/platos/{id}/disponibilidad:
+ *   get:
+ *     summary: Validar disponibilidad de ingredientes
+ *     description: Verifica si hay stock suficiente para elaborar el plato
+ *     tags:
+ *       - Platos
+ */
+router.get('/:id/disponibilidad', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const disponibilidad = await ServicioCalculos.validarDisponibilidadIngredientes(parseInt(id));
+    res.json(createResponse(true, disponibilidad, 'Disponibilidad validada'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando disponibilidad:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
+
+/**
+ * @swagger
+ * /api/platos/validar:
+ *   post:
+ *     summary: Validar datos de plato
+ *     description: Valida los datos de un plato antes de crear/editar
+ *     tags:
+ *       - Platos
+ */
+router.post('/validar', (req, res) => {
+  try {
+    const validacion = ServicioValidaciones.validarPlato(req.body, true);
+    res.json(createResponse(validacion.valido, validacion, 
+      validacion.valido ? 'Datos válidos' : 'Errores de validación'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando:', error);
+    res.status(500).json(createResponse(false, null, error.message));
+  }
+});
+
 module.exports = router;
+

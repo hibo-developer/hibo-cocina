@@ -59,9 +59,13 @@ function closeDatabase(db) {
  * Registrar usuario de prueba y obtener token
  */
 async function registerAndLogin(username = 'testuser', password = 'testpass123') {
+  // Convertir username a email format para el nuevo esquema
+  const email = username.includes('@') ? username : `${username}@test.com`;
+  const nombre = username;
+  
   const registerRes = await request(app)
     .post('/api/auth/register')
-    .send({ username, password });
+    .send({ email, nombre, password });
 
   if (registerRes.status !== 201) {
     throw new Error(`Failed to register: ${registerRes.body.error}`);

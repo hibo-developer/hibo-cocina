@@ -8,6 +8,9 @@ const { validate } = require('../middleware/validator');
 const { pedidosSchemas } = require('../middleware/validationSchemas');
 const { createLimiter, updateLimiter, deleteLimiter } = require('../middleware/rateLimiter');
 const { emitPedidosUpdate, emitNotification } = require('../utils/websocket-helper');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const { createResponse } = require('../middleware/errorHandler');
+const { getLogger } = require('../utils/logger');
 
 /**
  * @swagger
@@ -255,6 +258,33 @@ router.delete('/:id', async (req, res) => {
     }
   } catch (error) {
     // Error ya manejado por el controlador
+  }
+});
+
+/**
+ * @swagger
+ * /api/pedidos/validar:
+ *   post:
+ *     summary: Validar datos de pedido
+ *     description: Valida los datos de un pedido sin crear/actualizar el registro
+ *     tags:
+ *       - Pedidos
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ */
+router.post('/validar', (req, res) => {
+  try {
+    const validacion = ServicioValidaciones.validarPedido(req.body, true);
+    res.json(createResponse(validacion.valido, validacion, 
+      validacion.valido ? 'Datos válidos' : 'Errores de validación'));
+  } catch (error) {
+    const log = getLogger();
+    log.error('Error validando pedido:', error);
+    res.status(500).json(createResponse(false, null, error.message));
   }
 });
 

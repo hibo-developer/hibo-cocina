@@ -3,6 +3,9 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 // ============================================================================
 // OFERTAS
@@ -50,15 +53,24 @@ async function crearOferta(req, res, next) {
       return res.status(400).json(createResponse(false, null, 'codigo y nombre son requeridos', 400));
     }
 
+    // Verificar código único
+    const esUnico = await ServicioValidaciones.verificarCodigoUnico('ofertas', codigo);
+    if (!esUnico) {
+      return res.status(400).json(
+        createResponse(false, null, `Código '${codigo}' ya existe en ofertas`, 400)
+      );
+    }
+
     const db = getDatabase();
     db.run(
       'INSERT INTO ofertas (codigo, nombre, descripcion, tipo, precio_regular, precio_oferta, descuento_porcentaje, fecha_inicio, fecha_fin, platos, ingredientes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [codigo, nombre, descripcion, tipo || 'oferta', precio_regular, precio_oferta, descuento_porcentaje, fecha_inicio, fecha_fin, platos, ingredientes],
       function(err) {
         if (err) {
-          console.error('Error al crear oferta:', err);
+          logger.error('Error al crear oferta:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
+        logger.info(`Oferta creada: ID ${this.lastID} - ${nombre}`);
         res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
       }
     );
@@ -76,19 +88,28 @@ async function actualizarOferta(req, res, next) {
       return res.status(400).json(createResponse(false, null, 'codigo y nombre son requeridos', 400));
     }
 
+    // Verificar código único (excluir ID actual)
+    const esUnico = await ServicioValidaciones.verificarCodigoUnico('ofertas', codigo, id);
+    if (!esUnico) {
+      return res.status(400).json(
+        createResponse(false, null, `Código '${codigo}' ya existe en otra oferta`, 400)
+      );
+    }
+
     const db = getDatabase();
     db.run(
       'UPDATE ofertas SET codigo = ?, nombre = ?, descripcion = ?, tipo = ?, estado = ?, precio_regular = ?, precio_oferta = ?, descuento_porcentaje = ?, fecha_inicio = ?, fecha_fin = ?, platos = ?, ingredientes = ? WHERE id = ?',
       [codigo, nombre, descripcion, tipo, estado, precio_regular, precio_oferta, descuento_porcentaje, fecha_inicio, fecha_fin, platos, ingredientes, id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar oferta:', err);
+          logger.error('Error al actualizar oferta:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
         if (this.changes === 0) {
           return res.status(404).json(createResponse(false, null, 'Oferta no encontrada', 404));
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Oferta actualizada: ID ${id} - ${nombre}`);
+        res.json(createResponse(true, { id }, 'Oferta actualizada correctamente', 200));
       }
     );
   } catch (error) {

@@ -4,6 +4,8 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
 
 /**
  * GET /api/platos
@@ -60,19 +62,29 @@ async function obtenerPorId(req, res, next) {
  */
 async function crear(req, res, next) {
   try {
-    const { codigo, nombre, tipo, pvp, coste_produccion, activo, descripcion } = req.body;
+    const { codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion, familia, alergenos } = req.body;
     
-    // Validaciones básicas
-    if (!nombre || !codigo) {
+    // Validar datos
+    const validacion = ServicioValidaciones.validarPlato(req.body, true);
+    if (!validacion.valido) {
       return res.status(400).json(
-        createResponse(false, null, 'nombre y codigo son requeridos', 400)
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
+    }
+
+    // Verificar código único
+    const esUnico = await ServicioValidaciones.verificarCodigoUnico('platos', codigo);
+    if (!esUnico) {
+      return res.status(400).json(
+        createResponse(false, null, `El código ${codigo} ya existe`, 400)
       );
     }
 
     const db = getDatabase();
     db.run(
-      'INSERT INTO platos (codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [codigo, nombre, tipo, pvp || 0, coste_produccion || 0, activo !== false ? 1 : 0, descripcion],
+      `INSERT INTO platos (codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion, familia) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [codigo, nombre, tipo, precio_venta || 0, coste_racion || 0, activo !== false ? 1 : 0, descripcion || '', familia || ''],
       function(err) {
         if (err) {
           console.error('Error al crear plato:', err);
@@ -81,7 +93,7 @@ async function crear(req, res, next) {
           );
         }
         res.status(201).json(
-          createResponse(true, { id: this.lastID }, null, 201)
+          createResponse(true, { id: this.lastID }, 'Plato creado correctamente', 201)
         );
       }
     );
@@ -99,19 +111,31 @@ async function actualizar(req, res, next) {
     const { id } = req.params;
     const { codigo, nombre, tipo, precio_venta, coste_racion, activo, descripcion, familia } = req.body;
     
-    if (!nombre || !codigo) {
+    // Validar datos
+    const validacion = ServicioValidaciones.validarPlato(req.body, false);
+    if (!validacion.valido) {
       return res.status(400).json(
-        createResponse(false, null, 'nombre y codigo son requeridos', 400)
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
       );
+    }
+
+    // Verificar código único (excluyendo el actual)
+    if (codigo) {
+      const esUnico = await ServicioValidaciones.verificarCodigoUnico('platos', codigo, parseInt(id));
+      if (!esUnico) {
+        return res.status(400).json(
+          createResponse(false, null, `El código ${codigo} ya existe en otro plato`, 400)
+        );
+      }
     }
 
     const db = getDatabase();
     db.run(
-      'UPDATE platos SET codigo = ?, nombre = ?, tipo = ?, precio_venta = ?, coste_racion = ?, activo = ?, descripcion = ?, familia = ? WHERE id = ?',
-      [codigo, nombre, tipo, precio_venta, coste_racion, activo ? 1 : 0, descripcion, familia, id],
+      `UPDATE platos SET codigo = ?, nombre = ?, tipo = ?, precio_venta = ?, coste_racion = ?, activo = ?, descripcion = ?, familia = ? WHERE id = ?`,
+      [codigo, nombre, tipo, precio_venta || 0, coste_racion || 0, activo ? 1 : 0, descripcion || '', familia || '', id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar plato:', err);
+          logger.error('Error al actualizar plato:', err);
           return res.status(500).json(
             createResponse(false, null, err.message, 500)
           );
@@ -121,7 +145,10 @@ async function actualizar(req, res, next) {
             createResponse(false, null, 'Plato no encontrado', 404)
           );
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Plato actualizado: ID ${id} - ${nombre}`);
+        res.json(
+          createResponse(true, { id }, 'Plato actualizado correctamente', 200)
+        );
       }
     );
   } catch (error) {

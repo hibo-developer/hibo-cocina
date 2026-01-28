@@ -10,6 +10,8 @@ const {
   comparePasswords, 
   generateAuthResponse 
 } = require('../utils/auth');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const logger = require('../utils/logger');
 
 /**
  * POST /api/auth/register
@@ -17,11 +19,20 @@ const {
  */
 async function register(req, res, next) {
   try {
-    const { username, password } = req.body;
+    const { email, nombre, password } = req.body;
 
-    if (!username || !password) {
+    // Validar campos requeridos
+    if (!email || !nombre || !password) {
       return res.status(400).json(
-        createResponse(false, null, 'username y password son requeridos', 400)
+        createResponse(false, null, 'email, nombre y password son requeridos', 400)
+      );
+    }
+
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json(
+        createResponse(false, null, 'email no válido', 400)
       );
     }
 
@@ -33,59 +44,40 @@ async function register(req, res, next) {
 
     // Hashear contraseña
     const hashedPassword = await hashPassword(password);
-
-    // Crear tabla de usuarios si no existe
     const db = getDatabase();
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT DEFAULT 'user',
-        activo INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
 
-    db.run(createTableQuery, (err) => {
-      if (err && !err.message.includes('table usuarios already exists')) {
-        console.error('Error creando tabla usuarios:', err);
-        return res.status(500).json(
-          createResponse(false, null, err.message, 500)
-        );
-      }
-
-      // Insertar nuevo usuario
-      db.run(
-        'INSERT INTO usuarios (username, password, role) VALUES (?, ?, ?)',
-        [username, hashedPassword, 'user'],
-        function(err) {
-          if (err) {
-            if (err.message.includes('UNIQUE constraint failed')) {
-              return res.status(409).json(
-                createResponse(false, null, 'username ya existe', 409)
-              );
-            }
-            console.error('Error al crear usuario:', err);
-            return res.status(500).json(
-              createResponse(false, null, err.message, 500)
+    // Insertar nuevo usuario (tabla ya existe por migraciones)
+    db.run(
+      'INSERT INTO usuarios (email, nombre, password_hash, rol) VALUES (?, ?, ?, ?)',
+      [email, nombre, hashedPassword, 'usuario'],
+      function(err) {
+        if (err) {
+          if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(409).json(
+              createResponse(false, null, 'email ya existe', 409)
             );
           }
-
-          const userData = {
-            id: this.lastID,
-            username,
-            role: 'user'
-          };
-
-          const authResponse = generateAuthResponse(userData);
-          res.status(201).json(
-            createResponse(true, authResponse, null, 201)
+          console.error('Error al crear usuario:', err);
+          return res.status(500).json(
+            createResponse(false, null, err.message, 500)
           );
         }
-      );
-    });
+
+        const userData = {
+          id: this.lastID,
+          email,
+          nombre,
+          rol: 'usuario'
+        };
+
+        const authResponse = generateAuthResponse(userData);
+        logger.info(`Usuario registrado: ${email}`);
+        
+        res.status(201).json(
+          createResponse(true, authResponse, null, 201)
+        );
+      }
+    );
   } catch (error) {
     next(error);
   }
@@ -97,20 +89,20 @@ async function register(req, res, next) {
  */
 async function login(req, res, next) {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json(
-        createResponse(false, null, 'username y password son requeridos', 400)
+        createResponse(false, null, 'email y password son requeridos', 400)
       );
     }
 
     const db = getDatabase();
 
-    // Buscar usuario
+    // Buscar usuario por email
     db.get(
-      'SELECT * FROM usuarios WHERE username = ? AND activo = 1',
-      [username],
+      'SELECT * FROM usuarios WHERE email = ? AND activo = 1',
+      [email],
       async (err, user) => {
         if (err) {
           console.error('Error al buscar usuario:', err);
@@ -121,27 +113,35 @@ async function login(req, res, next) {
 
         if (!user) {
           return res.status(401).json(
-            createResponse(false, null, 'Usuario o contraseña incorrectos', 401)
+            createResponse(false, null, 'Email o contraseña incorrectos', 401)
           );
         }
 
         // Verificar contraseña
         try {
-          const passwordMatch = await comparePasswords(password, user.password);
+          const passwordMatch = await comparePasswords(password, user.password_hash);
 
           if (!passwordMatch) {
             return res.status(401).json(
-              createResponse(false, null, 'Usuario o contraseña incorrectos', 401)
+              createResponse(false, null, 'Email o contraseña incorrectos', 401)
             );
           }
+
+          // Actualizar last_login
+          db.run(
+            'UPDATE usuarios SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+            [user.id]
+          );
 
           // Contraseña correcta - generar token
           const authResponse = generateAuthResponse({
             id: user.id,
-            username: user.username,
-            role: user.role
+            email: user.email,
+            nombre: user.nombre,
+            rol: user.rol
           });
 
+          logger.info(`Usuario autenticado: ${email}`);
           res.json(createResponse(true, authResponse, null, 200));
         } catch (error) {
           console.error('Error al verificar contraseña:', error);

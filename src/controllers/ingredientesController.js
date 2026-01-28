@@ -3,6 +3,9 @@
  */
 const { getDatabase } = require('../utils/database');
 const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 async function obtenerTodos(req, res, next) {
   try {
@@ -40,21 +43,37 @@ async function obtenerPorId(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    const { nombre, unidad, precio, stock_actual, activo } = req.body;
+    const { codigo, nombre, unidad, precio, peso_neto, stock_actual, activo } = req.body;
     
-    if (!nombre) {
-      return res.status(400).json(createResponse(false, null, 'nombre es requerido', 400));
+    // Validar estructura del ingrediente
+    const validacion = ServicioValidaciones.validarIngrediente(req.body, true);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al crear ingrediente:', validacion.errores);
+      return res.status(400).json(
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
+    }
+
+    // Verificar código único
+    if (codigo) {
+      const esUnico = await ServicioValidaciones.verificarCodigoUnico('ingredientes', codigo);
+      if (!esUnico) {
+        return res.status(400).json(
+          createResponse(false, null, `Código '${codigo}' ya existe en ingredientes`, 400)
+        );
+      }
     }
 
     const db = getDatabase();
     db.run(
-      'INSERT INTO ingredientes (nombre, unidad, precio, stock_actual, activo) VALUES (?, ?, ?, ?, ?)',
-      [nombre, unidad || 'kg', precio || 0, stock_actual || 0, activo !== false ? 1 : 0],
+      'INSERT INTO ingredientes (codigo, nombre, unidad, precio, peso_neto, stock_actual, activo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [codigo || null, nombre, unidad || 'kg', precio || 0, peso_neto || 0, stock_actual || 0, activo !== false ? 1 : 0],
       function(err) {
         if (err) {
-          console.error('Error al crear ingrediente:', err);
+          logger.error('Error al crear ingrediente:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
+        logger.info(`Ingrediente creado: ID ${this.lastID} - ${nombre}`);
         res.status(201).json(createResponse(true, { id: this.lastID }, null, 201));
       }
     );
@@ -66,25 +85,41 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     const { id } = req.params;
-    const { nombre, unidad, precio, stock_actual, activo } = req.body;
+    const { codigo, nombre, unidad, precio, peso_neto, stock_actual, activo } = req.body;
     
-    if (!nombre) {
-      return res.status(400).json(createResponse(false, null, 'nombre es requerido', 400));
+    // Validar estructura del ingrediente
+    const validacion = ServicioValidaciones.validarIngrediente(req.body, false);
+    if (!validacion.valido) {
+      logger.error('Validación fallida al actualizar ingrediente:', validacion.errores);
+      return res.status(400).json(
+        createResponse(false, { errores: validacion.errores }, 'Errores de validación', 400)
+      );
+    }
+
+    // Verificar código único (excluir ID actual)
+    if (codigo) {
+      const esUnico = await ServicioValidaciones.verificarCodigoUnico('ingredientes', codigo, id);
+      if (!esUnico) {
+        return res.status(400).json(
+          createResponse(false, null, `Código '${codigo}' ya existe en otro ingrediente`, 400)
+        );
+      }
     }
 
     const db = getDatabase();
     db.run(
-      'UPDATE ingredientes SET nombre = ?, unidad = ?, precio = ?, stock_actual = ?, activo = ? WHERE id = ?',
-      [nombre, unidad, precio, stock_actual, activo ? 1 : 0, id],
+      'UPDATE ingredientes SET codigo = ?, nombre = ?, unidad = ?, precio = ?, peso_neto = ?, stock_actual = ?, activo = ? WHERE id = ?',
+      [codigo || null, nombre, unidad, precio, peso_neto, stock_actual, activo ? 1 : 0, id],
       function(err) {
         if (err) {
-          console.error('Error al actualizar ingrediente:', err);
+          logger.error('Error al actualizar ingrediente:', err);
           return res.status(500).json(createResponse(false, null, err.message, 500));
         }
         if (this.changes === 0) {
           return res.status(404).json(createResponse(false, null, 'Ingrediente no encontrado', 404));
         }
-        res.json(createResponse(true, { id }, null, 200));
+        logger.info(`Ingrediente actualizado: ID ${id} - ${nombre}`);
+        res.json(createResponse(true, null, 'Ingrediente actualizado correctamente', 200));
       }
     );
   } catch (error) {

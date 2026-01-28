@@ -1,4 +1,8 @@
 const { getDatabase } = require('../utils/database');
+const { createResponse } = require('../middleware/errorHandler');
+const ServicioValidaciones = require('../utils/servicioValidaciones');
+const ServicioCalculos = require('../utils/servicioCalculos');
+const logger = require('../utils/logger');
 
 const alergenosController = {
   // Listar todos los alérgenos personalizados

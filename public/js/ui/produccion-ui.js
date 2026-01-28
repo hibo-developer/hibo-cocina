@@ -81,6 +81,11 @@ async function cargarConsumosProduccion() {
 
 async function cargarEstadisticasProduccion() {
   try {
+    // Destruir gráficos previos
+    if (window.ChartsModule) {
+      ChartsModule.destroyAll();
+    }
+
     const desde = document.getElementById('filtroFechaDesdeStats')?.value || '';
     const hasta = document.getElementById('filtroFechaHastaStats')?.value || '';
 
@@ -88,9 +93,13 @@ async function cargarEstadisticasProduccion() {
     if (desde) filtros.desde = desde;
     if (hasta) filtros.hasta = hasta;
 
-    const response = await ProduccionService.obtenerEstadisticas(filtros);
-    if (response.success) {
-      const stats = response.data;
+    // Obtener datos de estadísticas y órdenes
+    const statsResponse = await ProduccionService.obtenerEstadisticas(filtros);
+    const ordenesResponse = await ProduccionService.obtenerOrdenes(filtros);
+    const rendimientosResponse = await ProduccionService.obtenerRendimientos(filtros);
+
+    if (statsResponse.success) {
+      const stats = statsResponse.data;
       
       // Actualizar cards de estadísticas
       document.getElementById('statTotalOrdenes').textContent = stats.total_ordenes || 0;
@@ -99,6 +108,42 @@ async function cargarEstadisticasProduccion() {
       document.getElementById('statOrdenesCanceladas').textContent = stats.ordenes_canceladas || 0;
       document.getElementById('statRendimiento').textContent = (stats.rendimiento_general || 0).toFixed(2) + '%';
       document.getElementById('statCosteTotal').textContent = '$' + (stats.coste_total || 0).toFixed(2);
+
+      // Crear gráficos si ChartsModule está disponible
+      if (window.ChartsModule && ordenesResponse.success && rendimientosResponse.success) {
+        const ordenes = ordenesResponse.data || [];
+        const rendimientos = rendimientosResponse.data || [];
+
+        // Gráfico de Producción - Últimos 30 días
+        try {
+          ChartsModule.createProduccionTimeseriesChart('chartProduccionTimeseries', ordenes);
+        } catch (e) { console.warn('Error al crear gráfico de timeseries:', e); }
+
+        // Gráfico de Rendimiento
+        try {
+          ChartsModule.createRendimientoChart('chartRendimiento', rendimientos);
+        } catch (e) { console.warn('Error al crear gráfico de rendimiento:', e); }
+
+        // Gráfico de Estados
+        try {
+          ChartsModule.createEstadosChart('chartEstados', ordenes);
+        } catch (e) { console.warn('Error al crear gráfico de estados:', e); }
+
+        // Gráfico de Costes
+        try {
+          ChartsModule.createCostesChart('chartCostes', rendimientos);
+        } catch (e) { console.warn('Error al crear gráfico de costes:', e); }
+
+        // Gráfico de Inventario
+        try {
+          ChartsModule.createInventarioChart('chartInventario', rendimientos);
+        } catch (e) { console.warn('Error al crear gráfico de inventario:', e); }
+
+        // Gráfico Comparativo
+        try {
+          ChartsModule.createComparativePlatos('chartComparative', rendimientos);
+        } catch (e) { console.warn('Error al crear gráfico comparativo:', e); }
+      }
 
       // Cargar rendimientos
       await cargarRendimientosTabla();

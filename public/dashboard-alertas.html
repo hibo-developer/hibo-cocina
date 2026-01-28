@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Alertas - Hibo Cocina</title>
+  <link rel="stylesheet" href="/css/dashboard-alertas.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚨 Dashboard de Alertas de Inventario</h1>
+      <p class="subtitle">
+        <span class="status-indicator connected" id="statusIndicator"></span>
+        <span id="statusText">Conectado en tiempo real</span> | 
+        Última actualización: <span id="lastUpdate">--:--:--</span>
+      </p>
+    </header>
+
+    <div id="loading" class="loading">
+      <div>⏳ Cargando alertas...</div>
+    </div>
+
+    <div id="content" style="display: none;">
+      <!-- Resumen -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-number critical" id="summaryEmergencias">0</div>
+          <div class="summary-label">🔴 Emergencias</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number critical" id="summaryCriticas">0</div>
+          <div class="summary-label">🔴 Críticas</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number warning" id="summaryBajas">0</div>
+          <div class="summary-label">🟡 Stock Bajo</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number warning" id="summaryVencidos">0</div>
+          <div class="summary-label">❌ Vencidos</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-number" id="summaryProximosVencer">0</div>
+          <div class="summary-label">⚠️ Próximos a Vencer</div>
+        </div>
+      </div>
+
+      <!-- Alertas -->
+      <div class="dashboard">
+        <!-- Alertas Críticas -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔴 Emergencias y Críticas</div>
+            <span class="badge critical" id="badgeCriticas">0</span>
+          </div>
+          <ul class="alert-list" id="alertasCriticas">
+            <li class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div>Sin alertas críticas</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Stock Bajo -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🟡 Stock Bajo</div>
+            <span class="badge warning" id="badgeBajas">0</span>
+          </div>
+          <ul class="alert-list" id="alertasBajas">
+            <li class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div>Sin alertas de stock bajo</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Productos Vencidos -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">❌ Productos Vencidos</div>
+            <span class="badge critical" id="badgeVencidos">0</span>
+          </div>
+          <ul class="alert-list" id="alertasVencidos">
+            <li class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div>Sin productos vencidos</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Próximos a Vencer -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚠️ Próximos a Vencer</div>
+            <span class="badge info" id="badgeProximosVencer">0</span>
+          </div>
+          <ul class="alert-list" id="alertasProximosVencer">
+            <li class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div>Sin productos próximos a vencer</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <button class="refresh-btn" onclick="cargarAlertas()">
+      🔄 Actualizar
+    </button>
+  </div>
+
+  <!-- Socket.io para notificaciones en tiempo real -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <script>
+    // Configuración
+    const API_BASE = 'http://localhost:3000/api';
+    let token = null; // Aquí deberías obtener el token del usuario autenticado
+
+    // Socket.io
+    const socket = io('http://localhost:3000');
+
+    socket.on('connect', () => {
+      console.log('✅ Conectado al servidor WebSocket');
+      document.getElementById('statusIndicator').className = 'status-indicator connected';
+      document.getElementById('statusText').textContent = 'Conectado en tiempo real';
+      socket.emit('join', 'inventario-alerts');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('❌ Desconectado del servidor');
+      document.getElementById('statusIndicator').className = 'status-indicator disconnected';
+      document.getElementById('statusText').textContent = 'Desconectado';
+    });
+
+    socket.on('alerta-inventario', (alerta) => {
+      console.log('🚨 Nueva alerta:', alerta);
+      mostrarNotificacion(alerta);
+      // Recargar alertas después de recibir notificación
+      setTimeout(cargarAlertas, 1000);
+    });
+
+    // Funciones
+    function mostrarNotificacion(alerta) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${alerta.severidad === 'CRÍTICA' ? 'critical' : 'warning'}`;
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 24px; margin-right: 10px;">${alerta.icono}</span>
+          <div>
+            <strong>${alerta.tipo}</strong><br>
+            <span style="font-size: 13px; color: #666;">${alerta.ingrediente}</span>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: #666;">
+          ${alerta.accion}
+        </div>
+      `;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 5000);
+    }
+
+    async function cargarAlertas() {
+      try {
+        // Cargar alertas críticas
+        const resCriticas = await fetch(`${API_BASE}/inventario/alertas/criticas`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const dataCriticas = await resCriticas.json();
+
+        // Cargar alertas de caducidad
+        const resCaducidad = await fetch(`${API_BASE}/inventario/alertas/caducidad`, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        const dataCaducidad = await resCaducidad.json();
+
+        // Actualizar UI
+        if (dataCriticas.success && dataCaducidad.success) {
+          actualizarDashboard(dataCriticas.data, dataCaducidad.data);
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+          document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+      } catch (error) {
+        console.error('❌ Error al cargar alertas:', error);
+        alert('Error al cargar alertas. Por favor, verifica que el servidor esté corriendo.');
+      }
+    }
+
+    function actualizarDashboard(criticas, caducidad) {
+      // Actualizar resumen
+      document.getElementById('summaryEmergencias').textContent = criticas.resumen.emergencias || 0;
+      document.getElementById('summaryCriticas').textContent = criticas.resumen.criticas || 0;
+      document.getElementById('summaryBajas').textContent = criticas.resumen.bajas || 0;
+      document.getElementById('summaryVencidos').textContent = caducidad.resumen.vencidos || 0;
+      document.getElementById('summaryProximosVencer').textContent = caducidad.resumen.proximo_vencer || 0;
+
+      // Actualizar badges
+      const totalCriticas = (criticas.resumen.emergencias || 0) + (criticas.resumen.criticas || 0);
+      document.getElementById('badgeCriticas').textContent = totalCriticas;
+      document.getElementById('badgeBajas').textContent = criticas.resumen.bajas || 0;
+      document.getElementById('badgeVencidos').textContent = caducidad.resumen.vencidos || 0;
+      document.getElementById('badgeProximosVencer').textContent = caducidad.resumen.proximo_vencer || 0;
+
+      // Renderizar alertas críticas
+      const listaCriticas = document.getElementById('alertasCriticas');
+      const todasCriticas = [...criticas.emergencias, ...criticas.criticas];
+      listaCriticas.innerHTML = todasCriticas.length > 0 
+        ? todasCriticas.map(a => `
+            <li class="alert-item critical">
+              <div class="alert-item-header">
+                <span class="alert-name">${a.ingrediente_nombre}</span>
+                <span class="alert-icon">🔴</span>
+              </div>
+              <div class="alert-details">
+                Stock: ${a.cantidad} ${a.unidad || 'unidades'} (Mínimo: ${a.stock_minimo})<br>
+                Falta: ${a.falta_porcentaje?.toFixed(1)}%<br>
+                <strong>${a.nivel_severidad}</strong>
+              </div>
+              <button class="alert-action critical-action">🛒 Solicitar compra</button>
+            </li>
+          `).join('')
+        : '<li class="empty-state"><div class="empty-state-icon">✅</div><div>Sin alertas críticas</div></li>';
+
+      // Renderizar stock bajo
+      const listaBajas = document.getElementById('alertasBajas');
+      listaBajas.innerHTML = criticas.bajas.length > 0
+        ? criticas.bajas.map(a => `
+            <li class="alert-item warning">
+              <div class="alert-item-header">
+                <span class="alert-name">${a.ingrediente_nombre}</span>
+                <span class="alert-icon">🟡</span>
+              </div>
+              <div class="alert-details">
+                Stock: ${a.cantidad} ${a.unidad || 'unidades'} (Mínimo: ${a.stock_minimo})<br>
+                Falta: ${a.falta_porcentaje?.toFixed(1)}%
+              </div>
+              <button class="alert-action">📝 Revisar</button>
+            </li>
+          `).join('')
+        : '<li class="empty-state"><div class="empty-state-icon">✅</div><div>Sin alertas de stock bajo</div></li>';
+
+      // Renderizar vencidos
+      const listaVencidos = document.getElementById('alertasVencidos');
+      listaVencidos.innerHTML = caducidad.vencidos.length > 0
+        ? caducidad.vencidos.map(a => `
+            <li class="alert-item expired">
+              <div class="alert-item-header">
+                <span class="alert-name">${a.ingrediente_nombre}</span>
+                <span class="alert-icon">❌</span>
+              </div>
+              <div class="alert-details">
+                Lote: ${a.lote}<br>
+                Vencido hace ${Math.abs(a.dias_restantes)} días<br>
+                Cantidad: ${a.cantidad} ${a.unidad || 'unidades'}
+              </div>
+              <button class="alert-action critical-action">🗑️ Descartar</button>
+            </li>
+          `).join('')
+        : '<li class="empty-state"><div class="empty-state-icon">✅</div><div>Sin productos vencidos</div></li>';
+
+      // Renderizar próximos a vencer
+      const listaProximosVencer = document.getElementById('alertasProximosVencer');
+      listaProximosVencer.innerHTML = caducidad.proximo_vencer.length > 0
+        ? caducidad.proximo_vencer.map(a => `
+            <li class="alert-item warning">
+              <div class="alert-item-header">
+                <span class="alert-name">${a.ingrediente_nombre}</span>
+                <span class="alert-icon">⚠️</span>
+              </div>
+              <div class="alert-details">
+                Vence en: ${a.dias_restantes} días<br>
+                Lote: ${a.lote}<br>
+                Cantidad: ${a.cantidad} ${a.unidad || 'unidades'}
+              </div>
+              <button class="alert-action">🍽️ Usar en menú</button>
+            </li>
+          `).join('')
+        : '<li class="empty-state"><div class="empty-state-icon">✅</div><div>Sin productos próximos a vencer</div></li>';
+    }
+
+    // Cargar al iniciar
+    document.addEventListener('DOMContentLoaded', cargarAlertas);
+
+    // Auto-refresh cada 2 minutos
+    setInterval(cargarAlertas, 120000);
+  </script>
+</body>
+</html>
